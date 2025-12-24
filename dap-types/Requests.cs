@@ -2,68 +2,111 @@
 // To regenerate from schema, run `cargo run -p generator`.
 
 using System;
+using System.Runtime.Serialization;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Linq;
 
 namespace Dap
 {
-    [JsonConverter(typeof(StringEnumConverter), typeof(CamelCaseNamingStrategy))]
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum Command
     {
+        [EnumMember(Value = "cancel")]
         Cancel,
+        [EnumMember(Value = "runInTerminal")]
         RunInTerminal,
+        [EnumMember(Value = "startDebugging")]
         StartDebugging,
+        [EnumMember(Value = "initialize")]
         Initialize,
+        [EnumMember(Value = "configurationDone")]
         ConfigurationDone,
+        [EnumMember(Value = "launch")]
         Launch,
+        [EnumMember(Value = "attach")]
         Attach,
+        [EnumMember(Value = "restart")]
         Restart,
+        [EnumMember(Value = "disconnect")]
         Disconnect,
+        [EnumMember(Value = "terminate")]
         Terminate,
+        [EnumMember(Value = "breakpointLocations")]
         BreakpointLocations,
+        [EnumMember(Value = "setBreakpoints")]
         SetBreakpoints,
+        [EnumMember(Value = "setFunctionBreakpoints")]
         SetFunctionBreakpoints,
+        [EnumMember(Value = "setExceptionBreakpoints")]
         SetExceptionBreakpoints,
+        [EnumMember(Value = "dataBreakpointInfo")]
         DataBreakpointInfo,
+        [EnumMember(Value = "setDataBreakpoints")]
         SetDataBreakpoints,
+        [EnumMember(Value = "setInstructionBreakpoints")]
         SetInstructionBreakpoints,
+        [EnumMember(Value = "continue")]
         Continue,
+        [EnumMember(Value = "next")]
         Next,
+        [EnumMember(Value = "stepIn")]
         StepIn,
+        [EnumMember(Value = "stepOut")]
         StepOut,
+        [EnumMember(Value = "stepBack")]
         StepBack,
+        [EnumMember(Value = "reverseContinue")]
         ReverseContinue,
+        [EnumMember(Value = "restartFrame")]
         RestartFrame,
+        [EnumMember(Value = "goto")]
         Goto,
+        [EnumMember(Value = "pause")]
         Pause,
+        [EnumMember(Value = "stackTrace")]
         StackTrace,
+        [EnumMember(Value = "scopes")]
         Scopes,
+        [EnumMember(Value = "variables")]
         Variables,
+        [EnumMember(Value = "setVariable")]
         SetVariable,
+        [EnumMember(Value = "source")]
         Source,
+        [EnumMember(Value = "threads")]
         Threads,
+        [EnumMember(Value = "terminateThreads")]
         TerminateThreads,
+        [EnumMember(Value = "modules")]
         Modules,
+        [EnumMember(Value = "loadedSources")]
         LoadedSources,
+        [EnumMember(Value = "evaluate")]
         Evaluate,
+        [EnumMember(Value = "setExpression")]
         SetExpression,
+        [EnumMember(Value = "stepInTargets")]
         StepInTargets,
+        [EnumMember(Value = "gotoTargets")]
         GotoTargets,
+        [EnumMember(Value = "completions")]
         Completions,
+        [EnumMember(Value = "exceptionInfo")]
         ExceptionInfo,
+        [EnumMember(Value = "readMemory")]
         ReadMemory,
+        [EnumMember(Value = "writeMemory")]
         WriteMemory,
+        [EnumMember(Value = "disassemble")]
         Disassemble,
+        [EnumMember(Value = "locations")]
         Locations,
     }
 
     public partial abstract class Request
     {
-        [JsonProperty("command")]
-        public abstract Dap.Command Command { get; }
-
-        public partial static Request ParseMessage(JObject message)
+        private partial static Request ParseInternal(JObject message)
         {
             switch (message.Value<Dap.Command>("command"))
             {
@@ -163,12 +206,361 @@ namespace Dap
         }
     }
 
+    /// The `cancel` request is used by the client in two situations:
+    /// - to indicate that it is no longer interested in the result produced by a specific request issued earlier
+    /// - to cancel a progress sequence.
+    /// Clients should only call this request if the corresponding capability `supportsCancelRequest` is true.
+    /// This request has a hint characteristic: a debug adapter can only be expected to make a 'best effort' in honoring this request but there are no guarantees.
+    /// The `cancel` request may return an error if it could not cancel an operation but a client should refrain from presenting this error to end users.
+    /// The request that got cancelled still needs to send a response back. This can either be a normal result (`success` attribute true) or an error response (`success` attribute false and the `message` set to `cancelled`).
+    /// Returning partial results from a cancelled request is possible but please note that a client has no generic way for detecting that a response is partial or not.
+    /// The progress that got cancelled still needs to send a `progressEnd` event back.
+    ///  A client should not assume that progress just got cancelled after sending the `cancel` request.
+    public sealed class CancelRequest : Request<CancelArguments>
+    {
+        public override Dap.Command Command => Dap.Command.Cancel;
+    }
+
+    /// This request is sent from the debug adapter to the client to run a command in a terminal.
+    /// This is typically used to launch the debuggee in a terminal provided by the client.
+    /// This request should only be called if the corresponding client capability `supportsRunInTerminalRequest` is true.
+    /// Client implementations of `runInTerminal` are free to run the command however they choose including issuing the command to a command line interpreter (aka 'shell'). Argument strings passed to the `runInTerminal` request must arrive verbatim in the command to be run. As a consequence, clients which use a shell are responsible for escaping any special shell characters in the argument strings to prevent them from being interpreted (and modified) by the shell.
+    /// Some users may wish to take advantage of shell processing in the argument strings. For clients which implement `runInTerminal` using an intermediary shell, the `argsCanBeInterpretedByShell` property can be set to true. In this case the client is requested not to escape any special shell characters in the argument strings.
+    public sealed class RunInTerminalRequest : Request<RunInTerminalRequestArguments>
+    {
+        public override Dap.Command Command => Dap.Command.RunInTerminal;
+    }
+
+    /// This request is sent from the debug adapter to the client to start a new debug session of the same type as the caller.
+    /// This request should only be sent if the corresponding client capability `supportsStartDebuggingRequest` is true.
+    /// A client implementation of `startDebugging` should start a new debug session (of the same type as the caller) in the same way that the caller's session was started. If the client supports hierarchical debug sessions, the newly created session can be treated as a child of the caller session.
+    public sealed class StartDebuggingRequest : Request<StartDebuggingRequestArguments>
+    {
+        public override Dap.Command Command => Dap.Command.StartDebugging;
+    }
+
+    /// The `initialize` request is sent as the first request from the client to the debug adapter in order to configure it with client capabilities and to retrieve capabilities from the debug adapter.
+    /// Until the debug adapter has responded with an `initialize` response, the client must not send any additional requests or events to the debug adapter.
+    /// In addition the debug adapter is not allowed to send any requests or events to the client until it has responded with an `initialize` response.
+    /// The `initialize` request may only be sent once.
+    public sealed class InitializeRequest : Request<InitializeRequestArguments>
+    {
+        public override Dap.Command Command => Dap.Command.Initialize;
+    }
+
+    /// This request indicates that the client has finished initialization of the debug adapter.
+    /// So it is the last request in the sequence of configuration requests (which was started by the `initialized` event).
+    /// Clients should only call this request if the corresponding capability `supportsConfigurationDoneRequest` is true.
+    public sealed class ConfigurationDoneRequest : Request<ConfigurationDoneArguments>
+    {
+        public override Dap.Command Command => Dap.Command.ConfigurationDone;
+    }
+
+    /// This launch request is sent from the client to the debug adapter to start the debuggee with or without debugging (if `noDebug` is true).
+    /// Since launching is debugger/runtime specific, the arguments for this request are not part of this specification.
+    public sealed class LaunchRequest : GenericRequest
+    {
+        public override Dap.Command Command => Dap.Command.Launch;
+    }
+
+    /// The `attach` request is sent from the client to the debug adapter to attach to a debuggee that is already running.
+    /// Since attaching is debugger/runtime specific, the arguments for this request are not part of this specification.
+    public sealed class AttachRequest : GenericRequest
+    {
+        public override Dap.Command Command => Dap.Command.Attach;
+    }
+
+    /// Restarts a debug session. Clients should only call this request if the corresponding capability `supportsRestartRequest` is true.
+    /// If the capability is missing or has the value false, a typical client emulates `restart` by terminating the debug adapter first and then launching it anew.
+    public sealed class RestartRequest : GenericRequest
+    {
+        public override Dap.Command Command => Dap.Command.Restart;
+    }
+
+    /// The `disconnect` request asks the debug adapter to disconnect from the debuggee (thus ending the debug session) and then to shut down itself (the debug adapter).
+    /// In addition, the debug adapter must terminate the debuggee if it was started with the `launch` request. If an `attach` request was used to connect to the debuggee, then the debug adapter must not terminate the debuggee.
+    /// This implicit behavior of when to terminate the debuggee can be overridden with the `terminateDebuggee` argument (which is only supported by a debug adapter if the corresponding capability `supportTerminateDebuggee` is true).
+    public sealed class DisconnectRequest : Request<DisconnectArguments>
+    {
+        public override Dap.Command Command => Dap.Command.Disconnect;
+    }
+
+    /// The `terminate` request is sent from the client to the debug adapter in order to shut down the debuggee gracefully. Clients should only call this request if the capability `supportsTerminateRequest` is true.
+    /// Typically a debug adapter implements `terminate` by sending a software signal which the debuggee intercepts in order to clean things up properly before terminating itself.
+    /// Please note that this request does not directly affect the state of the debug session: if the debuggee decides to veto the graceful shutdown for any reason by not terminating itself, then the debug session just continues.
+    /// Clients can surface the `terminate` request as an explicit command or they can integrate it into a two stage Stop command that first sends `terminate` to request a graceful shutdown, and if that fails uses `disconnect` for a forceful shutdown.
+    public sealed class TerminateRequest : Request<TerminateArguments>
+    {
+        public override Dap.Command Command => Dap.Command.Terminate;
+    }
+
+    /// The `breakpointLocations` request returns all possible locations for source breakpoints in a given range.
+    /// Clients should only call this request if the corresponding capability `supportsBreakpointLocationsRequest` is true.
+    public sealed class BreakpointLocationsRequest : Request<BreakpointLocationsArguments>
+    {
+        public override Dap.Command Command => Dap.Command.BreakpointLocations;
+    }
+
+    /// Sets multiple breakpoints for a single source and clears all previous breakpoints in that source.
+    /// To clear all breakpoint for a source, specify an empty array.
+    /// When a breakpoint is hit, a `stopped` event (with reason `breakpoint`) is generated.
+    public sealed class SetBreakpointsRequest : Request<SetBreakpointsArguments>
+    {
+        public override Dap.Command Command => Dap.Command.SetBreakpoints;
+    }
+
+    /// Replaces all existing function breakpoints with new function breakpoints.
+    /// To clear all function breakpoints, specify an empty array.
+    /// When a function breakpoint is hit, a `stopped` event (with reason `function breakpoint`) is generated.
+    /// Clients should only call this request if the corresponding capability `supportsFunctionBreakpoints` is true.
+    public sealed class SetFunctionBreakpointsRequest : Request<SetFunctionBreakpointsArguments>
+    {
+        public override Dap.Command Command => Dap.Command.SetFunctionBreakpoints;
+    }
+
+    /// The request configures the debugger's response to thrown exceptions. Each of the `filters`, `filterOptions`, and `exceptionOptions` in the request are independent configurations to a debug adapter indicating a kind of exception to catch. An exception thrown in a program should result in a `stopped` event from the debug adapter (with reason `exception`) if any of the configured filters match.
+    /// Clients should only call this request if the corresponding capability `exceptionBreakpointFilters` returns one or more filters.
+    public sealed class SetExceptionBreakpointsRequest : Request<SetExceptionBreakpointsArguments>
+    {
+        public override Dap.Command Command => Dap.Command.SetExceptionBreakpoints;
+    }
+
+    /// Obtains information on a possible data breakpoint that could be set on an expression or variable.
+    /// Clients should only call this request if the corresponding capability `supportsDataBreakpoints` is true.
+    public sealed class DataBreakpointInfoRequest : Request<DataBreakpointInfoArguments>
+    {
+        public override Dap.Command Command => Dap.Command.DataBreakpointInfo;
+    }
+
+    /// Replaces all existing data breakpoints with new data breakpoints.
+    /// To clear all data breakpoints, specify an empty array.
+    /// When a data breakpoint is hit, a `stopped` event (with reason `data breakpoint`) is generated.
+    /// Clients should only call this request if the corresponding capability `supportsDataBreakpoints` is true.
+    public sealed class SetDataBreakpointsRequest : Request<SetDataBreakpointsArguments>
+    {
+        public override Dap.Command Command => Dap.Command.SetDataBreakpoints;
+    }
+
+    /// Replaces all existing instruction breakpoints. Typically, instruction breakpoints would be set from a disassembly window.
+    /// To clear all instruction breakpoints, specify an empty array.
+    /// When an instruction breakpoint is hit, a `stopped` event (with reason `instruction breakpoint`) is generated.
+    /// Clients should only call this request if the corresponding capability `supportsInstructionBreakpoints` is true.
+    public sealed class SetInstructionBreakpointsRequest : Request<SetInstructionBreakpointsArguments>
+    {
+        public override Dap.Command Command => Dap.Command.SetInstructionBreakpoints;
+    }
+
+    /// The request resumes execution of all threads. If the debug adapter supports single thread execution (see capability `supportsSingleThreadExecutionRequests`), setting the `singleThread` argument to true resumes only the specified thread. If not all threads were resumed, the `allThreadsContinued` attribute of the response should be set to false.
+    public sealed class ContinueRequest : Request<ContinueArguments>
+    {
+        public override Dap.Command Command => Dap.Command.Continue;
+    }
+
+    /// The request executes one step (in the given granularity) for the specified thread and allows all other threads to run freely by resuming them.
+    /// If the debug adapter supports single thread execution (see capability `supportsSingleThreadExecutionRequests`), setting the `singleThread` argument to true prevents other suspended threads from resuming.
+    /// The debug adapter first sends the response and then a `stopped` event (with reason `step`) after the step has completed.
+    public sealed class NextRequest : Request<NextArguments>
+    {
+        public override Dap.Command Command => Dap.Command.Next;
+    }
+
+    /// The request resumes the given thread to step into a function/method and allows all other threads to run freely by resuming them.
+    /// If the debug adapter supports single thread execution (see capability `supportsSingleThreadExecutionRequests`), setting the `singleThread` argument to true prevents other suspended threads from resuming.
+    /// If the request cannot step into a target, `stepIn` behaves like the `next` request.
+    /// The debug adapter first sends the response and then a `stopped` event (with reason `step`) after the step has completed.
+    /// If there are multiple function/method calls (or other targets) on the source line,
+    /// the argument `targetId` can be used to control into which target the `stepIn` should occur.
+    /// The list of possible targets for a given source line can be retrieved via the `stepInTargets` request.
+    public sealed class StepInRequest : Request<StepInArguments>
+    {
+        public override Dap.Command Command => Dap.Command.StepIn;
+    }
+
+    /// The request resumes the given thread to step out (return) from a function/method and allows all other threads to run freely by resuming them.
+    /// If the debug adapter supports single thread execution (see capability `supportsSingleThreadExecutionRequests`), setting the `singleThread` argument to true prevents other suspended threads from resuming.
+    /// The debug adapter first sends the response and then a `stopped` event (with reason `step`) after the step has completed.
+    public sealed class StepOutRequest : Request<StepOutArguments>
+    {
+        public override Dap.Command Command => Dap.Command.StepOut;
+    }
+
+    /// The request executes one backward step (in the given granularity) for the specified thread and allows all other threads to run backward freely by resuming them.
+    /// If the debug adapter supports single thread execution (see capability `supportsSingleThreadExecutionRequests`), setting the `singleThread` argument to true prevents other suspended threads from resuming.
+    /// The debug adapter first sends the response and then a `stopped` event (with reason `step`) after the step has completed.
+    /// Clients should only call this request if the corresponding capability `supportsStepBack` is true.
+    public sealed class StepBackRequest : Request<StepBackArguments>
+    {
+        public override Dap.Command Command => Dap.Command.StepBack;
+    }
+
+    /// The request resumes backward execution of all threads. If the debug adapter supports single thread execution (see capability `supportsSingleThreadExecutionRequests`), setting the `singleThread` argument to true resumes only the specified thread. If not all threads were resumed, the `allThreadsContinued` attribute of the response should be set to false.
+    /// Clients should only call this request if the corresponding capability `supportsStepBack` is true.
+    public sealed class ReverseContinueRequest : Request<ReverseContinueArguments>
+    {
+        public override Dap.Command Command => Dap.Command.ReverseContinue;
+    }
+
+    /// The request restarts execution of the specified stack frame.
+    /// The debug adapter first sends the response and then a `stopped` event (with reason `restart`) after the restart has completed.
+    /// Clients should only call this request if the corresponding capability `supportsRestartFrame` is true.
+    public sealed class RestartFrameRequest : Request<RestartFrameArguments>
+    {
+        public override Dap.Command Command => Dap.Command.RestartFrame;
+    }
+
+    /// The request sets the location where the debuggee will continue to run.
+    /// This makes it possible to skip the execution of code or to execute code again.
+    /// The code between the current location and the goto target is not executed but skipped.
+    /// The debug adapter first sends the response and then a `stopped` event with reason `goto`.
+    /// Clients should only call this request if the corresponding capability `supportsGotoTargetsRequest` is true (because only then goto targets exist that can be passed as arguments).
+    public sealed class GotoRequest : Request<GotoArguments>
+    {
+        public override Dap.Command Command => Dap.Command.Goto;
+    }
+
+    /// The request suspends the debuggee.
+    /// The debug adapter first sends the response and then a `stopped` event (with reason `pause`) after the thread has been paused successfully.
+    public sealed class PauseRequest : Request<PauseArguments>
+    {
+        public override Dap.Command Command => Dap.Command.Pause;
+    }
+
+    /// The request returns a stacktrace from the current execution state of a given thread.
+    /// A client can request all stack frames by omitting the startFrame and levels arguments. For performance-conscious clients and if the corresponding capability `supportsDelayedStackTraceLoading` is true, stack frames can be retrieved in a piecemeal way with the `startFrame` and `levels` arguments. The response of the `stackTrace` request may contain a `totalFrames` property that hints at the total number of frames in the stack. If a client needs this total number upfront, it can issue a request for a single (first) frame and depending on the value of `totalFrames` decide how to proceed. In any case a client should be prepared to receive fewer frames than requested, which is an indication that the end of the stack has been reached.
+    public sealed class StackTraceRequest : Request<StackTraceArguments>
+    {
+        public override Dap.Command Command => Dap.Command.StackTrace;
+    }
+
+    /// The request returns the variable scopes for a given stack frame ID.
+    public sealed class ScopesRequest : Request<ScopesArguments>
+    {
+        public override Dap.Command Command => Dap.Command.Scopes;
+    }
+
+    /// Retrieves all child variables for the given variable reference.
+    /// A filter can be used to limit the fetched children to either named or indexed children.
+    public sealed class VariablesRequest : Request<VariablesArguments>
+    {
+        public override Dap.Command Command => Dap.Command.Variables;
+    }
+
+    /// Set the variable with the given name in the variable container to a new value. Clients should only call this request if the corresponding capability `supportsSetVariable` is true.
+    /// If a debug adapter implements both `setVariable` and `setExpression`, a client will only use `setExpression` if the variable has an `evaluateName` property.
+    public sealed class SetVariableRequest : Request<SetVariableArguments>
+    {
+        public override Dap.Command Command => Dap.Command.SetVariable;
+    }
+
+    /// The request retrieves the source code for a given source reference.
+    public sealed class SourceRequest : Request<SourceArguments>
+    {
+        public override Dap.Command Command => Dap.Command.Source;
+    }
+
+    /// The request retrieves a list of all threads.
+    public sealed class ThreadsRequest : Request
+    {
+        public override Dap.Command Command => Dap.Command.Threads;
+    }
+
+    /// The request terminates the threads with the given ids.
+    /// Clients should only call this request if the corresponding capability `supportsTerminateThreadsRequest` is true.
+    public sealed class TerminateThreadsRequest : Request<TerminateThreadsArguments>
+    {
+        public override Dap.Command Command => Dap.Command.TerminateThreads;
+    }
+
+    /// Modules can be retrieved from the debug adapter with this request which can either return all modules or a range of modules to support paging.
+    /// Clients should only call this request if the corresponding capability `supportsModulesRequest` is true.
+    public sealed class ModulesRequest : Request<ModulesArguments>
+    {
+        public override Dap.Command Command => Dap.Command.Modules;
+    }
+
+    /// Retrieves the set of all sources currently loaded by the debugged process.
+    /// Clients should only call this request if the corresponding capability `supportsLoadedSourcesRequest` is true.
+    public sealed class LoadedSourcesRequest : Request<LoadedSourcesArguments>
+    {
+        public override Dap.Command Command => Dap.Command.LoadedSources;
+    }
+
+    /// Evaluates the given expression in the context of a stack frame.
+    /// The expression has access to any variables and arguments that are in scope.
+    public sealed class EvaluateRequest : Request<EvaluateArguments>
+    {
+        public override Dap.Command Command => Dap.Command.Evaluate;
+    }
+
+    /// Evaluates the given `value` expression and assigns it to the `expression` which must be a modifiable l-value.
+    /// The expressions have access to any variables and arguments that are in scope of the specified frame.
+    /// Clients should only call this request if the corresponding capability `supportsSetExpression` is true.
+    /// If a debug adapter implements both `setExpression` and `setVariable`, a client uses `setExpression` if the variable has an `evaluateName` property.
+    public sealed class SetExpressionRequest : Request<SetExpressionArguments>
+    {
+        public override Dap.Command Command => Dap.Command.SetExpression;
+    }
+
+    /// This request retrieves the possible step-in targets for the specified stack frame.
+    /// These targets can be used in the `stepIn` request.
+    /// Clients should only call this request if the corresponding capability `supportsStepInTargetsRequest` is true.
+    public sealed class StepInTargetsRequest : Request<StepInTargetsArguments>
+    {
+        public override Dap.Command Command => Dap.Command.StepInTargets;
+    }
+
+    /// This request retrieves the possible goto targets for the specified source location.
+    /// These targets can be used in the `goto` request.
+    /// Clients should only call this request if the corresponding capability `supportsGotoTargetsRequest` is true.
+    public sealed class GotoTargetsRequest : Request<GotoTargetsArguments>
+    {
+        public override Dap.Command Command => Dap.Command.GotoTargets;
+    }
+
+    /// Returns a list of possible completions for a given caret position and text.
+    /// Clients should only call this request if the corresponding capability `supportsCompletionsRequest` is true.
+    public sealed class CompletionsRequest : Request<CompletionsArguments>
+    {
+        public override Dap.Command Command => Dap.Command.Completions;
+    }
+
+    /// Retrieves the details of the exception that caused this event to be raised.
+    /// Clients should only call this request if the corresponding capability `supportsExceptionInfoRequest` is true.
+    public sealed class ExceptionInfoRequest : Request<ExceptionInfoArguments>
+    {
+        public override Dap.Command Command => Dap.Command.ExceptionInfo;
+    }
+
+    /// Reads bytes from memory at the provided location.
+    /// Clients should only call this request if the corresponding capability `supportsReadMemoryRequest` is true.
+    public sealed class ReadMemoryRequest : Request<ReadMemoryArguments>
+    {
+        public override Dap.Command Command => Dap.Command.ReadMemory;
+    }
+
+    /// Writes bytes to memory at the provided location.
+    /// Clients should only call this request if the corresponding capability `supportsWriteMemoryRequest` is true.
+    public sealed class WriteMemoryRequest : Request<WriteMemoryArguments>
+    {
+        public override Dap.Command Command => Dap.Command.WriteMemory;
+    }
+
+    /// Disassembles code stored at the provided location.
+    /// Clients should only call this request if the corresponding capability `supportsDisassembleRequest` is true.
+    public sealed class DisassembleRequest : Request<DisassembleArguments>
+    {
+        public override Dap.Command Command => Dap.Command.Disassemble;
+    }
+
+    /// Looks up information about a location reference previously returned by the debug adapter.
+    public sealed class LocationsRequest : Request<LocationsArguments>
+    {
+        public override Dap.Command Command => Dap.Command.Locations;
+    }
+
     public partial abstract class Response
     {
-        [JsonProperty("command")]
-        public abstract Dap.Command Command { get; }
-
-        public partial static Response ParseMessage(JObject message)
+        private partial static Response ParseInternal(JObject message)
         {
             switch (message.Value<Dap.Command>("command"))
             {
@@ -278,12 +670,7 @@ namespace Dap
     /// Returning partial results from a cancelled request is possible but please note that a client has no generic way for detecting that a response is partial or not.
     /// The progress that got cancelled still needs to send a `progressEnd` event back.
     ///  A client should not assume that progress just got cancelled after sending the `cancel` request.
-    public class CancelRequest : Request<CancelArguments>
-    {
-        public override Dap.Command Command => Dap.Command.Cancel;
-    }
-
-    public class CancelResponse : Response
+    public sealed class CancelResponse : Response
     {
         public override Dap.Command Command => Dap.Command.Cancel;
     }
@@ -293,12 +680,7 @@ namespace Dap
     /// This request should only be called if the corresponding client capability `supportsRunInTerminalRequest` is true.
     /// Client implementations of `runInTerminal` are free to run the command however they choose including issuing the command to a command line interpreter (aka 'shell'). Argument strings passed to the `runInTerminal` request must arrive verbatim in the command to be run. As a consequence, clients which use a shell are responsible for escaping any special shell characters in the argument strings to prevent them from being interpreted (and modified) by the shell.
     /// Some users may wish to take advantage of shell processing in the argument strings. For clients which implement `runInTerminal` using an intermediary shell, the `argsCanBeInterpretedByShell` property can be set to true. In this case the client is requested not to escape any special shell characters in the argument strings.
-    public class RunInTerminalRequest : Request<RunInTerminalRequestArguments>
-    {
-        public override Dap.Command Command => Dap.Command.RunInTerminal;
-    }
-
-    public class RunInTerminalResponse : Response<RunInTerminalResponseBody>
+    public sealed class RunInTerminalResponse : Response
     {
         public override Dap.Command Command => Dap.Command.RunInTerminal;
     }
@@ -306,12 +688,7 @@ namespace Dap
     /// This request is sent from the debug adapter to the client to start a new debug session of the same type as the caller.
     /// This request should only be sent if the corresponding client capability `supportsStartDebuggingRequest` is true.
     /// A client implementation of `startDebugging` should start a new debug session (of the same type as the caller) in the same way that the caller's session was started. If the client supports hierarchical debug sessions, the newly created session can be treated as a child of the caller session.
-    public class StartDebuggingRequest : Request<StartDebuggingRequestArguments>
-    {
-        public override Dap.Command Command => Dap.Command.StartDebugging;
-    }
-
-    public class StartDebuggingResponse : Response
+    public sealed class StartDebuggingResponse : Response
     {
         public override Dap.Command Command => Dap.Command.StartDebugging;
     }
@@ -320,12 +697,7 @@ namespace Dap
     /// Until the debug adapter has responded with an `initialize` response, the client must not send any additional requests or events to the debug adapter.
     /// In addition the debug adapter is not allowed to send any requests or events to the client until it has responded with an `initialize` response.
     /// The `initialize` request may only be sent once.
-    public class InitializeRequest : Request<InitializeRequestArguments>
-    {
-        public override Dap.Command Command => Dap.Command.Initialize;
-    }
-
-    public class InitializeResponse : Response<Capabilities>
+    public sealed class InitializeResponse : Response
     {
         public override Dap.Command Command => Dap.Command.Initialize;
     }
@@ -333,48 +705,28 @@ namespace Dap
     /// This request indicates that the client has finished initialization of the debug adapter.
     /// So it is the last request in the sequence of configuration requests (which was started by the `initialized` event).
     /// Clients should only call this request if the corresponding capability `supportsConfigurationDoneRequest` is true.
-    public class ConfigurationDoneRequest : Request<ConfigurationDoneArguments>
-    {
-        public override Dap.Command Command => Dap.Command.ConfigurationDone;
-    }
-
-    public class ConfigurationDoneResponse : Response
+    public sealed class ConfigurationDoneResponse : Response
     {
         public override Dap.Command Command => Dap.Command.ConfigurationDone;
     }
 
     /// This launch request is sent from the client to the debug adapter to start the debuggee with or without debugging (if `noDebug` is true).
     /// Since launching is debugger/runtime specific, the arguments for this request are not part of this specification.
-    public class LaunchRequest : RequestDynamic
-    {
-        public override Dap.Command Command => Dap.Command.Launch;
-    }
-
-    public class LaunchResponse : Response
+    public sealed class LaunchResponse : Response
     {
         public override Dap.Command Command => Dap.Command.Launch;
     }
 
     /// The `attach` request is sent from the client to the debug adapter to attach to a debuggee that is already running.
     /// Since attaching is debugger/runtime specific, the arguments for this request are not part of this specification.
-    public class AttachRequest : RequestDynamic
-    {
-        public override Dap.Command Command => Dap.Command.Attach;
-    }
-
-    public class AttachResponse : Response
+    public sealed class AttachResponse : Response
     {
         public override Dap.Command Command => Dap.Command.Attach;
     }
 
     /// Restarts a debug session. Clients should only call this request if the corresponding capability `supportsRestartRequest` is true.
     /// If the capability is missing or has the value false, a typical client emulates `restart` by terminating the debug adapter first and then launching it anew.
-    public class RestartRequest : RequestDynamic
-    {
-        public override Dap.Command Command => Dap.Command.Restart;
-    }
-
-    public class RestartResponse : Response
+    public sealed class RestartResponse : Response
     {
         public override Dap.Command Command => Dap.Command.Restart;
     }
@@ -382,12 +734,7 @@ namespace Dap
     /// The `disconnect` request asks the debug adapter to disconnect from the debuggee (thus ending the debug session) and then to shut down itself (the debug adapter).
     /// In addition, the debug adapter must terminate the debuggee if it was started with the `launch` request. If an `attach` request was used to connect to the debuggee, then the debug adapter must not terminate the debuggee.
     /// This implicit behavior of when to terminate the debuggee can be overridden with the `terminateDebuggee` argument (which is only supported by a debug adapter if the corresponding capability `supportTerminateDebuggee` is true).
-    public class DisconnectRequest : Request<DisconnectArguments>
-    {
-        public override Dap.Command Command => Dap.Command.Disconnect;
-    }
-
-    public class DisconnectResponse : Response
+    public sealed class DisconnectResponse : Response
     {
         public override Dap.Command Command => Dap.Command.Disconnect;
     }
@@ -396,24 +743,14 @@ namespace Dap
     /// Typically a debug adapter implements `terminate` by sending a software signal which the debuggee intercepts in order to clean things up properly before terminating itself.
     /// Please note that this request does not directly affect the state of the debug session: if the debuggee decides to veto the graceful shutdown for any reason by not terminating itself, then the debug session just continues.
     /// Clients can surface the `terminate` request as an explicit command or they can integrate it into a two stage Stop command that first sends `terminate` to request a graceful shutdown, and if that fails uses `disconnect` for a forceful shutdown.
-    public class TerminateRequest : Request<TerminateArguments>
-    {
-        public override Dap.Command Command => Dap.Command.Terminate;
-    }
-
-    public class TerminateResponse : Response
+    public sealed class TerminateResponse : Response
     {
         public override Dap.Command Command => Dap.Command.Terminate;
     }
 
     /// The `breakpointLocations` request returns all possible locations for source breakpoints in a given range.
     /// Clients should only call this request if the corresponding capability `supportsBreakpointLocationsRequest` is true.
-    public class BreakpointLocationsRequest : Request<BreakpointLocationsArguments>
-    {
-        public override Dap.Command Command => Dap.Command.BreakpointLocations;
-    }
-
-    public class BreakpointLocationsResponse : Response<BreakpointLocationsResponseBody>
+    public sealed class BreakpointLocationsResponse : Response
     {
         public override Dap.Command Command => Dap.Command.BreakpointLocations;
     }
@@ -421,12 +758,7 @@ namespace Dap
     /// Sets multiple breakpoints for a single source and clears all previous breakpoints in that source.
     /// To clear all breakpoint for a source, specify an empty array.
     /// When a breakpoint is hit, a `stopped` event (with reason `breakpoint`) is generated.
-    public class SetBreakpointsRequest : Request<SetBreakpointsArguments>
-    {
-        public override Dap.Command Command => Dap.Command.SetBreakpoints;
-    }
-
-    public class SetBreakpointsResponse : Response<SetBreakpointsResponseBody>
+    public sealed class SetBreakpointsResponse : Response
     {
         public override Dap.Command Command => Dap.Command.SetBreakpoints;
     }
@@ -435,36 +767,21 @@ namespace Dap
     /// To clear all function breakpoints, specify an empty array.
     /// When a function breakpoint is hit, a `stopped` event (with reason `function breakpoint`) is generated.
     /// Clients should only call this request if the corresponding capability `supportsFunctionBreakpoints` is true.
-    public class SetFunctionBreakpointsRequest : Request<SetFunctionBreakpointsArguments>
-    {
-        public override Dap.Command Command => Dap.Command.SetFunctionBreakpoints;
-    }
-
-    public class SetFunctionBreakpointsResponse : Response<SetFunctionBreakpointsResponseBody>
+    public sealed class SetFunctionBreakpointsResponse : Response
     {
         public override Dap.Command Command => Dap.Command.SetFunctionBreakpoints;
     }
 
     /// The request configures the debugger's response to thrown exceptions. Each of the `filters`, `filterOptions`, and `exceptionOptions` in the request are independent configurations to a debug adapter indicating a kind of exception to catch. An exception thrown in a program should result in a `stopped` event from the debug adapter (with reason `exception`) if any of the configured filters match.
     /// Clients should only call this request if the corresponding capability `exceptionBreakpointFilters` returns one or more filters.
-    public class SetExceptionBreakpointsRequest : Request<SetExceptionBreakpointsArguments>
-    {
-        public override Dap.Command Command => Dap.Command.SetExceptionBreakpoints;
-    }
-
-    public class SetExceptionBreakpointsResponse : Response<SetExceptionBreakpointsResponseBody>
+    public sealed class SetExceptionBreakpointsResponse : Response
     {
         public override Dap.Command Command => Dap.Command.SetExceptionBreakpoints;
     }
 
     /// Obtains information on a possible data breakpoint that could be set on an expression or variable.
     /// Clients should only call this request if the corresponding capability `supportsDataBreakpoints` is true.
-    public class DataBreakpointInfoRequest : Request<DataBreakpointInfoArguments>
-    {
-        public override Dap.Command Command => Dap.Command.DataBreakpointInfo;
-    }
-
-    public class DataBreakpointInfoResponse : Response<DataBreakpointInfoResponseBody>
+    public sealed class DataBreakpointInfoResponse : Response
     {
         public override Dap.Command Command => Dap.Command.DataBreakpointInfo;
     }
@@ -473,12 +790,7 @@ namespace Dap
     /// To clear all data breakpoints, specify an empty array.
     /// When a data breakpoint is hit, a `stopped` event (with reason `data breakpoint`) is generated.
     /// Clients should only call this request if the corresponding capability `supportsDataBreakpoints` is true.
-    public class SetDataBreakpointsRequest : Request<SetDataBreakpointsArguments>
-    {
-        public override Dap.Command Command => Dap.Command.SetDataBreakpoints;
-    }
-
-    public class SetDataBreakpointsResponse : Response<SetDataBreakpointsResponseBody>
+    public sealed class SetDataBreakpointsResponse : Response
     {
         public override Dap.Command Command => Dap.Command.SetDataBreakpoints;
     }
@@ -487,23 +799,13 @@ namespace Dap
     /// To clear all instruction breakpoints, specify an empty array.
     /// When an instruction breakpoint is hit, a `stopped` event (with reason `instruction breakpoint`) is generated.
     /// Clients should only call this request if the corresponding capability `supportsInstructionBreakpoints` is true.
-    public class SetInstructionBreakpointsRequest : Request<SetInstructionBreakpointsArguments>
-    {
-        public override Dap.Command Command => Dap.Command.SetInstructionBreakpoints;
-    }
-
-    public class SetInstructionBreakpointsResponse : Response<SetInstructionBreakpointsResponseBody>
+    public sealed class SetInstructionBreakpointsResponse : Response
     {
         public override Dap.Command Command => Dap.Command.SetInstructionBreakpoints;
     }
 
     /// The request resumes execution of all threads. If the debug adapter supports single thread execution (see capability `supportsSingleThreadExecutionRequests`), setting the `singleThread` argument to true resumes only the specified thread. If not all threads were resumed, the `allThreadsContinued` attribute of the response should be set to false.
-    public class ContinueRequest : Request<ContinueArguments>
-    {
-        public override Dap.Command Command => Dap.Command.Continue;
-    }
-
-    public class ContinueResponse : Response<ContinueResponseBody>
+    public sealed class ContinueResponse : Response
     {
         public override Dap.Command Command => Dap.Command.Continue;
     }
@@ -511,12 +813,7 @@ namespace Dap
     /// The request executes one step (in the given granularity) for the specified thread and allows all other threads to run freely by resuming them.
     /// If the debug adapter supports single thread execution (see capability `supportsSingleThreadExecutionRequests`), setting the `singleThread` argument to true prevents other suspended threads from resuming.
     /// The debug adapter first sends the response and then a `stopped` event (with reason `step`) after the step has completed.
-    public class NextRequest : Request<NextArguments>
-    {
-        public override Dap.Command Command => Dap.Command.Next;
-    }
-
-    public class NextResponse : Response
+    public sealed class NextResponse : Response
     {
         public override Dap.Command Command => Dap.Command.Next;
     }
@@ -528,12 +825,7 @@ namespace Dap
     /// If there are multiple function/method calls (or other targets) on the source line,
     /// the argument `targetId` can be used to control into which target the `stepIn` should occur.
     /// The list of possible targets for a given source line can be retrieved via the `stepInTargets` request.
-    public class StepInRequest : Request<StepInArguments>
-    {
-        public override Dap.Command Command => Dap.Command.StepIn;
-    }
-
-    public class StepInResponse : Response
+    public sealed class StepInResponse : Response
     {
         public override Dap.Command Command => Dap.Command.StepIn;
     }
@@ -541,12 +833,7 @@ namespace Dap
     /// The request resumes the given thread to step out (return) from a function/method and allows all other threads to run freely by resuming them.
     /// If the debug adapter supports single thread execution (see capability `supportsSingleThreadExecutionRequests`), setting the `singleThread` argument to true prevents other suspended threads from resuming.
     /// The debug adapter first sends the response and then a `stopped` event (with reason `step`) after the step has completed.
-    public class StepOutRequest : Request<StepOutArguments>
-    {
-        public override Dap.Command Command => Dap.Command.StepOut;
-    }
-
-    public class StepOutResponse : Response
+    public sealed class StepOutResponse : Response
     {
         public override Dap.Command Command => Dap.Command.StepOut;
     }
@@ -555,24 +842,14 @@ namespace Dap
     /// If the debug adapter supports single thread execution (see capability `supportsSingleThreadExecutionRequests`), setting the `singleThread` argument to true prevents other suspended threads from resuming.
     /// The debug adapter first sends the response and then a `stopped` event (with reason `step`) after the step has completed.
     /// Clients should only call this request if the corresponding capability `supportsStepBack` is true.
-    public class StepBackRequest : Request<StepBackArguments>
-    {
-        public override Dap.Command Command => Dap.Command.StepBack;
-    }
-
-    public class StepBackResponse : Response
+    public sealed class StepBackResponse : Response
     {
         public override Dap.Command Command => Dap.Command.StepBack;
     }
 
     /// The request resumes backward execution of all threads. If the debug adapter supports single thread execution (see capability `supportsSingleThreadExecutionRequests`), setting the `singleThread` argument to true resumes only the specified thread. If not all threads were resumed, the `allThreadsContinued` attribute of the response should be set to false.
     /// Clients should only call this request if the corresponding capability `supportsStepBack` is true.
-    public class ReverseContinueRequest : Request<ReverseContinueArguments>
-    {
-        public override Dap.Command Command => Dap.Command.ReverseContinue;
-    }
-
-    public class ReverseContinueResponse : Response
+    public sealed class ReverseContinueResponse : Response
     {
         public override Dap.Command Command => Dap.Command.ReverseContinue;
     }
@@ -580,12 +857,7 @@ namespace Dap
     /// The request restarts execution of the specified stack frame.
     /// The debug adapter first sends the response and then a `stopped` event (with reason `restart`) after the restart has completed.
     /// Clients should only call this request if the corresponding capability `supportsRestartFrame` is true.
-    public class RestartFrameRequest : Request<RestartFrameArguments>
-    {
-        public override Dap.Command Command => Dap.Command.RestartFrame;
-    }
-
-    public class RestartFrameResponse : Response
+    public sealed class RestartFrameResponse : Response
     {
         public override Dap.Command Command => Dap.Command.RestartFrame;
     }
@@ -595,141 +867,81 @@ namespace Dap
     /// The code between the current location and the goto target is not executed but skipped.
     /// The debug adapter first sends the response and then a `stopped` event with reason `goto`.
     /// Clients should only call this request if the corresponding capability `supportsGotoTargetsRequest` is true (because only then goto targets exist that can be passed as arguments).
-    public class GotoRequest : Request<GotoArguments>
-    {
-        public override Dap.Command Command => Dap.Command.Goto;
-    }
-
-    public class GotoResponse : Response
+    public sealed class GotoResponse : Response
     {
         public override Dap.Command Command => Dap.Command.Goto;
     }
 
     /// The request suspends the debuggee.
     /// The debug adapter first sends the response and then a `stopped` event (with reason `pause`) after the thread has been paused successfully.
-    public class PauseRequest : Request<PauseArguments>
-    {
-        public override Dap.Command Command => Dap.Command.Pause;
-    }
-
-    public class PauseResponse : Response
+    public sealed class PauseResponse : Response
     {
         public override Dap.Command Command => Dap.Command.Pause;
     }
 
     /// The request returns a stacktrace from the current execution state of a given thread.
     /// A client can request all stack frames by omitting the startFrame and levels arguments. For performance-conscious clients and if the corresponding capability `supportsDelayedStackTraceLoading` is true, stack frames can be retrieved in a piecemeal way with the `startFrame` and `levels` arguments. The response of the `stackTrace` request may contain a `totalFrames` property that hints at the total number of frames in the stack. If a client needs this total number upfront, it can issue a request for a single (first) frame and depending on the value of `totalFrames` decide how to proceed. In any case a client should be prepared to receive fewer frames than requested, which is an indication that the end of the stack has been reached.
-    public class StackTraceRequest : Request<StackTraceArguments>
-    {
-        public override Dap.Command Command => Dap.Command.StackTrace;
-    }
-
-    public class StackTraceResponse : Response<StackTraceResponseBody>
+    public sealed class StackTraceResponse : Response
     {
         public override Dap.Command Command => Dap.Command.StackTrace;
     }
 
     /// The request returns the variable scopes for a given stack frame ID.
-    public class ScopesRequest : Request<ScopesArguments>
-    {
-        public override Dap.Command Command => Dap.Command.Scopes;
-    }
-
-    public class ScopesResponse : Response<ScopesResponseBody>
+    public sealed class ScopesResponse : Response
     {
         public override Dap.Command Command => Dap.Command.Scopes;
     }
 
     /// Retrieves all child variables for the given variable reference.
     /// A filter can be used to limit the fetched children to either named or indexed children.
-    public class VariablesRequest : Request<VariablesArguments>
-    {
-        public override Dap.Command Command => Dap.Command.Variables;
-    }
-
-    public class VariablesResponse : Response<VariablesResponseBody>
+    public sealed class VariablesResponse : Response
     {
         public override Dap.Command Command => Dap.Command.Variables;
     }
 
     /// Set the variable with the given name in the variable container to a new value. Clients should only call this request if the corresponding capability `supportsSetVariable` is true.
     /// If a debug adapter implements both `setVariable` and `setExpression`, a client will only use `setExpression` if the variable has an `evaluateName` property.
-    public class SetVariableRequest : Request<SetVariableArguments>
-    {
-        public override Dap.Command Command => Dap.Command.SetVariable;
-    }
-
-    public class SetVariableResponse : Response<SetVariableResponseBody>
+    public sealed class SetVariableResponse : Response
     {
         public override Dap.Command Command => Dap.Command.SetVariable;
     }
 
     /// The request retrieves the source code for a given source reference.
-    public class SourceRequest : Request<SourceArguments>
-    {
-        public override Dap.Command Command => Dap.Command.Source;
-    }
-
-    public class SourceResponse : Response<SourceResponseBody>
+    public sealed class SourceResponse : Response
     {
         public override Dap.Command Command => Dap.Command.Source;
     }
 
     /// The request retrieves a list of all threads.
-    public class ThreadsRequest : Request
-    {
-        public override Dap.Command Command => Dap.Command.Threads;
-    }
-
-    public class ThreadsResponse : Response<ThreadsResponseBody>
+    public sealed class ThreadsResponse : Response
     {
         public override Dap.Command Command => Dap.Command.Threads;
     }
 
     /// The request terminates the threads with the given ids.
     /// Clients should only call this request if the corresponding capability `supportsTerminateThreadsRequest` is true.
-    public class TerminateThreadsRequest : Request<TerminateThreadsArguments>
-    {
-        public override Dap.Command Command => Dap.Command.TerminateThreads;
-    }
-
-    public class TerminateThreadsResponse : Response
+    public sealed class TerminateThreadsResponse : Response
     {
         public override Dap.Command Command => Dap.Command.TerminateThreads;
     }
 
     /// Modules can be retrieved from the debug adapter with this request which can either return all modules or a range of modules to support paging.
     /// Clients should only call this request if the corresponding capability `supportsModulesRequest` is true.
-    public class ModulesRequest : Request<ModulesArguments>
-    {
-        public override Dap.Command Command => Dap.Command.Modules;
-    }
-
-    public class ModulesResponse : Response<ModulesResponseBody>
+    public sealed class ModulesResponse : Response
     {
         public override Dap.Command Command => Dap.Command.Modules;
     }
 
     /// Retrieves the set of all sources currently loaded by the debugged process.
     /// Clients should only call this request if the corresponding capability `supportsLoadedSourcesRequest` is true.
-    public class LoadedSourcesRequest : Request<LoadedSourcesArguments>
-    {
-        public override Dap.Command Command => Dap.Command.LoadedSources;
-    }
-
-    public class LoadedSourcesResponse : Response<LoadedSourcesResponseBody>
+    public sealed class LoadedSourcesResponse : Response
     {
         public override Dap.Command Command => Dap.Command.LoadedSources;
     }
 
     /// Evaluates the given expression in the context of a stack frame.
     /// The expression has access to any variables and arguments that are in scope.
-    public class EvaluateRequest : Request<EvaluateArguments>
-    {
-        public override Dap.Command Command => Dap.Command.Evaluate;
-    }
-
-    public class EvaluateResponse : Response<EvaluateResponseBody>
+    public sealed class EvaluateResponse : Response
     {
         public override Dap.Command Command => Dap.Command.Evaluate;
     }
@@ -738,12 +950,7 @@ namespace Dap
     /// The expressions have access to any variables and arguments that are in scope of the specified frame.
     /// Clients should only call this request if the corresponding capability `supportsSetExpression` is true.
     /// If a debug adapter implements both `setExpression` and `setVariable`, a client uses `setExpression` if the variable has an `evaluateName` property.
-    public class SetExpressionRequest : Request<SetExpressionArguments>
-    {
-        public override Dap.Command Command => Dap.Command.SetExpression;
-    }
-
-    public class SetExpressionResponse : Response<SetExpressionResponseBody>
+    public sealed class SetExpressionResponse : Response
     {
         public override Dap.Command Command => Dap.Command.SetExpression;
     }
@@ -751,12 +958,7 @@ namespace Dap
     /// This request retrieves the possible step-in targets for the specified stack frame.
     /// These targets can be used in the `stepIn` request.
     /// Clients should only call this request if the corresponding capability `supportsStepInTargetsRequest` is true.
-    public class StepInTargetsRequest : Request<StepInTargetsArguments>
-    {
-        public override Dap.Command Command => Dap.Command.StepInTargets;
-    }
-
-    public class StepInTargetsResponse : Response<StepInTargetsResponseBody>
+    public sealed class StepInTargetsResponse : Response
     {
         public override Dap.Command Command => Dap.Command.StepInTargets;
     }
@@ -764,83 +966,48 @@ namespace Dap
     /// This request retrieves the possible goto targets for the specified source location.
     /// These targets can be used in the `goto` request.
     /// Clients should only call this request if the corresponding capability `supportsGotoTargetsRequest` is true.
-    public class GotoTargetsRequest : Request<GotoTargetsArguments>
-    {
-        public override Dap.Command Command => Dap.Command.GotoTargets;
-    }
-
-    public class GotoTargetsResponse : Response<GotoTargetsResponseBody>
+    public sealed class GotoTargetsResponse : Response
     {
         public override Dap.Command Command => Dap.Command.GotoTargets;
     }
 
     /// Returns a list of possible completions for a given caret position and text.
     /// Clients should only call this request if the corresponding capability `supportsCompletionsRequest` is true.
-    public class CompletionsRequest : Request<CompletionsArguments>
-    {
-        public override Dap.Command Command => Dap.Command.Completions;
-    }
-
-    public class CompletionsResponse : Response<CompletionsResponseBody>
+    public sealed class CompletionsResponse : Response
     {
         public override Dap.Command Command => Dap.Command.Completions;
     }
 
     /// Retrieves the details of the exception that caused this event to be raised.
     /// Clients should only call this request if the corresponding capability `supportsExceptionInfoRequest` is true.
-    public class ExceptionInfoRequest : Request<ExceptionInfoArguments>
-    {
-        public override Dap.Command Command => Dap.Command.ExceptionInfo;
-    }
-
-    public class ExceptionInfoResponse : Response<ExceptionInfoResponseBody>
+    public sealed class ExceptionInfoResponse : Response
     {
         public override Dap.Command Command => Dap.Command.ExceptionInfo;
     }
 
     /// Reads bytes from memory at the provided location.
     /// Clients should only call this request if the corresponding capability `supportsReadMemoryRequest` is true.
-    public class ReadMemoryRequest : Request<ReadMemoryArguments>
-    {
-        public override Dap.Command Command => Dap.Command.ReadMemory;
-    }
-
-    public class ReadMemoryResponse : Response<ReadMemoryResponseBody>
+    public sealed class ReadMemoryResponse : Response
     {
         public override Dap.Command Command => Dap.Command.ReadMemory;
     }
 
     /// Writes bytes to memory at the provided location.
     /// Clients should only call this request if the corresponding capability `supportsWriteMemoryRequest` is true.
-    public class WriteMemoryRequest : Request<WriteMemoryArguments>
-    {
-        public override Dap.Command Command => Dap.Command.WriteMemory;
-    }
-
-    public class WriteMemoryResponse : Response<WriteMemoryResponseBody>
+    public sealed class WriteMemoryResponse : Response
     {
         public override Dap.Command Command => Dap.Command.WriteMemory;
     }
 
     /// Disassembles code stored at the provided location.
     /// Clients should only call this request if the corresponding capability `supportsDisassembleRequest` is true.
-    public class DisassembleRequest : Request<DisassembleArguments>
-    {
-        public override Dap.Command Command => Dap.Command.Disassemble;
-    }
-
-    public class DisassembleResponse : Response<DisassembleResponseBody>
+    public sealed class DisassembleResponse : Response
     {
         public override Dap.Command Command => Dap.Command.Disassemble;
     }
 
     /// Looks up information about a location reference previously returned by the debug adapter.
-    public class LocationsRequest : Request<LocationsArguments>
-    {
-        public override Dap.Command Command => Dap.Command.Locations;
-    }
-
-    public class LocationsResponse : Response<LocationsResponseBody>
+    public sealed class LocationsResponse : Response
     {
         public override Dap.Command Command => Dap.Command.Locations;
     }

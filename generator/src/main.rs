@@ -55,6 +55,7 @@ fn write_file(file: &str, contents: &str) {
 fn write_requests(types: &[ProtocolType]) -> String {
     let mut writer = Writer::default();
     writer.line("using System;");
+    writer.line("using System.Runtime.Serialization;");
     writer.line("using Newtonsoft.Json;");
     writer.line("using Newtonsoft.Json.Converters;");
     writer.line("using Newtonsoft.Json.Linq;");
@@ -62,21 +63,31 @@ fn write_requests(types: &[ProtocolType]) -> String {
 
     writer.line("namespace Dap");
     writer.scoped(|writer| {
-        let request_types = types.iter().filter_map(|ty| {
-            if let Type::Object(obj) = &ty.ty {
-                if obj.base.as_deref() == Some("Request") {
-                    return Some((ty, obj));
+        let mut request_types = types
+            .iter()
+            .filter_map(|type_info| {
+                if let Type::Object(obj) = &type_info.type_info {
+                    if obj.base.as_deref() == Some("Request") {
+                        let commands = &obj
+                            .find_field("command")
+                            .unwrap()
+                            .type_info
+                            .as_enum()
+                            .variants;
+                        assert_eq!(commands.len(), 1);
+                        return Some((type_info.name.clone(), obj, commands[0].clone()));
+                    }
                 }
-            }
-            None
-        });
+                None
+            })
+            .collect::<Vec<_>>();
 
-        writer
-            .line("[JsonConverter(typeof(StringEnumConverter), typeof(CamelCaseNamingStrategy))]");
+        writer.line("[JsonConverter(typeof(StringEnumConverter))]");
         writer.line("public enum Command");
         writer.scoped(|writer| {
-            for (ty, _) in request_types.clone() {
-                let command = ty.name.strip_suffix("Request").unwrap();
+            for (_, _, command) in &mut request_types {
+                writer.line(format!("[EnumMember(Value = \"{command}\")]"));
+                *command = to_pascal_case(command);
                 writer.line(format!("{},", command));
             }
         });
@@ -84,19 +95,14 @@ fn write_requests(types: &[ProtocolType]) -> String {
 
         writer.line("public partial abstract class Request");
         writer.scoped(|writer| {
-            writer.line("[JsonProperty(\"command\")]");
-            writer.line("public abstract Dap.Command Command { get; }");
-            writer.finished_object();
-
-            writer.line("public partial static Request ParseMessage(JObject message)");
+            writer.line("private partial static Request ParseInternal(JObject message)");
             writer.scoped(|writer| {
                 writer.line("switch (message.Value<Dap.Command>(\"command\"))");
                 writer.scoped(|writer| {
-                    for (ty, _) in request_types.clone() {
-                        let command = &ty.name.strip_suffix("Request").unwrap();
+                    for (name, _, command) in &request_types {
                         writer.line(format!("case Dap.Command.{command}:",));
                         writer.indented(|writer| {
-                            writer.line(format!("return message.ToObject<{command}Request>();"))
+                            writer.line(format!("return message.ToObject<{name}>();"))
                         });
                     }
                     writer.line("default:");
@@ -108,20 +114,56 @@ fn write_requests(types: &[ProtocolType]) -> String {
         });
         writer.finished_object();
 
+        for (name, type_info, command) in &request_types {
+            let base = if let Some(args) = type_info.find_field("arguments") {
+                match &args.type_info {
+                    Type::Any | Type::Object(_) => "GenericRequest".to_owned(),
+                    Type::Basic(args) => format!("Request<{args}>"),
+                    _ => panic!("bad arguments type for {}", name),
+                }
+            } else {
+                "Request".to_owned()
+            };
+            writer.doc(type_info.doc.as_ref().unwrap());
+            writer.line(format!("public sealed class {name} : {base}"));
+            writer.scoped(|writer| {
+                writer.line(format!(
+                    "public override Dap.Command Command => Dap.Command.{command};"
+                ))
+            });
+            writer.finished_object();
+        }
+
+        for (name, _, _) in &mut request_types {
+            name.replace_range(name.find("Request").unwrap().., "Response");
+        }
+
+        assert_eq!(
+            request_types
+                .iter()
+                .map(|(name, _, _)| name)
+                .collect::<Vec<_>>(),
+            types
+                .iter()
+                .filter_map(|type_info| if type_info.name.ends_with("Response") {
+                    Some(&type_info.name)
+                } else {
+                    None
+                })
+                .filter(|name| *name != "ErrorResponse")
+                .collect::<Vec<_>>()
+        );
+
         writer.line("public partial abstract class Response");
         writer.scoped(|writer| {
-            writer.line("[JsonProperty(\"command\")]");
-            writer.line("public abstract Dap.Command Command { get; }");
-            writer.finished_object();
-            writer.line("public partial static Response ParseMessage(JObject message)");
+            writer.line("private partial static Response ParseInternal(JObject message)");
             writer.scoped(|writer| {
                 writer.line("switch (message.Value<Dap.Command>(\"command\"))");
                 writer.scoped(|writer| {
-                    for (ty, _) in request_types.clone() {
-                        let command = &ty.name.strip_suffix("Request").unwrap();
+                    for (name, _, command) in &request_types {
                         writer.line(format!("case Dap.Command.{command}:"));
                         writer.indented(|writer| {
-                            writer.line(format!("return message.ToObject<{command}Response>();"))
+                            writer.line(format!("return message.ToObject<{name}>();"))
                         });
                     }
                     writer.line("default:");
@@ -133,43 +175,23 @@ fn write_requests(types: &[ProtocolType]) -> String {
             });
         });
 
-        for (ty, o) in request_types {
+        for (name, type_info, command) in request_types {
             writer.finished_object();
-            let request = ty.name.strip_suffix("Request").unwrap();
-            let request_base = if let Some(args) = o.find_field("arguments") {
-                match &args.ty {
-                    Type::Any | Type::Object(_) => "RequestDynamic".to_owned(),
-                    Type::Basic(args) => format!("Request<{args}>"),
-                    _ => panic!("bad arguments type for {}", ty.name),
-                }
-            } else {
-                "Request".to_owned()
-            };
-            let response = format!("{request}Response");
-            let response_ty = types.iter().find(|t| t.name == response).unwrap();
-            let ro = response_ty.ty.as_object();
-            let response_base = if let Some(body) = ro.find_field("body") {
-                match &body.ty {
-                    Type::Any => "ResponseDynamic".to_owned(),
+            let base = if let Some(body) = type_info.find_field("body") {
+                match &body.type_info {
+                    Type::Any => "GenericResponse".to_owned(),
                     Type::Basic(body) => format!("Response<{body}>"),
-                    Type::Object(_) => format!("Response<{request}ResponseBody>"),
-                    _ => panic!("bad response body for {}", ty.name),
+                    Type::Object(_) => format!("Response<{name}Body>"),
+                    _ => panic!("bad response body for {}", name),
                 }
             } else {
                 "Response".to_owned()
             };
-            writer.doc(o.doc.as_ref().unwrap());
-            writer.line(format!("public class {request}Request : {request_base}"));
+            writer.doc(type_info.doc.as_ref().unwrap());
+            writer.line(format!("public sealed class {name} : {base}"));
             writer.scoped(|writer| {
                 writer.line(format!(
-                    "public override Dap.Command Command => Dap.Command.{request};"
-                ))
-            });
-            writer.finished_object();
-            writer.line(format!("public class {request}Response : {response_base}"));
-            writer.scoped(|writer| {
-                writer.line(format!(
-                    "public override Dap.Command Command => Dap.Command.{request};"
+                    "public override Dap.Command Command => Dap.Command.{command};"
                 ))
             });
         }
@@ -180,6 +202,7 @@ fn write_requests(types: &[ProtocolType]) -> String {
 fn write_events(types: &[ProtocolType]) -> String {
     let mut writer = Writer::default();
     writer.line("using System;");
+    writer.line("using System.Runtime.Serialization;");
     writer.line("using Newtonsoft.Json;");
     writer.line("using Newtonsoft.Json.Converters;");
     writer.line("using Newtonsoft.Json.Linq;");
@@ -187,40 +210,46 @@ fn write_events(types: &[ProtocolType]) -> String {
 
     writer.line("namespace Dap");
     writer.scoped(|writer| {
-        let event_types = types.iter().filter_map(|ty| {
-            if let Type::Object(obj) = &ty.ty {
-                if obj.base.as_deref() == Some("Event") {
-                    return Some((ty, obj));
+        let mut event_types = types
+            .iter()
+            .filter_map(|ty| {
+                if let Type::Object(obj) = &ty.type_info {
+                    if obj.base.as_deref() == Some("Event") {
+                        let events = &obj
+                            .find_field("event")
+                            .unwrap()
+                            .type_info
+                            .as_enum()
+                            .variants;
+                        assert_eq!(events.len(), 1);
+                        return Some((ty.name.clone(), obj, events[0].clone()));
+                    }
                 }
-            }
-            None
-        });
+                None
+            })
+            .collect::<Vec<_>>();
 
-        writer
-            .line("[JsonConverter(typeof(StringEnumConverter), typeof(CamelCaseNamingStrategy))]");
+        writer.line("[JsonConverter(typeof(StringEnumConverter))]");
         writer.line("public enum EventType");
         writer.scoped(|writer| {
-            for (ty, _) in event_types.clone() {
-                let command = ty.name.strip_suffix("Event").unwrap();
-                writer.line(format!("{},", command));
+            for (_, _, event) in &mut event_types {
+                writer.line(format!("[EnumMember(Value = \"{event}\")]"));
+                *event = to_pascal_case(event);
+                writer.line(format!("{},", event));
             }
         });
         writer.finished_object();
 
         writer.line("public partial abstract class Event");
         writer.scoped(|writer| {
-            writer.line("[JsonProperty(\"event\")]");
-            writer.line("public abstract Dap.EventType EventType { get; }");
-            writer.finished_object();
-            writer.line("public partial static Event ParseMessage(JObject message)");
+            writer.line("private partial static Event ParseInternal(JObject message)");
             writer.scoped(|writer| {
                 writer.line("switch (message.Value<Dap.EventType>(\"event\"))");
                 writer.scoped(|writer| {
-                    for (ty, _) in event_types.clone() {
-                        let event = &ty.name.strip_suffix("Event").unwrap();
+                    for (ty, _, event) in &event_types {
                         writer.line(format!("case Dap.EventType.{event}:"));
                         writer.indented(|writer| {
-                            writer.line(format!("return message.ToObject<{event}Event>();"))
+                            writer.line(format!("return message.ToObject<{ty}>();"))
                         });
                     }
                     writer.line("default:");
@@ -231,21 +260,20 @@ fn write_events(types: &[ProtocolType]) -> String {
             });
         });
 
-        for (ty, o) in event_types {
+        for (name, type_info, event) in event_types {
             writer.finished_object();
-            let event = ty.name.strip_suffix("Event").unwrap();
-            let event_base = if let Some(body) = o.find_field("body") {
-                match &body.ty {
-                    Type::Any => "EventDynamic".to_owned(),
+            let event_base = if let Some(body) = type_info.find_field("body") {
+                match &body.type_info {
+                    Type::Any => "GenericEvent".to_owned(),
                     Type::Basic(body) => format!("Event<{body}>"),
-                    Type::Object(_) => format!("Event<{event}EventBody>"),
-                    _ => panic!("bad event body for {}", ty.name),
+                    Type::Object(_) => format!("Event<{name}Body>"),
+                    _ => panic!("bad event body for {name}"),
                 }
             } else {
                 "Event".to_owned()
             };
-            writer.doc(o.doc.as_ref().unwrap());
-            writer.line(format!("public class {event}Event : {event_base}"));
+            writer.doc(type_info.doc.as_ref().unwrap());
+            writer.line(format!("public sealed class {name} : {event_base}"));
             writer.scoped(|writer| {
                 writer.line(format!(
                     "public override Dap.EventType EventType => Dap.EventType.{event};"
@@ -273,14 +301,14 @@ fn write_types(types: &[ProtocolType]) -> String {
             }
             println!("writing type {}", ty.name);
             if ty.name.ends_with("Response") || ty.name.ends_with("Event") {
-                let Some(body) = ty.ty.as_object().find_field("body") else {
+                let Some(body) = ty.type_info.as_object().find_field("body") else {
                     continue;
                 };
-                match &body.ty {
+                match &body.type_info {
                     Type::Any => continue,
                     Type::Object(o) => {
                         let mut o = o.clone();
-                        o.doc = o.doc.or(ty.ty.doc());
+                        o.doc = o.doc.or(ty.type_info.doc());
                         o.write(&format!("{}Body", ty.name), writer);
                     }
                     Type::Basic(_) => continue,
@@ -305,7 +333,7 @@ fn generate_protocol_types(schema: &Value) -> Vec<ProtocolType> {
         println!("generating {name}");
         types.push(ProtocolType {
             name: name.to_owned(),
-            ty: translate_type(defs, def),
+            type_info: translate_type(defs, def),
         });
     }
     types
@@ -388,7 +416,7 @@ fn generate_field(defs: &Map<String, Value>, name: &str, def: &Value, required: 
             .get("description")
             .map(|x| x.as_str().unwrap().to_owned()),
         name: name.to_owned(),
-        ty,
+        type_info: ty,
         required,
     }
 }
@@ -567,7 +595,7 @@ impl Writer {
 
 struct ProtocolType {
     name: String,
-    ty: Type,
+    type_info: Type,
 }
 
 #[derive(Clone)]
@@ -580,6 +608,14 @@ enum Type {
 }
 
 impl Type {
+    #[track_caller]
+    fn as_enum(&self) -> &Enum {
+        match self {
+            Type::Enum(e) => e,
+            _ => panic!("not an enum"),
+        }
+    }
+
     #[track_caller]
     fn as_object(&self) -> &Object {
         match self {
@@ -621,13 +657,13 @@ struct Object {
 struct Field {
     doc: Option<String>,
     name: String,
-    ty: Type,
+    type_info: Type,
     required: bool,
 }
 
 impl ProtocolType {
     fn write(&self, dst: &mut Writer) {
-        match &self.ty {
+        match &self.type_info {
             Type::Any => todo!(),
             Type::Basic(_) => (),
             Type::Enum(e) => e.write(&self.name, dst),
@@ -665,7 +701,7 @@ impl Object {
             dst.scoped(|dst| {
                 for field in &self.fields {
                     let inline_name = format!("{}{}", name, to_pascal_case(&field.name));
-                    let mut ty = field.ty.stringify(inline_name, &mut pending);
+                    let mut ty = field.type_info.stringify(inline_name, &mut pending);
                     if let Some(doc) = &field.doc {
                         dst.doc(doc);
                     }

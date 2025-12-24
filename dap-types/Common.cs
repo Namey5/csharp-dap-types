@@ -1,15 +1,19 @@
 using System;
+using System.Runtime.Serialization;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Linq;
 
 namespace Dap
 {
-    [JsonConverter(typeof(StringEnumConverter), typeof(CamelCaseNamingStrategy))]
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum MessageType
     {
+        [EnumMember(Value = "request")]
         Request,
+        [EnumMember(Value = "response")]
         Response,
+        [EnumMember(Value = "event")]
         Event,
     }
 
@@ -43,7 +47,15 @@ namespace Dap
     {
         public override Dap.MessageType MessageType => MessageType.Request;
 
-        public partial static Request ParseMessage(JObject message);
+        [JsonProperty("command")]
+        public abstract Dap.Command Command { get; }
+
+        public static Request ParseMessage(JObject message)
+        {
+            return ParseInternal(message);
+        }
+
+        private partial static Request ParseInternal(JObject message);
     }
 
     public abstract class Request<T> : Request
@@ -52,7 +64,7 @@ namespace Dap
         public T? arguments;
     }
 
-    public abstract class RequestDynamic : Request
+    public abstract class GenericRequest : Request
     {
         public JObject arguments;
     }
@@ -61,12 +73,25 @@ namespace Dap
     {
         public override Dap.MessageType MessageType => MessageType.Response;
 
+        [JsonProperty("command")]
+        public abstract Dap.Command Command { get; }
+        [JsonProperty("success")]
+        public virtual bool Success => true;
+
         [JsonProperty("request_seq")]
         public ulong requestSeq;
-        public bool success;
         public string? message;
 
-        public partial static Response ParseMessage(JObject message);
+        public static Response ParseMessage(JObject message)
+        {
+            if (!message.Value<bool>("success"))
+            {
+                return message.ToObject<ErrorResponse>();
+            }
+            return ParseInternal(message);
+        }
+
+        private partial static Response ParseInternal(JObject message);
     }
 
     public abstract class Response<T> : Response
@@ -75,16 +100,38 @@ namespace Dap
         public T? body;
     }
 
-    public abstract class ResponseDynamic : Response
+    public abstract class GenericResponse : Response
     {
         public JObject body;
+    }
+
+    public sealed class ErrorResponse : Response<ErrorResponseBody>
+    {
+        public override bool Success => false;
+        public override Dap.Command Command { get; set; }
+
+        public ErrorResponse() { }
+
+        public ErrorResponse(Dap.Request request, Dap.Message message)
+        {
+            Command = request.Command;
+            body = new ErrorResponseBody { error = message };
+        }
     }
 
     public partial abstract class Event : ProtocolMessage
     {
         public override Dap.MessageType MessageType => MessageType.Event;
 
-        public partial static Event ParseMessage(JObject message);
+        [JsonProperty("event")]
+        public abstract Dap.EventType EventType { get; }
+
+        public static Event ParseMessage(JObject message)
+        {
+            return ParseInternal(message);
+        }
+
+        private partial static Event ParseInternal(JObject message);
     }
 
     public abstract class Event<T> : Event
@@ -93,7 +140,7 @@ namespace Dap
         public T? body;
     }
 
-    public abstract class EventDynamic : Event
+    public abstract class GenericEvent : Event
     {
         public JObject body;
     }
