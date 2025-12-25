@@ -51,7 +51,9 @@ namespace Dap
     {
         private static partial Event ParseInternal(JObject message)
         {
-            Dap.EventType eventType = message.Value<Dap.EventType>("event");
+            Dap.EventType eventType = message["event"]?
+                .ToObject<Dap.EventType>()
+                ?? throw new MissingFieldException("event");
             switch (eventType)
             {
                 case Dap.EventType.Initialized:

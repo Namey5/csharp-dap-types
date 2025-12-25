@@ -27,7 +27,7 @@ namespace Dap
         /// Message type.
         /// </summary>
         [JsonProperty("type")]
-        public abstract MessageType MessageType { get; }
+        public abstract Dap.MessageType MessageType { get; }
 
         /// <summary>
         /// Sequence number of the message (also known as message ID).
@@ -45,14 +45,16 @@ namespace Dap
         public static ProtocolMessage Parse(string json)
         {
             JObject message = JObject.Parse(json);
-            MessageType messageType = message.Value<MessageType>("type");
+            Dap.MessageType messageType = message["type"]?
+                .ToObject<Dap.MessageType>()
+                ?? throw new MissingFieldException("type");
             switch (messageType)
             {
-                case MessageType.Request:
+                case Dap.MessageType.Request:
                     return Request.ParseMessage(message);
-                case MessageType.Response:
+                case Dap.MessageType.Response:
                     return Response.ParseMessage(message);
-                case MessageType.Event:
+                case Dap.MessageType.Event:
                     return Event.ParseMessage(message);
                 default:
                     throw new ArgumentException($"unknown message type: {messageType}");
@@ -142,7 +144,7 @@ namespace Dap
 
         public static Response ParseMessage(JObject message)
         {
-            if (!message.Value<bool>("success"))
+            if (!(message["success"]?.ToObject<bool>() ?? throw new MissingFieldException("success")))
             {
                 return message.ToObject<ErrorResponse>();
             }

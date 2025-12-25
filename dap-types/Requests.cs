@@ -107,7 +107,9 @@ namespace Dap
     {
         private static partial Request ParseInternal(JObject message)
         {
-            Dap.Command command = message.Value<Dap.Command>("command");
+            Dap.Command command = message["command"]?
+                .ToObject<Dap.Command>()
+                ?? throw new MissingFieldException("command");
             switch (command)
             {
                 case Dap.Command.Cancel:
@@ -734,7 +736,9 @@ namespace Dap
     {
         private static partial Response ParseInternal(JObject message)
         {
-            Dap.Command command = message.Value<Dap.Command>("command");
+            Dap.Command command = message["command"]?
+                .ToObject<Dap.Command>()
+                ?? throw new MissingFieldException("command");
             switch (command)
             {
                 case Dap.Command.Cancel:

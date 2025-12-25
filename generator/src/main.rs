@@ -130,8 +130,12 @@ fn write_request_types(writer: &mut Writer, types: &[(String, &Object, String)])
         writer.line("private static partial Request ParseInternal(JObject message)");
         writer.scoped(|writer| {
             writer.line(format!(
-                "{NAMESPACE}.Command command = message.Value<{NAMESPACE}.Command>(\"command\");"
+                "{NAMESPACE}.Command command = message[\"command\"]?"
             ));
+            writer.indented(|writer| {
+                writer.line(format!(".ToObject<{NAMESPACE}.Command>()"));
+                writer.line("?? throw new MissingFieldException(\"command\");");
+            });
             writer.line("switch (command)");
             writer.scoped(|writer| {
                 for (name, _, command) in types {
@@ -177,8 +181,12 @@ fn write_response_types(writer: &mut Writer, types: &[(String, &Object, String)]
         writer.line("private static partial Response ParseInternal(JObject message)");
         writer.scoped(|writer| {
             writer.line(format!(
-                "{NAMESPACE}.Command command = message.Value<{NAMESPACE}.Command>(\"command\");"
+                "{NAMESPACE}.Command command = message[\"command\"]?"
             ));
+            writer.indented(|writer| {
+                writer.line(format!(".ToObject<{NAMESPACE}.Command>()"));
+                writer.line("?? throw new MissingFieldException(\"command\");");
+            });
             writer.line("switch (command)");
             writer.scoped(|writer| {
                 for (name, _, command) in types {
@@ -262,8 +270,12 @@ fn write_events(types: &[ProtocolType]) -> String {
             writer.line("private static partial Event ParseInternal(JObject message)");
             writer.scoped(|writer| {
                 writer.line(format!(
-                    "{NAMESPACE}.EventType eventType = message.Value<{NAMESPACE}.EventType>(\"event\");"
+                    "{NAMESPACE}.EventType eventType = message[\"event\"]?"
                 ));
+                writer.indented(|writer| {
+                    writer.line(format!(".ToObject<{NAMESPACE}.EventType>()"));
+                    writer.line("?? throw new MissingFieldException(\"event\");");
+                });
                 writer.line("switch (eventType)");
                 writer.scoped(|writer| {
                     for (ty, _, event) in &event_types {
