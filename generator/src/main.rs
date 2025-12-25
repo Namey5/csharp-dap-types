@@ -60,7 +60,6 @@ fn write_file(file: &str, contents: &str) {
 fn write_requests(types: &[ProtocolType]) -> String {
     let mut writer = Writer::default();
     writer.line(DISCLAIMER);
-    writer.finished_object();
     writer.line(IMPORTS);
     writer.finished_object();
 
@@ -220,7 +219,6 @@ fn write_response_types(writer: &mut Writer, types: &[(String, &Object, String)]
 fn write_events(types: &[ProtocolType]) -> String {
     let mut writer = Writer::default();
     writer.line(DISCLAIMER);
-    writer.finished_object();
     writer.line(IMPORTS);
     writer.finished_object();
 
@@ -305,7 +303,6 @@ fn write_events(types: &[ProtocolType]) -> String {
 fn write_types(types: &[ProtocolType]) -> String {
     let mut writer = Writer::default();
     writer.line(DISCLAIMER);
-    writer.finished_object();
     writer.line(IMPORTS);
     writer.finished_object();
 
