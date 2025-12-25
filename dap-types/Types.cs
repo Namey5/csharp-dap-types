@@ -9,161 +9,270 @@ using Newtonsoft.Json.Linq;
 
 namespace Dap
 {
+    /// <summary>
     /// On error (whenever `success` is false), the body can provide more details.
+    /// </summary>
     [JsonObject]
     public struct ErrorResponseBody
     {
+        /// <summary>
         /// A structured error message.
+        /// </summary>
         public Message? error;
     }
 
+    /// <summary>
     /// Arguments for `cancel` request.
+    /// </summary>
     [JsonObject]
     public struct CancelArguments
     {
+        /// <summary>
         /// The ID (attribute `seq`) of the request to cancel. If missing no request is cancelled.
+        /// <br/>
         /// Both a `requestId` and a `progressId` can be specified in one request.
+        /// </summary>
         public ulong? requestId;
+        /// <summary>
         /// The ID (attribute `progressId`) of the progress to cancel. If missing no progress is cancelled.
+        /// <br/>
         /// Both a `requestId` and a `progressId` can be specified in one request.
+        /// </summary>
         public string? progressId;
     }
 
+    /// <summary>
     /// The event indicates that the execution of the debuggee has stopped due to some condition.
+    /// <br/>
     /// This can be caused by a breakpoint previously set, a stepping request has completed, by executing a debugger statement etc.
+    /// </summary>
     [JsonObject]
     public struct StoppedEventBody
     {
+        /// <summary>
         /// The reason for the event.
+        /// <br/>
         /// For backward compatibility this string is shown in the UI if the `description` attribute is missing (but it must not be translated).
+        /// </summary>
         public string reason;
+        /// <summary>
         /// The full reason for the event, e.g. 'Paused on exception'. This string is shown in the UI as is and can be translated.
+        /// </summary>
         public string? description;
+        /// <summary>
         /// The thread which was stopped.
+        /// </summary>
         public ulong? threadId;
+        /// <summary>
         /// A value of true hints to the client that this event should not change the focus.
+        /// </summary>
         public bool? preserveFocusHint;
+        /// <summary>
         /// Additional information. E.g. if reason is `exception`, text contains the exception name. This string is shown in the UI.
+        /// </summary>
         public string? text;
+        /// <summary>
         /// If `allThreadsStopped` is true, a debug adapter can announce that all threads have stopped.
+        /// <br/>
         /// - The client should use this information to enable that all threads can be expanded to access their stacktraces.
+        /// <br/>
         /// - If the attribute is missing or false, only the thread with the given `threadId` can be expanded.
+        /// </summary>
         public bool? allThreadsStopped;
+        /// <summary>
         /// Ids of the breakpoints that triggered the event. In most cases there is only a single breakpoint but here are some examples for multiple breakpoints:
+        /// <br/>
         /// - Different types of breakpoints map to the same location.
+        /// <br/>
         /// - Multiple source breakpoints get collapsed to the same instruction by the compiler/runtime.
+        /// <br/>
         /// - Multiple function breakpoints with different function names map to the same location.
+        /// </summary>
         public ulong[]? hitBreakpointIds;
     }
 
+    /// <summary>
     /// The event indicates that the execution of the debuggee has continued.
+    /// <br/>
     /// Please note: a debug adapter is not expected to send this event in response to a request that implies that execution continues, e.g. `launch` or `continue`.
+    /// <br/>
     /// It is only necessary to send a `continued` event if there was no previous request that implied this.
+    /// </summary>
     [JsonObject]
     public struct ContinuedEventBody
     {
+        /// <summary>
         /// The thread which was continued.
+        /// </summary>
         public ulong threadId;
+        /// <summary>
         /// If omitted or set to `true`, this event signals to the client that all threads have been resumed. The value `false` indicates that not all threads were resumed.
+        /// </summary>
         public bool? allThreadsContinued;
     }
 
+    /// <summary>
     /// The event indicates that the debuggee has exited and returns its exit code.
+    /// </summary>
     [JsonObject]
     public struct ExitedEventBody
     {
+        /// <summary>
         /// The exit code returned from the debuggee.
+        /// </summary>
         public ulong exitCode;
     }
 
+    /// <summary>
     /// The event indicates that debugging of the debuggee has terminated. This does **not** mean that the debuggee itself has exited.
+    /// </summary>
     [JsonObject]
     public struct TerminatedEventBody
     {
+        /// <summary>
         /// A debug adapter may set `restart` to true (or to an arbitrary object) to request that the client restarts the session.
+        /// <br/>
         /// The value is not interpreted by the client and passed unmodified as an attribute `__restart` to the `launch` and `attach` requests.
+        /// </summary>
         public object? restart;
     }
 
+    /// <summary>
     /// The event indicates that a thread has started or exited.
+    /// </summary>
     [JsonObject]
     public struct ThreadEventBody
     {
+        /// <summary>
         /// The reason for the event.
+        /// </summary>
         public string reason;
+        /// <summary>
         /// The identifier of the thread.
+        /// </summary>
         public ulong threadId;
     }
 
+    /// <summary>
     /// The event indicates that the target has produced some output.
+    /// </summary>
     [JsonObject]
     public struct OutputEventBody
     {
+        /// <summary>
         /// The output category. If not specified or if the category is not understood by the client, `console` is assumed.
+        /// </summary>
         public string? category;
+        /// <summary>
         /// The output to report.
+        /// <br/>
         ///
+        /// <br/>
         /// ANSI escape sequences may be used to influence text color and styling if `supportsANSIStyling` is present in both the adapter's `Capabilities` and the client's `InitializeRequestArguments`. A client may strip any unrecognized ANSI sequences.
+        /// <br/>
         ///
+        /// <br/>
         /// If the `supportsANSIStyling` capabilities are not both true, then the client should display the output literally.
+        /// </summary>
         public string output;
+        /// <summary>
         /// Support for keeping an output log organized by grouping related messages.
+        /// </summary>
         public OutputEventBodyGroup? group;
+        /// <summary>
         /// If an attribute `variablesReference` exists and its value is > 0, the output contains objects which can be retrieved by passing `variablesReference` to the `variables` request as long as execution remains suspended. See 'Lifetime of Object References' in the Overview section for details.
+        /// </summary>
         public ulong? variablesReference;
+        /// <summary>
         /// The source location where the output was produced.
+        /// </summary>
         public Source? source;
+        /// <summary>
         /// The source location's line where the output was produced.
+        /// </summary>
         public ulong? line;
+        /// <summary>
         /// The position in `line` where the output was produced. It is measured in UTF-16 code units and the client capability `columnsStartAt1` determines whether it is 0- or 1-based.
+        /// </summary>
         public ulong? column;
+        /// <summary>
         /// Additional data to report. For the `telemetry` category the data is sent to telemetry, for the other categories the data is shown in JSON format.
+        /// </summary>
         public object? data;
+        /// <summary>
         /// A reference that allows the client to request the location where the new value is declared. For example, if the logged value is function pointer, the adapter may be able to look up the function's location. This should be present only if the adapter is likely to be able to resolve the location.
+        /// <br/>
         ///
+        /// <br/>
         /// This reference shares the same lifetime as the `variablesReference`. See 'Lifetime of Object References' in the Overview section for details.
+        /// </summary>
         public ulong? locationReference;
     }
 
+    /// <summary>
     /// Support for keeping an output log organized by grouping related messages.
+    /// </summary>
     [JsonConverter(typeof(StringEnumConverter))]
     public enum OutputEventBodyGroup
     {
+        /// <summary>
         /// Start a new group in expanded mode. Subsequent output events are members of the group and should be shown indented.
+        /// <br/>
         /// The `output` attribute becomes the name of the group and is not indented.
+        /// </summary>
         [EnumMember(Value = "start")]
         Start,
+        /// <summary>
         /// Start a new group in collapsed mode. Subsequent output events are members of the group and should be shown indented (as soon as the group is expanded).
+        /// <br/>
         /// The `output` attribute becomes the name of the group and is not indented.
+        /// </summary>
         [EnumMember(Value = "startCollapsed")]
         StartCollapsed,
+        /// <summary>
         /// End the current group and decrease the indentation of subsequent output events.
+        /// <br/>
         /// A non-empty `output` attribute is shown as the unindented end of the group.
+        /// </summary>
         [EnumMember(Value = "end")]
         End,
     }
 
+    /// <summary>
     /// The event indicates that some information about a breakpoint has changed.
+    /// </summary>
     [JsonObject]
     public struct BreakpointEventBody
     {
+        /// <summary>
         /// The reason for the event.
+        /// </summary>
         public string reason;
+        /// <summary>
         /// The `id` attribute is used to find the target breakpoint, the other attributes are used as the new values.
+        /// </summary>
         public Breakpoint breakpoint;
     }
 
+    /// <summary>
     /// The event indicates that some information about a module has changed.
+    /// </summary>
     [JsonObject]
     public struct ModuleEventBody
     {
+        /// <summary>
         /// The reason for the event.
+        /// </summary>
         public ModuleEventBodyReason reason;
+        /// <summary>
         /// The new, changed, or removed module. In case of `removed` only the module id is used.
+        /// </summary>
         public Module module;
     }
 
+    /// <summary>
     /// The reason for the event.
+    /// </summary>
     [JsonConverter(typeof(StringEnumConverter))]
     public enum ModuleEventBodyReason
     {
@@ -175,17 +284,25 @@ namespace Dap
         Removed,
     }
 
+    /// <summary>
     /// The event indicates that some source has been added, changed, or removed from the set of all loaded sources.
+    /// </summary>
     [JsonObject]
     public struct LoadedSourceEventBody
     {
+        /// <summary>
         /// The reason for the event.
+        /// </summary>
         public LoadedSourceEventBodyReason reason;
+        /// <summary>
         /// The new, changed, or removed source.
+        /// </summary>
         public Source source;
     }
 
+    /// <summary>
     /// The reason for the event.
+    /// </summary>
     [JsonConverter(typeof(StringEnumConverter))]
     public enum LoadedSourceEventBodyReason
     {
@@ -197,144 +314,244 @@ namespace Dap
         Removed,
     }
 
+    /// <summary>
     /// The event indicates that the debugger has begun debugging a new process. Either one that it has launched, or one that it has attached to.
+    /// </summary>
     [JsonObject]
     public struct ProcessEventBody
     {
+        /// <summary>
         /// The logical name of the process. This is usually the full path to process's executable file. Example: /home/example/myproj/program.js.
+        /// </summary>
         public string name;
+        /// <summary>
         /// The process ID of the debugged process, as assigned by the operating system. This property should be omitted for logical processes that do not map to operating system processes on the machine.
+        /// </summary>
         public ulong? systemProcessId;
+        /// <summary>
         /// If true, the process is running on the same computer as the debug adapter.
+        /// </summary>
         public bool? isLocalProcess;
+        /// <summary>
         /// Describes how the debug engine started debugging this process.
+        /// </summary>
         public ProcessEventBodyStartMethod? startMethod;
+        /// <summary>
         /// The size of a pointer or address for this process, in bits. This value may be used by clients when formatting addresses for display.
+        /// </summary>
         public ulong? pointerSize;
     }
 
+    /// <summary>
     /// Describes how the debug engine started debugging this process.
+    /// </summary>
     [JsonConverter(typeof(StringEnumConverter))]
     public enum ProcessEventBodyStartMethod
     {
+        /// <summary>
         /// Process was launched under the debugger.
+        /// </summary>
         [EnumMember(Value = "launch")]
         Launch,
+        /// <summary>
         /// Debugger attached to an existing process.
+        /// </summary>
         [EnumMember(Value = "attach")]
         Attach,
+        /// <summary>
         /// A project launcher component has launched a new process in a suspended state and then asked the debugger to attach.
+        /// </summary>
         [EnumMember(Value = "attachForSuspendedLaunch")]
         AttachForSuspendedLaunch,
     }
 
+    /// <summary>
     /// The event indicates that one or more capabilities have changed.
+    /// <br/>
     /// Since the capabilities are dependent on the client and its UI, it might not be possible to change that at random times (or too late).
+    /// <br/>
     /// Consequently this event has a hint characteristic: a client can only be expected to make a 'best effort' in honoring individual capabilities but there are no guarantees.
+    /// <br/>
     /// Only changed capabilities need to be included, all other capabilities keep their values.
+    /// </summary>
     [JsonObject]
     public struct CapabilitiesEventBody
     {
+        /// <summary>
         /// The set of updated capabilities.
+        /// </summary>
         public Capabilities capabilities;
     }
 
+    /// <summary>
     /// The event signals that a long running operation is about to start and provides additional information for the client to set up a corresponding progress and cancellation UI.
+    /// <br/>
     /// The client is free to delay the showing of the UI in order to reduce flicker.
+    /// <br/>
     /// This event should only be sent if the corresponding capability `supportsProgressReporting` is true.
+    /// </summary>
     [JsonObject]
     public struct ProgressStartEventBody
     {
+        /// <summary>
         /// An ID that can be used in subsequent `progressUpdate` and `progressEnd` events to make them refer to the same progress reporting.
+        /// <br/>
         /// IDs must be unique within a debug session.
+        /// </summary>
         public string progressId;
+        /// <summary>
         /// Short title of the progress reporting. Shown in the UI to describe the long running operation.
+        /// </summary>
         public string title;
+        /// <summary>
         /// The request ID that this progress report is related to. If specified a debug adapter is expected to emit progress events for the long running request until the request has been either completed or cancelled.
+        /// <br/>
         /// If the request ID is omitted, the progress report is assumed to be related to some general activity of the debug adapter.
+        /// </summary>
         public ulong? requestId;
+        /// <summary>
         /// If true, the request that reports progress may be cancelled with a `cancel` request.
+        /// <br/>
         /// So this property basically controls whether the client should use UX that supports cancellation.
+        /// <br/>
         /// Clients that don't support cancellation are allowed to ignore the setting.
+        /// </summary>
         public bool? cancellable;
+        /// <summary>
         /// More detailed progress message.
+        /// </summary>
         public string? message;
+        /// <summary>
         /// Progress percentage to display (value range: 0 to 100). If omitted no percentage is shown.
+        /// </summary>
         public double? percentage;
     }
 
+    /// <summary>
     /// The event signals that the progress reporting needs to be updated with a new message and/or percentage.
+    /// <br/>
     /// The client does not have to update the UI immediately, but the clients needs to keep track of the message and/or percentage values.
+    /// <br/>
     /// This event should only be sent if the corresponding capability `supportsProgressReporting` is true.
+    /// </summary>
     [JsonObject]
     public struct ProgressUpdateEventBody
     {
+        /// <summary>
         /// The ID that was introduced in the initial `progressStart` event.
+        /// </summary>
         public string progressId;
+        /// <summary>
         /// More detailed progress message. If omitted, the previous message (if any) is used.
+        /// </summary>
         public string? message;
+        /// <summary>
         /// Progress percentage to display (value range: 0 to 100). If omitted no percentage is shown.
+        /// </summary>
         public double? percentage;
     }
 
+    /// <summary>
     /// The event signals the end of the progress reporting with a final message.
+    /// <br/>
     /// This event should only be sent if the corresponding capability `supportsProgressReporting` is true.
+    /// </summary>
     [JsonObject]
     public struct ProgressEndEventBody
     {
+        /// <summary>
         /// The ID that was introduced in the initial `ProgressStartEvent`.
+        /// </summary>
         public string progressId;
+        /// <summary>
         /// More detailed progress message. If omitted, the previous message (if any) is used.
+        /// </summary>
         public string? message;
     }
 
+    /// <summary>
     /// This event signals that some state in the debug adapter has changed and requires that the client needs to re-render the data snapshot previously requested.
+    /// <br/>
     /// Debug adapters do not have to emit this event for runtime changes like stopped or thread events because in that case the client refetches the new state anyway. But the event can be used for example to refresh the UI after rendering formatting has changed in the debug adapter.
+    /// <br/>
     /// This event should only be sent if the corresponding capability `supportsInvalidatedEvent` is true.
+    /// </summary>
     [JsonObject]
     public struct InvalidatedEventBody
     {
+        /// <summary>
         /// Set of logical areas that got invalidated. This property has a hint characteristic: a client can only be expected to make a 'best effort' in honoring the areas but there are no guarantees. If this property is missing, empty, or if values are not understood, the client should assume a single value `all`.
+        /// </summary>
         public string[]? areas;
+        /// <summary>
         /// If specified, the client only needs to refetch data related to this thread.
+        /// </summary>
         public ulong? threadId;
+        /// <summary>
         /// If specified, the client only needs to refetch data related to this stack frame (and the `threadId` is ignored).
+        /// </summary>
         public ulong? stackFrameId;
     }
 
+    /// <summary>
     /// This event indicates that some memory range has been updated. It should only be sent if the corresponding capability `supportsMemoryEvent` is true.
+    /// <br/>
     /// Clients typically react to the event by re-issuing a `readMemory` request if they show the memory identified by the `memoryReference` and if the updated memory range overlaps the displayed range. Clients should not make assumptions how individual memory references relate to each other, so they should not assume that they are part of a single continuous address range and might overlap.
+    /// <br/>
     /// Debug adapters can use this event to indicate that the contents of a memory range has changed due to some other request like `setVariable` or `setExpression`. Debug adapters are not expected to emit this event for each and every memory change of a running program, because that information is typically not available from debuggers and it would flood clients with too many events.
+    /// </summary>
     [JsonObject]
     public struct MemoryEventBody
     {
+        /// <summary>
         /// Memory reference of a memory range that has been updated.
+        /// </summary>
         public string memoryReference;
+        /// <summary>
         /// Starting offset in bytes where memory has been updated. Can be negative.
+        /// </summary>
         public ulong offset;
+        /// <summary>
         /// Number of bytes updated.
+        /// </summary>
         public ulong count;
     }
 
+    /// <summary>
     /// Arguments for `runInTerminal` request.
+    /// </summary>
     [JsonObject]
     public struct RunInTerminalRequestArguments
     {
+        /// <summary>
         /// What kind of terminal to launch. Defaults to `integrated` if not specified.
+        /// </summary>
         public RunInTerminalRequestArgumentsKind? kind;
+        /// <summary>
         /// Title of the terminal.
+        /// </summary>
         public string? title;
+        /// <summary>
         /// Working directory for the command. For non-empty, valid paths this typically results in execution of a change directory command.
+        /// </summary>
         public string cwd;
+        /// <summary>
         /// List of arguments. The first argument is the command to run.
+        /// </summary>
         public string[] args;
+        /// <summary>
         /// Environment key-value pairs that are added to or removed from the default environment.
+        /// </summary>
         public object? env;
+        /// <summary>
         /// This property should only be set if the corresponding capability `supportsArgsCanBeInterpretedByShell` is true. If the client uses an intermediary shell to launch the application, then the client must not attempt to escape characters with special meanings for the shell. The user is fully responsible for escaping as needed and that arguments using special characters may not be portable across shells.
+        /// </summary>
         public bool? argsCanBeInterpretedByShell;
     }
 
+    /// <summary>
     /// What kind of terminal to launch. Defaults to `integrated` if not specified.
+    /// </summary>
     [JsonConverter(typeof(StringEnumConverter))]
     public enum RunInTerminalRequestArgumentsKind
     {
@@ -344,27 +561,41 @@ namespace Dap
         External,
     }
 
+    /// <summary>
     /// Response to `runInTerminal` request.
+    /// </summary>
     [JsonObject]
     public struct RunInTerminalResponseBody
     {
+        /// <summary>
         /// The process ID. The value should be less than or equal to 2147483647 (2^31-1).
+        /// </summary>
         public ulong? processId;
+        /// <summary>
         /// The process ID of the terminal shell. The value should be less than or equal to 2147483647 (2^31-1).
+        /// </summary>
         public ulong? shellProcessId;
     }
 
+    /// <summary>
     /// Arguments for `startDebugging` request.
+    /// </summary>
     [JsonObject]
     public struct StartDebuggingRequestArguments
     {
+        /// <summary>
         /// Arguments passed to the new debug session. The arguments must only contain properties understood by the `launch` or `attach` requests of the debug adapter and they must not contain any client-specific properties (e.g. `type`) or client-specific features (e.g. substitutable 'variables').
+        /// </summary>
         public object configuration;
+        /// <summary>
         /// Indicates whether the new debug session should be started with a `launch` or `attach` request.
+        /// </summary>
         public StartDebuggingRequestArgumentsRequest request;
     }
 
+    /// <summary>
     /// Indicates whether the new debug session should be started with a `launch` or `attach` request.
+    /// </summary>
     [JsonConverter(typeof(StringEnumConverter))]
     public enum StartDebuggingRequestArgumentsRequest
     {
@@ -374,405 +605,675 @@ namespace Dap
         Attach,
     }
 
+    /// <summary>
     /// Arguments for `initialize` request.
+    /// </summary>
     [JsonObject]
     public struct InitializeRequestArguments
     {
+        /// <summary>
         /// The ID of the client using this adapter.
+        /// </summary>
         public string? clientID;
+        /// <summary>
         /// The human-readable name of the client using this adapter.
+        /// </summary>
         public string? clientName;
+        /// <summary>
         /// The ID of the debug adapter.
+        /// </summary>
         public string adapterID;
+        /// <summary>
         /// The ISO-639 locale of the client using this adapter, e.g. en-US or de-CH.
+        /// </summary>
         public string? locale;
+        /// <summary>
         /// If true all line numbers are 1-based (default).
+        /// </summary>
         public bool? linesStartAt1;
+        /// <summary>
         /// If true all column numbers are 1-based (default).
+        /// </summary>
         public bool? columnsStartAt1;
+        /// <summary>
         /// Determines in what format paths are specified. The default is `path`, which is the native format.
+        /// </summary>
         public string? pathFormat;
+        /// <summary>
         /// Client supports the `type` attribute for variables.
+        /// </summary>
         public bool? supportsVariableType;
+        /// <summary>
         /// Client supports the paging of variables.
+        /// </summary>
         public bool? supportsVariablePaging;
+        /// <summary>
         /// Client supports the `runInTerminal` request.
+        /// </summary>
         public bool? supportsRunInTerminalRequest;
+        /// <summary>
         /// Client supports memory references.
+        /// </summary>
         public bool? supportsMemoryReferences;
+        /// <summary>
         /// Client supports progress reporting.
+        /// </summary>
         public bool? supportsProgressReporting;
+        /// <summary>
         /// Client supports the `invalidated` event.
+        /// </summary>
         public bool? supportsInvalidatedEvent;
+        /// <summary>
         /// Client supports the `memory` event.
+        /// </summary>
         public bool? supportsMemoryEvent;
+        /// <summary>
         /// Client supports the `argsCanBeInterpretedByShell` attribute on the `runInTerminal` request.
+        /// </summary>
         public bool? supportsArgsCanBeInterpretedByShell;
+        /// <summary>
         /// Client supports the `startDebugging` request.
+        /// </summary>
         public bool? supportsStartDebuggingRequest;
+        /// <summary>
         /// The client will interpret ANSI escape sequences in the display of `OutputEvent.output` and `Variable.value` fields when `Capabilities.supportsANSIStyling` is also enabled.
+        /// </summary>
         public bool? supportsANSIStyling;
     }
 
+    /// <summary>
     /// Arguments for `configurationDone` request.
+    /// </summary>
     [JsonObject]
     public struct ConfigurationDoneArguments {}
 
+    /// <summary>
     /// Arguments for `disconnect` request.
+    /// </summary>
     [JsonObject]
     public struct DisconnectArguments
     {
+        /// <summary>
         /// A value of true indicates that this `disconnect` request is part of a restart sequence.
+        /// </summary>
         public bool? restart;
+        /// <summary>
         /// Indicates whether the debuggee should be terminated when the debugger is disconnected.
+        /// <br/>
         /// If unspecified, the debug adapter is free to do whatever it thinks is best.
+        /// <br/>
         /// The attribute is only honored by a debug adapter if the corresponding capability `supportTerminateDebuggee` is true.
+        /// </summary>
         public bool? terminateDebuggee;
+        /// <summary>
         /// Indicates whether the debuggee should stay suspended when the debugger is disconnected.
+        /// <br/>
         /// If unspecified, the debuggee should resume execution.
+        /// <br/>
         /// The attribute is only honored by a debug adapter if the corresponding capability `supportSuspendDebuggee` is true.
+        /// </summary>
         public bool? suspendDebuggee;
     }
 
+    /// <summary>
     /// Arguments for `terminate` request.
+    /// </summary>
     [JsonObject]
     public struct TerminateArguments
     {
+        /// <summary>
         /// A value of true indicates that this `terminate` request is part of a restart sequence.
+        /// </summary>
         public bool? restart;
     }
 
+    /// <summary>
     /// Arguments for `breakpointLocations` request.
+    /// </summary>
     [JsonObject]
     public struct BreakpointLocationsArguments
     {
+        /// <summary>
         /// The source location of the breakpoints; either `source.path` or `source.sourceReference` must be specified.
+        /// </summary>
         public Source source;
+        /// <summary>
         /// Start line of range to search possible breakpoint locations in. If only the line is specified, the request returns all possible locations in that line.
+        /// </summary>
         public ulong line;
+        /// <summary>
         /// Start position within `line` to search possible breakpoint locations in. It is measured in UTF-16 code units and the client capability `columnsStartAt1` determines whether it is 0- or 1-based. If no column is given, the first position in the start line is assumed.
+        /// </summary>
         public ulong? column;
+        /// <summary>
         /// End line of range to search possible breakpoint locations in. If no end line is given, then the end line is assumed to be the start line.
+        /// </summary>
         public ulong? endLine;
+        /// <summary>
         /// End position within `endLine` to search possible breakpoint locations in. It is measured in UTF-16 code units and the client capability `columnsStartAt1` determines whether it is 0- or 1-based. If no end column is given, the last position in the end line is assumed.
+        /// </summary>
         public ulong? endColumn;
     }
 
+    /// <summary>
     /// Response to `breakpointLocations` request.
+    /// <br/>
     /// Contains possible locations for source breakpoints.
+    /// </summary>
     [JsonObject]
     public struct BreakpointLocationsResponseBody
     {
+        /// <summary>
         /// Sorted set of possible breakpoint locations.
+        /// </summary>
         public BreakpointLocation[] breakpoints;
     }
 
+    /// <summary>
     /// Arguments for `setBreakpoints` request.
+    /// </summary>
     [JsonObject]
     public struct SetBreakpointsArguments
     {
+        /// <summary>
         /// The source location of the breakpoints; either `source.path` or `source.sourceReference` must be specified.
+        /// </summary>
         public Source source;
+        /// <summary>
         /// The code locations of the breakpoints.
+        /// </summary>
         public SourceBreakpoint[]? breakpoints;
+        /// <summary>
         /// Deprecated: The code locations of the breakpoints.
+        /// </summary>
         public ulong[]? lines;
+        /// <summary>
         /// A value of true indicates that the underlying source has been modified which results in new breakpoint locations.
+        /// </summary>
         public bool? sourceModified;
     }
 
+    /// <summary>
     /// Response to `setBreakpoints` request.
+    /// <br/>
     /// Returned is information about each breakpoint created by this request.
+    /// <br/>
     /// This includes the actual code location and whether the breakpoint could be verified.
+    /// <br/>
     /// The breakpoints returned are in the same order as the elements of the `breakpoints`
+    /// <br/>
     /// (or the deprecated `lines`) array in the arguments.
+    /// </summary>
     [JsonObject]
     public struct SetBreakpointsResponseBody
     {
+        /// <summary>
         /// Information about the breakpoints.
+        /// <br/>
         /// The array elements are in the same order as the elements of the `breakpoints` (or the deprecated `lines`) array in the arguments.
+        /// </summary>
         public Breakpoint[] breakpoints;
     }
 
+    /// <summary>
     /// Arguments for `setFunctionBreakpoints` request.
+    /// </summary>
     [JsonObject]
     public struct SetFunctionBreakpointsArguments
     {
+        /// <summary>
         /// The function names of the breakpoints.
+        /// </summary>
         public FunctionBreakpoint[] breakpoints;
     }
 
+    /// <summary>
     /// Response to `setFunctionBreakpoints` request.
+    /// <br/>
     /// Returned is information about each breakpoint created by this request.
+    /// </summary>
     [JsonObject]
     public struct SetFunctionBreakpointsResponseBody
     {
+        /// <summary>
         /// Information about the breakpoints. The array elements correspond to the elements of the `breakpoints` array.
+        /// </summary>
         public Breakpoint[] breakpoints;
     }
 
+    /// <summary>
     /// Arguments for `setExceptionBreakpoints` request.
+    /// </summary>
     [JsonObject]
     public struct SetExceptionBreakpointsArguments
     {
+        /// <summary>
         /// Set of exception filters specified by their ID. The set of all possible exception filters is defined by the `exceptionBreakpointFilters` capability. The `filter` and `filterOptions` sets are additive.
+        /// </summary>
         public string[] filters;
+        /// <summary>
         /// Set of exception filters and their options. The set of all possible exception filters is defined by the `exceptionBreakpointFilters` capability. This attribute is only honored by a debug adapter if the corresponding capability `supportsExceptionFilterOptions` is true. The `filter` and `filterOptions` sets are additive.
+        /// </summary>
         public ExceptionFilterOptions[]? filterOptions;
+        /// <summary>
         /// Configuration options for selected exceptions.
+        /// <br/>
         /// The attribute is only honored by a debug adapter if the corresponding capability `supportsExceptionOptions` is true.
+        /// </summary>
         public ExceptionOptions[]? exceptionOptions;
     }
 
+    /// <summary>
     /// Response to `setExceptionBreakpoints` request.
+    /// <br/>
     /// The response contains an array of `Breakpoint` objects with information about each exception breakpoint or filter. The `Breakpoint` objects are in the same order as the elements of the `filters`, `filterOptions`, `exceptionOptions` arrays given as arguments. If both `filters` and `filterOptions` are given, the returned array must start with `filters` information first, followed by `filterOptions` information.
+    /// <br/>
     /// The `verified` property of a `Breakpoint` object signals whether the exception breakpoint or filter could be successfully created and whether the condition is valid. In case of an error the `message` property explains the problem. The `id` property can be used to introduce a unique ID for the exception breakpoint or filter so that it can be updated subsequently by sending breakpoint events.
+    /// <br/>
     /// For backward compatibility both the `breakpoints` array and the enclosing `body` are optional. If these elements are missing a client is not able to show problems for individual exception breakpoints or filters.
+    /// </summary>
     [JsonObject]
     public struct SetExceptionBreakpointsResponseBody
     {
+        /// <summary>
         /// Information about the exception breakpoints or filters.
+        /// <br/>
         /// The breakpoints returned are in the same order as the elements of the `filters`, `filterOptions`, `exceptionOptions` arrays in the arguments. If both `filters` and `filterOptions` are given, the returned array must start with `filters` information first, followed by `filterOptions` information.
+        /// </summary>
         public Breakpoint[]? breakpoints;
     }
 
+    /// <summary>
     /// Arguments for `dataBreakpointInfo` request.
+    /// </summary>
     [JsonObject]
     public struct DataBreakpointInfoArguments
     {
+        /// <summary>
         /// Reference to the variable container if the data breakpoint is requested for a child of the container. The `variablesReference` must have been obtained in the current suspended state. See 'Lifetime of Object References' in the Overview section for details.
+        /// </summary>
         public ulong? variablesReference;
+        /// <summary>
         /// The name of the variable's child to obtain data breakpoint information for.
+        /// <br/>
         /// If `variablesReference` isn't specified, this can be an expression, or an address if `asAddress` is also true.
+        /// </summary>
         public string name;
+        /// <summary>
         /// When `name` is an expression, evaluate it in the scope of this stack frame. If not specified, the expression is evaluated in the global scope. When `variablesReference` is specified, this property has no effect.
+        /// </summary>
         public ulong? frameId;
+        /// <summary>
         /// If specified, a debug adapter should return information for the range of memory extending `bytes` number of bytes from the address or variable specified by `name`. Breakpoints set using the resulting data ID should pause on data access anywhere within that range.
+        /// <br/>
         ///
+        /// <br/>
         /// Clients may set this property only if the `supportsDataBreakpointBytes` capability is true.
+        /// </summary>
         public ulong? bytes;
+        /// <summary>
         /// If `true`, the `name` is a memory address and the debugger should interpret it as a decimal value, or hex value if it is prefixed with `0x`.
+        /// <br/>
         ///
+        /// <br/>
         /// Clients may set this property only if the `supportsDataBreakpointBytes`
+        /// <br/>
         /// capability is true.
+        /// </summary>
         public bool? asAddress;
+        /// <summary>
         /// The mode of the desired breakpoint. If defined, this must be one of the `breakpointModes` the debug adapter advertised in its `Capabilities`.
+        /// </summary>
         public string? mode;
     }
 
+    /// <summary>
     /// Response to `dataBreakpointInfo` request.
+    /// </summary>
     [JsonObject]
     public struct DataBreakpointInfoResponseBody
     {
+        /// <summary>
         /// An identifier for the data on which a data breakpoint can be registered with the `setDataBreakpoints` request or null if no data breakpoint is available. If a `variablesReference` or `frameId` is passed, the `dataId` is valid in the current suspended state, otherwise it's valid indefinitely. See 'Lifetime of Object References' in the Overview section for details. Breakpoints set using the `dataId` in the `setDataBreakpoints` request may outlive the lifetime of the associated `dataId`.
+        /// </summary>
         public string dataId;
+        /// <summary>
         /// UI string that describes on what data the breakpoint is set on or why a data breakpoint is not available.
+        /// </summary>
         public string description;
+        /// <summary>
         /// Attribute lists the available access types for a potential data breakpoint. A UI client could surface this information.
+        /// </summary>
         public DataBreakpointAccessType[]? accessTypes;
+        /// <summary>
         /// Attribute indicates that a potential data breakpoint could be persisted across sessions.
+        /// </summary>
         public bool? canPersist;
     }
 
+    /// <summary>
     /// Arguments for `setDataBreakpoints` request.
+    /// </summary>
     [JsonObject]
     public struct SetDataBreakpointsArguments
     {
+        /// <summary>
         /// The contents of this array replaces all existing data breakpoints. An empty array clears all data breakpoints.
+        /// </summary>
         public DataBreakpoint[] breakpoints;
     }
 
+    /// <summary>
     /// Response to `setDataBreakpoints` request.
+    /// <br/>
     /// Returned is information about each breakpoint created by this request.
+    /// </summary>
     [JsonObject]
     public struct SetDataBreakpointsResponseBody
     {
+        /// <summary>
         /// Information about the data breakpoints. The array elements correspond to the elements of the input argument `breakpoints` array.
+        /// </summary>
         public Breakpoint[] breakpoints;
     }
 
+    /// <summary>
     /// Arguments for `setInstructionBreakpoints` request
+    /// </summary>
     [JsonObject]
     public struct SetInstructionBreakpointsArguments
     {
+        /// <summary>
         /// The instruction references of the breakpoints
+        /// </summary>
         public InstructionBreakpoint[] breakpoints;
     }
 
+    /// <summary>
     /// Response to `setInstructionBreakpoints` request
+    /// </summary>
     [JsonObject]
     public struct SetInstructionBreakpointsResponseBody
     {
+        /// <summary>
         /// Information about the breakpoints. The array elements correspond to the elements of the `breakpoints` array.
+        /// </summary>
         public Breakpoint[] breakpoints;
     }
 
+    /// <summary>
     /// Arguments for `continue` request.
+    /// </summary>
     [JsonObject]
     public struct ContinueArguments
     {
+        /// <summary>
         /// Specifies the active thread. If the debug adapter supports single thread execution (see `supportsSingleThreadExecutionRequests`) and the argument `singleThread` is true, only the thread with this ID is resumed.
+        /// </summary>
         public ulong threadId;
+        /// <summary>
         /// If this flag is true, execution is resumed only for the thread with given `threadId`.
+        /// </summary>
         public bool? singleThread;
     }
 
+    /// <summary>
     /// Response to `continue` request.
+    /// </summary>
     [JsonObject]
     public struct ContinueResponseBody
     {
+        /// <summary>
         /// If omitted or set to `true`, this response signals to the client that all threads have been resumed. The value `false` indicates that not all threads were resumed.
+        /// </summary>
         public bool? allThreadsContinued;
     }
 
+    /// <summary>
     /// Arguments for `next` request.
+    /// </summary>
     [JsonObject]
     public struct NextArguments
     {
+        /// <summary>
         /// Specifies the thread for which to resume execution for one step (of the given granularity).
+        /// </summary>
         public ulong threadId;
+        /// <summary>
         /// If this flag is true, all other suspended threads are not resumed.
+        /// </summary>
         public bool? singleThread;
+        /// <summary>
         /// Stepping granularity. If no granularity is specified, a granularity of `statement` is assumed.
+        /// </summary>
         public SteppingGranularity? granularity;
     }
 
+    /// <summary>
     /// Arguments for `stepIn` request.
+    /// </summary>
     [JsonObject]
     public struct StepInArguments
     {
+        /// <summary>
         /// Specifies the thread for which to resume execution for one step-into (of the given granularity).
+        /// </summary>
         public ulong threadId;
+        /// <summary>
         /// If this flag is true, all other suspended threads are not resumed.
+        /// </summary>
         public bool? singleThread;
+        /// <summary>
         /// Id of the target to step into.
+        /// </summary>
         public ulong? targetId;
+        /// <summary>
         /// Stepping granularity. If no granularity is specified, a granularity of `statement` is assumed.
+        /// </summary>
         public SteppingGranularity? granularity;
     }
 
+    /// <summary>
     /// Arguments for `stepOut` request.
+    /// </summary>
     [JsonObject]
     public struct StepOutArguments
     {
+        /// <summary>
         /// Specifies the thread for which to resume execution for one step-out (of the given granularity).
+        /// </summary>
         public ulong threadId;
+        /// <summary>
         /// If this flag is true, all other suspended threads are not resumed.
+        /// </summary>
         public bool? singleThread;
+        /// <summary>
         /// Stepping granularity. If no granularity is specified, a granularity of `statement` is assumed.
+        /// </summary>
         public SteppingGranularity? granularity;
     }
 
+    /// <summary>
     /// Arguments for `stepBack` request.
+    /// </summary>
     [JsonObject]
     public struct StepBackArguments
     {
+        /// <summary>
         /// Specifies the thread for which to resume execution for one step backwards (of the given granularity).
+        /// </summary>
         public ulong threadId;
+        /// <summary>
         /// If this flag is true, all other suspended threads are not resumed.
+        /// </summary>
         public bool? singleThread;
+        /// <summary>
         /// Stepping granularity to step. If no granularity is specified, a granularity of `statement` is assumed.
+        /// </summary>
         public SteppingGranularity? granularity;
     }
 
+    /// <summary>
     /// Arguments for `reverseContinue` request.
+    /// </summary>
     [JsonObject]
     public struct ReverseContinueArguments
     {
+        /// <summary>
         /// Specifies the active thread. If the debug adapter supports single thread execution (see `supportsSingleThreadExecutionRequests`) and the `singleThread` argument is true, only the thread with this ID is resumed.
+        /// </summary>
         public ulong threadId;
+        /// <summary>
         /// If this flag is true, backward execution is resumed only for the thread with given `threadId`.
+        /// </summary>
         public bool? singleThread;
     }
 
+    /// <summary>
     /// Arguments for `restartFrame` request.
+    /// </summary>
     [JsonObject]
     public struct RestartFrameArguments
     {
+        /// <summary>
         /// Restart the stack frame identified by `frameId`. The `frameId` must have been obtained in the current suspended state. See 'Lifetime of Object References' in the Overview section for details.
+        /// </summary>
         public ulong frameId;
     }
 
+    /// <summary>
     /// Arguments for `goto` request.
+    /// </summary>
     [JsonObject]
     public struct GotoArguments
     {
+        /// <summary>
         /// Set the goto target for this thread.
+        /// </summary>
         public ulong threadId;
+        /// <summary>
         /// The location where the debuggee will continue to run.
+        /// </summary>
         public ulong targetId;
     }
 
+    /// <summary>
     /// Arguments for `pause` request.
+    /// </summary>
     [JsonObject]
     public struct PauseArguments
     {
+        /// <summary>
         /// Pause execution for this thread.
+        /// </summary>
         public ulong threadId;
     }
 
+    /// <summary>
     /// Arguments for `stackTrace` request.
+    /// </summary>
     [JsonObject]
     public struct StackTraceArguments
     {
+        /// <summary>
         /// Retrieve the stacktrace for this thread.
+        /// </summary>
         public ulong threadId;
+        /// <summary>
         /// The index of the first frame to return; if omitted frames start at 0.
+        /// </summary>
         public ulong? startFrame;
+        /// <summary>
         /// The maximum number of frames to return. If levels is not specified or 0, all frames are returned.
+        /// </summary>
         public ulong? levels;
+        /// <summary>
         /// Specifies details on how to format the returned `StackFrame.name`. The debug adapter may format requested details in any way that would make sense to a developer.
+        /// <br/>
         /// The attribute is only honored by a debug adapter if the corresponding capability `supportsValueFormattingOptions` is true.
+        /// </summary>
         public StackFrameFormat? format;
     }
 
+    /// <summary>
     /// Response to `stackTrace` request.
+    /// </summary>
     [JsonObject]
     public struct StackTraceResponseBody
     {
+        /// <summary>
         /// The frames of the stack frame. If the array has length zero, there are no stack frames available.
+        /// <br/>
         /// This means that there is no location information available.
+        /// </summary>
         public StackFrame[] stackFrames;
+        /// <summary>
         /// The total number of frames available in the stack. If omitted or if `totalFrames` is larger than the available frames, a client is expected to request frames until a request returns less frames than requested (which indicates the end of the stack). Returning monotonically increasing `totalFrames` values for subsequent requests can be used to enforce paging in the client.
+        /// </summary>
         public ulong? totalFrames;
     }
 
+    /// <summary>
     /// Arguments for `scopes` request.
+    /// </summary>
     [JsonObject]
     public struct ScopesArguments
     {
+        /// <summary>
         /// Retrieve the scopes for the stack frame identified by `frameId`. The `frameId` must have been obtained in the current suspended state. See 'Lifetime of Object References' in the Overview section for details.
+        /// </summary>
         public ulong frameId;
     }
 
+    /// <summary>
     /// Response to `scopes` request.
+    /// </summary>
     [JsonObject]
     public struct ScopesResponseBody
     {
+        /// <summary>
         /// The scopes of the stack frame. If the array has length zero, there are no scopes available.
+        /// </summary>
         public Scope[] scopes;
     }
 
+    /// <summary>
     /// Arguments for `variables` request.
+    /// </summary>
     [JsonObject]
     public struct VariablesArguments
     {
+        /// <summary>
         /// The variable for which to retrieve its children. The `variablesReference` must have been obtained in the current suspended state. See 'Lifetime of Object References' in the Overview section for details.
+        /// </summary>
         public ulong variablesReference;
+        /// <summary>
         /// Filter to limit the child variables to either named or indexed. If omitted, both types are fetched.
+        /// </summary>
         public VariablesArgumentsFilter? filter;
+        /// <summary>
         /// The index of the first variable to return; if omitted children start at 0.
+        /// <br/>
         /// The attribute is only honored by a debug adapter if the corresponding capability `supportsVariablePaging` is true.
+        /// </summary>
         public ulong? start;
+        /// <summary>
         /// The number of variables to return. If count is missing or 0, all variables are returned.
+        /// <br/>
         /// The attribute is only honored by a debug adapter if the corresponding capability `supportsVariablePaging` is true.
+        /// </summary>
         public ulong? count;
+        /// <summary>
         /// Specifies details on how to format the Variable values.
+        /// <br/>
         /// The attribute is only honored by a debug adapter if the corresponding capability `supportsValueFormattingOptions` is true.
+        /// </summary>
         public ValueFormat? format;
     }
 
+    /// <summary>
     /// Filter to limit the child variables to either named or indexed. If omitted, both types are fetched.
+    /// </summary>
     [JsonConverter(typeof(StringEnumConverter))]
     public enum VariablesArgumentsFilter
     {
@@ -782,588 +1283,1029 @@ namespace Dap
         Named,
     }
 
+    /// <summary>
     /// Response to `variables` request.
+    /// </summary>
     [JsonObject]
     public struct VariablesResponseBody
     {
+        /// <summary>
         /// All (or a range) of variables for the given variable reference.
+        /// </summary>
         public Variable[] variables;
     }
 
+    /// <summary>
     /// Arguments for `setVariable` request.
+    /// </summary>
     [JsonObject]
     public struct SetVariableArguments
     {
+        /// <summary>
         /// The reference of the variable container. The `variablesReference` must have been obtained in the current suspended state. See 'Lifetime of Object References' in the Overview section for details.
+        /// </summary>
         public ulong variablesReference;
+        /// <summary>
         /// The name of the variable in the container.
+        /// </summary>
         public string name;
+        /// <summary>
         /// The value of the variable.
+        /// </summary>
         public string value;
+        /// <summary>
         /// Specifies details on how to format the response value.
+        /// </summary>
         public ValueFormat? format;
     }
 
+    /// <summary>
     /// Response to `setVariable` request.
+    /// </summary>
     [JsonObject]
     public struct SetVariableResponseBody
     {
+        /// <summary>
         /// The new value of the variable.
+        /// </summary>
         public string value;
+        /// <summary>
         /// The type of the new value. Typically shown in the UI when hovering over the value.
+        /// </summary>
         public string? type;
+        /// <summary>
         /// If `variablesReference` is > 0, the new value is structured and its children can be retrieved by passing `variablesReference` to the `variables` request as long as execution remains suspended. See 'Lifetime of Object References' in the Overview section for details.
+        /// <br/>
         ///
+        /// <br/>
         /// If this property is included in the response, any `variablesReference` previously associated with the updated variable, and those of its children, are no longer valid.
+        /// </summary>
         public ulong? variablesReference;
+        /// <summary>
         /// The number of named child variables.
+        /// <br/>
         /// The client can use this information to present the variables in a paged UI and fetch them in chunks.
+        /// <br/>
         /// The value should be less than or equal to 2147483647 (2^31-1).
+        /// </summary>
         public ulong? namedVariables;
+        /// <summary>
         /// The number of indexed child variables.
+        /// <br/>
         /// The client can use this information to present the variables in a paged UI and fetch them in chunks.
+        /// <br/>
         /// The value should be less than or equal to 2147483647 (2^31-1).
+        /// </summary>
         public ulong? indexedVariables;
+        /// <summary>
         /// A memory reference to a location appropriate for this result.
+        /// <br/>
         /// For pointer type eval results, this is generally a reference to the memory address contained in the pointer.
+        /// <br/>
         /// This attribute may be returned by a debug adapter if corresponding capability `supportsMemoryReferences` is true.
+        /// </summary>
         public string? memoryReference;
+        /// <summary>
         /// A reference that allows the client to request the location where the new value is declared. For example, if the new value is function pointer, the adapter may be able to look up the function's location. This should be present only if the adapter is likely to be able to resolve the location.
+        /// <br/>
         ///
+        /// <br/>
         /// This reference shares the same lifetime as the `variablesReference`. See 'Lifetime of Object References' in the Overview section for details.
+        /// </summary>
         public ulong? valueLocationReference;
     }
 
+    /// <summary>
     /// Arguments for `source` request.
+    /// </summary>
     [JsonObject]
     public struct SourceArguments
     {
+        /// <summary>
         /// Specifies the source content to load. Either `source.path` or `source.sourceReference` must be specified.
+        /// </summary>
         public Source? source;
+        /// <summary>
         /// The reference to the source. This is the same as `source.sourceReference`.
+        /// <br/>
         /// This is provided for backward compatibility since old clients do not understand the `source` attribute.
+        /// </summary>
         public ulong sourceReference;
     }
 
+    /// <summary>
     /// Response to `source` request.
+    /// </summary>
     [JsonObject]
     public struct SourceResponseBody
     {
+        /// <summary>
         /// Content of the source reference.
+        /// </summary>
         public string content;
+        /// <summary>
         /// Content type (MIME type) of the source.
+        /// </summary>
         public string? mimeType;
     }
 
+    /// <summary>
     /// Response to `threads` request.
+    /// </summary>
     [JsonObject]
     public struct ThreadsResponseBody
     {
+        /// <summary>
         /// All threads.
+        /// </summary>
         public Thread[] threads;
     }
 
+    /// <summary>
     /// Arguments for `terminateThreads` request.
+    /// </summary>
     [JsonObject]
     public struct TerminateThreadsArguments
     {
+        /// <summary>
         /// Ids of threads to be terminated.
+        /// </summary>
         public ulong[]? threadIds;
     }
 
+    /// <summary>
     /// Arguments for `modules` request.
+    /// </summary>
     [JsonObject]
     public struct ModulesArguments
     {
+        /// <summary>
         /// The index of the first module to return; if omitted modules start at 0.
+        /// </summary>
         public ulong? startModule;
+        /// <summary>
         /// The number of modules to return. If `moduleCount` is not specified or 0, all modules are returned.
+        /// </summary>
         public ulong? moduleCount;
     }
 
+    /// <summary>
     /// Response to `modules` request.
+    /// </summary>
     [JsonObject]
     public struct ModulesResponseBody
     {
+        /// <summary>
         /// All modules or range of modules.
+        /// </summary>
         public Module[] modules;
+        /// <summary>
         /// The total number of modules available.
+        /// </summary>
         public ulong? totalModules;
     }
 
+    /// <summary>
     /// Arguments for `loadedSources` request.
+    /// </summary>
     [JsonObject]
     public struct LoadedSourcesArguments {}
 
+    /// <summary>
     /// Response to `loadedSources` request.
+    /// </summary>
     [JsonObject]
     public struct LoadedSourcesResponseBody
     {
+        /// <summary>
         /// Set of loaded sources.
+        /// </summary>
         public Source[] sources;
     }
 
+    /// <summary>
     /// Arguments for `evaluate` request.
+    /// </summary>
     [JsonObject]
     public struct EvaluateArguments
     {
+        /// <summary>
         /// The expression to evaluate.
+        /// </summary>
         public string expression;
+        /// <summary>
         /// Evaluate the expression in the scope of this stack frame. If not specified, the expression is evaluated in the global scope.
+        /// </summary>
         public ulong? frameId;
+        /// <summary>
         /// The contextual line where the expression should be evaluated. In the 'hover' context, this should be set to the start of the expression being hovered.
+        /// </summary>
         public ulong? line;
+        /// <summary>
         /// The contextual column where the expression should be evaluated. This may be provided if `line` is also provided.
+        /// <br/>
         ///
+        /// <br/>
         /// It is measured in UTF-16 code units and the client capability `columnsStartAt1` determines whether it is 0- or 1-based.
+        /// </summary>
         public ulong? column;
+        /// <summary>
         /// The contextual source in which the `line` is found. This must be provided if `line` is provided.
+        /// </summary>
         public Source? source;
+        /// <summary>
         /// The context in which the evaluate request is used.
+        /// </summary>
         public string? context;
+        /// <summary>
         /// Specifies details on how to format the result.
+        /// <br/>
         /// The attribute is only honored by a debug adapter if the corresponding capability `supportsValueFormattingOptions` is true.
+        /// </summary>
         public ValueFormat? format;
     }
 
+    /// <summary>
     /// Response to `evaluate` request.
+    /// </summary>
     [JsonObject]
     public struct EvaluateResponseBody
     {
+        /// <summary>
         /// The result of the evaluate request.
+        /// </summary>
         public string result;
+        /// <summary>
         /// The type of the evaluate result.
+        /// <br/>
         /// This attribute should only be returned by a debug adapter if the corresponding capability `supportsVariableType` is true.
+        /// </summary>
         public string? type;
+        /// <summary>
         /// Properties of an evaluate result that can be used to determine how to render the result in the UI.
+        /// </summary>
         public VariablePresentationHint? presentationHint;
+        /// <summary>
         /// If `variablesReference` is > 0, the evaluate result is structured and its children can be retrieved by passing `variablesReference` to the `variables` request as long as execution remains suspended. See 'Lifetime of Object References' in the Overview section for details.
+        /// </summary>
         public ulong variablesReference;
+        /// <summary>
         /// The number of named child variables.
+        /// <br/>
         /// The client can use this information to present the variables in a paged UI and fetch them in chunks.
+        /// <br/>
         /// The value should be less than or equal to 2147483647 (2^31-1).
+        /// </summary>
         public ulong? namedVariables;
+        /// <summary>
         /// The number of indexed child variables.
+        /// <br/>
         /// The client can use this information to present the variables in a paged UI and fetch them in chunks.
+        /// <br/>
         /// The value should be less than or equal to 2147483647 (2^31-1).
+        /// </summary>
         public ulong? indexedVariables;
+        /// <summary>
         /// A memory reference to a location appropriate for this result.
+        /// <br/>
         /// For pointer type eval results, this is generally a reference to the memory address contained in the pointer.
+        /// <br/>
         /// This attribute may be returned by a debug adapter if corresponding capability `supportsMemoryReferences` is true.
+        /// </summary>
         public string? memoryReference;
+        /// <summary>
         /// A reference that allows the client to request the location where the returned value is declared. For example, if a function pointer is returned, the adapter may be able to look up the function's location. This should be present only if the adapter is likely to be able to resolve the location.
+        /// <br/>
         ///
+        /// <br/>
         /// This reference shares the same lifetime as the `variablesReference`. See 'Lifetime of Object References' in the Overview section for details.
+        /// </summary>
         public ulong? valueLocationReference;
     }
 
+    /// <summary>
     /// Arguments for `setExpression` request.
+    /// </summary>
     [JsonObject]
     public struct SetExpressionArguments
     {
+        /// <summary>
         /// The l-value expression to assign to.
+        /// </summary>
         public string expression;
+        /// <summary>
         /// The value expression to assign to the l-value expression.
+        /// </summary>
         public string value;
+        /// <summary>
         /// Evaluate the expressions in the scope of this stack frame. If not specified, the expressions are evaluated in the global scope.
+        /// </summary>
         public ulong? frameId;
+        /// <summary>
         /// Specifies how the resulting value should be formatted.
+        /// </summary>
         public ValueFormat? format;
     }
 
+    /// <summary>
     /// Response to `setExpression` request.
+    /// </summary>
     [JsonObject]
     public struct SetExpressionResponseBody
     {
+        /// <summary>
         /// The new value of the expression.
+        /// </summary>
         public string value;
+        /// <summary>
         /// The type of the value.
+        /// <br/>
         /// This attribute should only be returned by a debug adapter if the corresponding capability `supportsVariableType` is true.
+        /// </summary>
         public string? type;
+        /// <summary>
         /// Properties of a value that can be used to determine how to render the result in the UI.
+        /// </summary>
         public VariablePresentationHint? presentationHint;
+        /// <summary>
         /// If `variablesReference` is > 0, the evaluate result is structured and its children can be retrieved by passing `variablesReference` to the `variables` request as long as execution remains suspended. See 'Lifetime of Object References' in the Overview section for details.
+        /// </summary>
         public ulong? variablesReference;
+        /// <summary>
         /// The number of named child variables.
+        /// <br/>
         /// The client can use this information to present the variables in a paged UI and fetch them in chunks.
+        /// <br/>
         /// The value should be less than or equal to 2147483647 (2^31-1).
+        /// </summary>
         public ulong? namedVariables;
+        /// <summary>
         /// The number of indexed child variables.
+        /// <br/>
         /// The client can use this information to present the variables in a paged UI and fetch them in chunks.
+        /// <br/>
         /// The value should be less than or equal to 2147483647 (2^31-1).
+        /// </summary>
         public ulong? indexedVariables;
+        /// <summary>
         /// A memory reference to a location appropriate for this result.
+        /// <br/>
         /// For pointer type eval results, this is generally a reference to the memory address contained in the pointer.
+        /// <br/>
         /// This attribute may be returned by a debug adapter if corresponding capability `supportsMemoryReferences` is true.
+        /// </summary>
         public string? memoryReference;
+        /// <summary>
         /// A reference that allows the client to request the location where the new value is declared. For example, if the new value is function pointer, the adapter may be able to look up the function's location. This should be present only if the adapter is likely to be able to resolve the location.
+        /// <br/>
         ///
+        /// <br/>
         /// This reference shares the same lifetime as the `variablesReference`. See 'Lifetime of Object References' in the Overview section for details.
+        /// </summary>
         public ulong? valueLocationReference;
     }
 
+    /// <summary>
     /// Arguments for `stepInTargets` request.
+    /// </summary>
     [JsonObject]
     public struct StepInTargetsArguments
     {
+        /// <summary>
         /// The stack frame for which to retrieve the possible step-in targets.
+        /// </summary>
         public ulong frameId;
     }
 
+    /// <summary>
     /// Response to `stepInTargets` request.
+    /// </summary>
     [JsonObject]
     public struct StepInTargetsResponseBody
     {
+        /// <summary>
         /// The possible step-in targets of the specified source location.
+        /// </summary>
         public StepInTarget[] targets;
     }
 
+    /// <summary>
     /// Arguments for `gotoTargets` request.
+    /// </summary>
     [JsonObject]
     public struct GotoTargetsArguments
     {
+        /// <summary>
         /// The source location for which the goto targets are determined.
+        /// </summary>
         public Source source;
+        /// <summary>
         /// The line location for which the goto targets are determined.
+        /// </summary>
         public ulong line;
+        /// <summary>
         /// The position within `line` for which the goto targets are determined. It is measured in UTF-16 code units and the client capability `columnsStartAt1` determines whether it is 0- or 1-based.
+        /// </summary>
         public ulong? column;
     }
 
+    /// <summary>
     /// Response to `gotoTargets` request.
+    /// </summary>
     [JsonObject]
     public struct GotoTargetsResponseBody
     {
+        /// <summary>
         /// The possible goto targets of the specified location.
+        /// </summary>
         public GotoTarget[] targets;
     }
 
+    /// <summary>
     /// Arguments for `completions` request.
+    /// </summary>
     [JsonObject]
     public struct CompletionsArguments
     {
+        /// <summary>
         /// Returns completions in the scope of this stack frame. If not specified, the completions are returned for the global scope.
+        /// </summary>
         public ulong? frameId;
+        /// <summary>
         /// One or more source lines. Typically this is the text users have typed into the debug console before they asked for completion.
+        /// </summary>
         public string text;
+        /// <summary>
         /// The position within `text` for which to determine the completion proposals. It is measured in UTF-16 code units and the client capability `columnsStartAt1` determines whether it is 0- or 1-based.
+        /// </summary>
         public ulong column;
+        /// <summary>
         /// A line for which to determine the completion proposals. If missing the first line of the text is assumed.
+        /// </summary>
         public ulong? line;
     }
 
+    /// <summary>
     /// Response to `completions` request.
+    /// </summary>
     [JsonObject]
     public struct CompletionsResponseBody
     {
+        /// <summary>
         /// The possible completions for .
+        /// </summary>
         public CompletionItem[] targets;
     }
 
+    /// <summary>
     /// Arguments for `exceptionInfo` request.
+    /// </summary>
     [JsonObject]
     public struct ExceptionInfoArguments
     {
+        /// <summary>
         /// Thread for which exception information should be retrieved.
+        /// </summary>
         public ulong threadId;
     }
 
+    /// <summary>
     /// Response to `exceptionInfo` request.
+    /// </summary>
     [JsonObject]
     public struct ExceptionInfoResponseBody
     {
+        /// <summary>
         /// ID of the exception that was thrown.
+        /// </summary>
         public string exceptionId;
+        /// <summary>
         /// Descriptive text for the exception.
+        /// </summary>
         public string? description;
+        /// <summary>
         /// Mode that caused the exception notification to be raised.
+        /// </summary>
         public ExceptionBreakMode breakMode;
+        /// <summary>
         /// Detailed information about the exception.
+        /// </summary>
         public ExceptionDetails? details;
     }
 
+    /// <summary>
     /// Arguments for `readMemory` request.
+    /// </summary>
     [JsonObject]
     public struct ReadMemoryArguments
     {
+        /// <summary>
         /// Memory reference to the base location from which data should be read.
+        /// </summary>
         public string memoryReference;
+        /// <summary>
         /// Offset (in bytes) to be applied to the reference location before reading data. Can be negative.
+        /// </summary>
         public ulong? offset;
+        /// <summary>
         /// Number of bytes to read at the specified location and offset.
+        /// </summary>
         public ulong count;
     }
 
+    /// <summary>
     /// Response to `readMemory` request.
+    /// </summary>
     [JsonObject]
     public struct ReadMemoryResponseBody
     {
+        /// <summary>
         /// The address of the first byte of data returned.
+        /// <br/>
         /// Treated as a hex value if prefixed with `0x`, or as a decimal value otherwise.
+        /// </summary>
         public string address;
+        /// <summary>
         /// The number of unreadable bytes encountered after the last successfully read byte.
+        /// <br/>
         /// This can be used to determine the number of bytes that should be skipped before a subsequent `readMemory` request succeeds.
+        /// </summary>
         public ulong? unreadableBytes;
+        /// <summary>
         /// The bytes read from memory, encoded using base64. If the decoded length of `data` is less than the requested `count` in the original `readMemory` request, and `unreadableBytes` is zero or omitted, then the client should assume it's reached the end of readable memory.
+        /// </summary>
         public string? data;
     }
 
+    /// <summary>
     /// Arguments for `writeMemory` request.
+    /// </summary>
     [JsonObject]
     public struct WriteMemoryArguments
     {
+        /// <summary>
         /// Memory reference to the base location to which data should be written.
+        /// </summary>
         public string memoryReference;
+        /// <summary>
         /// Offset (in bytes) to be applied to the reference location before writing data. Can be negative.
+        /// </summary>
         public ulong? offset;
+        /// <summary>
         /// Property to control partial writes. If true, the debug adapter should attempt to write memory even if the entire memory region is not writable. In such a case the debug adapter should stop after hitting the first byte of memory that cannot be written and return the number of bytes written in the response via the `offset` and `bytesWritten` properties.
+        /// <br/>
         /// If false or missing, a debug adapter should attempt to verify the region is writable before writing, and fail the response if it is not.
+        /// </summary>
         public bool? allowPartial;
+        /// <summary>
         /// Bytes to write, encoded using base64.
+        /// </summary>
         public string data;
     }
 
+    /// <summary>
     /// Response to `writeMemory` request.
+    /// </summary>
     [JsonObject]
     public struct WriteMemoryResponseBody
     {
+        /// <summary>
         /// Property that should be returned when `allowPartial` is true to indicate the offset of the first byte of data successfully written. Can be negative.
+        /// </summary>
         public ulong? offset;
+        /// <summary>
         /// Property that should be returned when `allowPartial` is true to indicate the number of bytes starting from address that were successfully written.
+        /// </summary>
         public ulong? bytesWritten;
     }
 
+    /// <summary>
     /// Arguments for `disassemble` request.
+    /// </summary>
     [JsonObject]
     public struct DisassembleArguments
     {
+        /// <summary>
         /// Memory reference to the base location containing the instructions to disassemble.
+        /// </summary>
         public string memoryReference;
+        /// <summary>
         /// Offset (in bytes) to be applied to the reference location before disassembling. Can be negative.
+        /// </summary>
         public ulong? offset;
+        /// <summary>
         /// Offset (in instructions) to be applied after the byte offset (if any) before disassembling. Can be negative.
+        /// </summary>
         public ulong? instructionOffset;
+        /// <summary>
         /// Number of instructions to disassemble starting at the specified location and offset.
+        /// <br/>
         /// An adapter must return exactly this number of instructions - any unavailable instructions should be replaced with an implementation-defined 'invalid instruction' value.
+        /// </summary>
         public ulong instructionCount;
+        /// <summary>
         /// If true, the adapter should attempt to resolve memory addresses and other values to symbolic names.
+        /// </summary>
         public bool? resolveSymbols;
     }
 
+    /// <summary>
     /// Response to `disassemble` request.
+    /// </summary>
     [JsonObject]
     public struct DisassembleResponseBody
     {
+        /// <summary>
         /// The list of disassembled instructions.
+        /// </summary>
         public DisassembledInstruction[] instructions;
     }
 
+    /// <summary>
     /// Arguments for `locations` request.
+    /// </summary>
     [JsonObject]
     public struct LocationsArguments
     {
+        /// <summary>
         /// Location reference to resolve.
+        /// </summary>
         public ulong locationReference;
     }
 
+    /// <summary>
     /// Response to `locations` request.
+    /// </summary>
     [JsonObject]
     public struct LocationsResponseBody
     {
+        /// <summary>
         /// The source containing the location; either `source.path` or `source.sourceReference` must be specified.
+        /// </summary>
         public Source source;
+        /// <summary>
         /// The line number of the location. The client capability `linesStartAt1` determines whether it is 0- or 1-based.
+        /// </summary>
         public ulong line;
+        /// <summary>
         /// Position of the location within the `line`. It is measured in UTF-16 code units and the client capability `columnsStartAt1` determines whether it is 0- or 1-based. If no column is given, the first position in the start line is assumed.
+        /// </summary>
         public ulong? column;
+        /// <summary>
         /// End line of the location, present if the location refers to a range.  The client capability `linesStartAt1` determines whether it is 0- or 1-based.
+        /// </summary>
         public ulong? endLine;
+        /// <summary>
         /// End position of the location within `endLine`, present if the location refers to a range. It is measured in UTF-16 code units and the client capability `columnsStartAt1` determines whether it is 0- or 1-based.
+        /// </summary>
         public ulong? endColumn;
     }
 
+    /// <summary>
     /// Information about the capabilities of a debug adapter.
+    /// </summary>
     [JsonObject]
     public struct Capabilities
     {
+        /// <summary>
         /// The debug adapter supports the `configurationDone` request.
+        /// </summary>
         public bool? supportsConfigurationDoneRequest;
+        /// <summary>
         /// The debug adapter supports function breakpoints.
+        /// </summary>
         public bool? supportsFunctionBreakpoints;
+        /// <summary>
         /// The debug adapter supports conditional breakpoints.
+        /// </summary>
         public bool? supportsConditionalBreakpoints;
+        /// <summary>
         /// The debug adapter supports breakpoints that break execution after a specified number of hits.
+        /// </summary>
         public bool? supportsHitConditionalBreakpoints;
+        /// <summary>
         /// The debug adapter supports a (side effect free) `evaluate` request for data hovers.
+        /// </summary>
         public bool? supportsEvaluateForHovers;
+        /// <summary>
         /// Available exception filter options for the `setExceptionBreakpoints` request.
+        /// </summary>
         public ExceptionBreakpointsFilter[]? exceptionBreakpointFilters;
+        /// <summary>
         /// The debug adapter supports stepping back via the `stepBack` and `reverseContinue` requests.
+        /// </summary>
         public bool? supportsStepBack;
+        /// <summary>
         /// The debug adapter supports setting a variable to a value.
+        /// </summary>
         public bool? supportsSetVariable;
+        /// <summary>
         /// The debug adapter supports restarting a frame.
+        /// </summary>
         public bool? supportsRestartFrame;
+        /// <summary>
         /// The debug adapter supports the `gotoTargets` request.
+        /// </summary>
         public bool? supportsGotoTargetsRequest;
+        /// <summary>
         /// The debug adapter supports the `stepInTargets` request.
+        /// </summary>
         public bool? supportsStepInTargetsRequest;
+        /// <summary>
         /// The debug adapter supports the `completions` request.
+        /// </summary>
         public bool? supportsCompletionsRequest;
+        /// <summary>
         /// The set of characters that should trigger completion in a REPL. If not specified, the UI should assume the `.` character.
+        /// </summary>
         public string[]? completionTriggerCharacters;
+        /// <summary>
         /// The debug adapter supports the `modules` request.
+        /// </summary>
         public bool? supportsModulesRequest;
+        /// <summary>
         /// The set of additional module information exposed by the debug adapter.
+        /// </summary>
         public ColumnDescriptor[]? additionalModuleColumns;
+        /// <summary>
         /// Checksum algorithms supported by the debug adapter.
+        /// </summary>
         public ChecksumAlgorithm[]? supportedChecksumAlgorithms;
+        /// <summary>
         /// The debug adapter supports the `restart` request. In this case a client should not implement `restart` by terminating and relaunching the adapter but by calling the `restart` request.
+        /// </summary>
         public bool? supportsRestartRequest;
+        /// <summary>
         /// The debug adapter supports `exceptionOptions` on the `setExceptionBreakpoints` request.
+        /// </summary>
         public bool? supportsExceptionOptions;
+        /// <summary>
         /// The debug adapter supports a `format` attribute on the `stackTrace`, `variables`, and `evaluate` requests.
+        /// </summary>
         public bool? supportsValueFormattingOptions;
+        /// <summary>
         /// The debug adapter supports the `exceptionInfo` request.
+        /// </summary>
         public bool? supportsExceptionInfoRequest;
+        /// <summary>
         /// The debug adapter supports the `terminateDebuggee` attribute on the `disconnect` request.
+        /// </summary>
         public bool? supportTerminateDebuggee;
+        /// <summary>
         /// The debug adapter supports the `suspendDebuggee` attribute on the `disconnect` request.
+        /// </summary>
         public bool? supportSuspendDebuggee;
+        /// <summary>
         /// The debug adapter supports the delayed loading of parts of the stack, which requires that both the `startFrame` and `levels` arguments and the `totalFrames` result of the `stackTrace` request are supported.
+        /// </summary>
         public bool? supportsDelayedStackTraceLoading;
+        /// <summary>
         /// The debug adapter supports the `loadedSources` request.
+        /// </summary>
         public bool? supportsLoadedSourcesRequest;
+        /// <summary>
         /// The debug adapter supports log points by interpreting the `logMessage` attribute of the `SourceBreakpoint`.
+        /// </summary>
         public bool? supportsLogPoints;
+        /// <summary>
         /// The debug adapter supports the `terminateThreads` request.
+        /// </summary>
         public bool? supportsTerminateThreadsRequest;
+        /// <summary>
         /// The debug adapter supports the `setExpression` request.
+        /// </summary>
         public bool? supportsSetExpression;
+        /// <summary>
         /// The debug adapter supports the `terminate` request.
+        /// </summary>
         public bool? supportsTerminateRequest;
+        /// <summary>
         /// The debug adapter supports data breakpoints.
+        /// </summary>
         public bool? supportsDataBreakpoints;
+        /// <summary>
         /// The debug adapter supports the `readMemory` request.
+        /// </summary>
         public bool? supportsReadMemoryRequest;
+        /// <summary>
         /// The debug adapter supports the `writeMemory` request.
+        /// </summary>
         public bool? supportsWriteMemoryRequest;
+        /// <summary>
         /// The debug adapter supports the `disassemble` request.
+        /// </summary>
         public bool? supportsDisassembleRequest;
+        /// <summary>
         /// The debug adapter supports the `cancel` request.
+        /// </summary>
         public bool? supportsCancelRequest;
+        /// <summary>
         /// The debug adapter supports the `breakpointLocations` request.
+        /// </summary>
         public bool? supportsBreakpointLocationsRequest;
+        /// <summary>
         /// The debug adapter supports the `clipboard` context value in the `evaluate` request.
+        /// </summary>
         public bool? supportsClipboardContext;
+        /// <summary>
         /// The debug adapter supports stepping granularities (argument `granularity`) for the stepping requests.
+        /// </summary>
         public bool? supportsSteppingGranularity;
+        /// <summary>
         /// The debug adapter supports adding breakpoints based on instruction references.
+        /// </summary>
         public bool? supportsInstructionBreakpoints;
+        /// <summary>
         /// The debug adapter supports `filterOptions` as an argument on the `setExceptionBreakpoints` request.
+        /// </summary>
         public bool? supportsExceptionFilterOptions;
+        /// <summary>
         /// The debug adapter supports the `singleThread` property on the execution requests (`continue`, `next`, `stepIn`, `stepOut`, `reverseContinue`, `stepBack`).
+        /// </summary>
         public bool? supportsSingleThreadExecutionRequests;
+        /// <summary>
         /// The debug adapter supports the `asAddress` and `bytes` fields in the `dataBreakpointInfo` request.
+        /// </summary>
         public bool? supportsDataBreakpointBytes;
+        /// <summary>
         /// Modes of breakpoints supported by the debug adapter, such as 'hardware' or 'software'. If present, the client may allow the user to select a mode and include it in its `setBreakpoints` request.
+        /// <br/>
         ///
+        /// <br/>
         /// Clients may present the first applicable mode in this array as the 'default' mode in gestures that set breakpoints.
+        /// </summary>
         public BreakpointMode[]? breakpointModes;
+        /// <summary>
         /// The debug adapter supports ANSI escape sequences in styling of `OutputEvent.output` and `Variable.value` fields.
+        /// </summary>
         public bool? supportsANSIStyling;
     }
 
+    /// <summary>
     /// An `ExceptionBreakpointsFilter` is shown in the UI as an filter option for configuring how exceptions are dealt with.
+    /// </summary>
     [JsonObject]
     public struct ExceptionBreakpointsFilter
     {
+        /// <summary>
         /// The internal ID of the filter option. This value is passed to the `setExceptionBreakpoints` request.
+        /// </summary>
         public string filter;
+        /// <summary>
         /// The name of the filter option. This is shown in the UI.
+        /// </summary>
         public string label;
+        /// <summary>
         /// A help text providing additional information about the exception filter. This string is typically shown as a hover and can be translated.
+        /// </summary>
         public string? description;
+        /// <summary>
         /// Initial value of the filter option. If not specified a value false is assumed.
+        /// </summary>
         public bool? default;
+        /// <summary>
         /// Controls whether a condition can be specified for this filter option. If false or missing, a condition can not be set.
+        /// </summary>
         public bool? supportsCondition;
+        /// <summary>
         /// A help text providing information about the condition. This string is shown as the placeholder text for a text box and can be translated.
+        /// </summary>
         public string? conditionDescription;
     }
 
+    /// <summary>
     /// A structured message object. Used to return errors from requests.
+    /// </summary>
     [JsonObject]
     public struct Message
     {
+        /// <summary>
         /// Unique (within a debug adapter implementation) identifier for the message. The purpose of these error IDs is to help extension authors that have the requirement that every user visible error message needs a corresponding error number, so that users or customer support can find information about the specific error more easily.
+        /// </summary>
         public ulong id;
+        /// <summary>
         /// A format string for the message. Embedded variables have the form `{name}`.
+        /// <br/>
         /// If variable name starts with an underscore character, the variable does not contain user data (PII) and can be safely used for telemetry purposes.
+        /// </summary>
         public string format;
+        /// <summary>
         /// An object used as a dictionary for looking up the variables in the format string.
+        /// </summary>
         public object? variables;
+        /// <summary>
         /// If true send to telemetry.
+        /// </summary>
         public bool? sendTelemetry;
+        /// <summary>
         /// If true show user.
+        /// </summary>
         public bool? showUser;
+        /// <summary>
         /// A url where additional information about this message can be found.
+        /// </summary>
         public string? url;
+        /// <summary>
         /// A label that is presented to the user as the UI for opening the url.
+        /// </summary>
         public string? urlLabel;
     }
 
+    /// <summary>
     /// A Module object represents a row in the modules view.
+    /// <br/>
     /// The `id` attribute identifies a module in the modules view and is used in a `module` event for identifying a module for adding, updating or deleting.
+    /// <br/>
     /// The `name` attribute is used to minimally render the module in the UI.
+    /// <br/>
     ///
+    /// <br/>
     /// Additional attributes can be added to the module. They show up in the module view if they have a corresponding `ColumnDescriptor`.
+    /// <br/>
     ///
+    /// <br/>
     /// To avoid an unnecessary proliferation of additional attributes with similar semantics but different names, we recommend to re-use attributes from the 'recommended' list below first, and only introduce new attributes if nothing appropriate could be found.
+    /// </summary>
     [JsonObject]
     public struct Module
     {
+        /// <summary>
         /// Unique identifier for the module.
+        /// </summary>
         public string id;
+        /// <summary>
         /// A name of the module.
+        /// </summary>
         public string name;
+        /// <summary>
         /// Logical full path to the module. The exact definition is implementation defined, but usually this would be a full path to the on-disk file for the module.
+        /// </summary>
         public string? path;
+        /// <summary>
         /// True if the module is optimized.
+        /// </summary>
         public bool? isOptimized;
+        /// <summary>
         /// True if the module is considered 'user code' by a debugger that supports 'Just My Code'.
+        /// </summary>
         public bool? isUserCode;
+        /// <summary>
         /// Version of Module.
+        /// </summary>
         public string? version;
+        /// <summary>
         /// User-understandable description of if symbols were found for the module (ex: 'Symbols Loaded', 'Symbols not found', etc.)
+        /// </summary>
         public string? symbolStatus;
+        /// <summary>
         /// Logical full path to the symbol file. The exact definition is implementation defined.
+        /// </summary>
         public string? symbolFilePath;
+        /// <summary>
         /// Module created or modified, encoded as a RFC 3339 timestamp.
+        /// </summary>
         public string? dateTimeStamp;
+        /// <summary>
         /// Address range covered by this module.
+        /// </summary>
         public string? addressRange;
     }
 
+    /// <summary>
     /// A `ColumnDescriptor` specifies what module attribute to show in a column of the modules view, how to format it,
+    /// <br/>
     /// and what the column's label should be.
+    /// <br/>
     /// It is only used if the underlying UI actually supports this level of customization.
+    /// </summary>
     [JsonObject]
     public struct ColumnDescriptor
     {
+        /// <summary>
         /// Name of the attribute rendered in this column.
+        /// </summary>
         public string attributeName;
+        /// <summary>
         /// Header UI label of column.
+        /// </summary>
         public string label;
+        /// <summary>
         /// Format to use for the rendered values in this column. TBD how the format strings looks like.
+        /// </summary>
         public string? format;
+        /// <summary>
         /// Datatype of values in this column. Defaults to `string` if not specified.
+        /// </summary>
         public ColumnDescriptorType? type;
+        /// <summary>
         /// Width of this column in characters (hint only).
+        /// </summary>
         public ulong? width;
     }
 
+    /// <summary>
     /// Datatype of values in this column. Defaults to `string` if not specified.
+    /// </summary>
     [JsonConverter(typeof(StringEnumConverter))]
     public enum ColumnDescriptorType
     {
@@ -1377,47 +2319,81 @@ namespace Dap
         UnixTimestampUtc,
     }
 
+    /// <summary>
     /// A Thread
+    /// </summary>
     [JsonObject]
     public struct Thread
     {
+        /// <summary>
         /// Unique identifier for the thread.
+        /// </summary>
         public ulong id;
+        /// <summary>
         /// The name of the thread.
+        /// </summary>
         public string name;
     }
 
+    /// <summary>
     /// A `Source` is a descriptor for source code.
+    /// <br/>
     /// It is returned from the debug adapter as part of a `StackFrame` and it is used by clients when specifying breakpoints.
+    /// </summary>
     [JsonObject]
     public struct Source
     {
+        /// <summary>
         /// The short name of the source. Every source returned from the debug adapter has a name.
+        /// <br/>
         /// When sending a source to the debug adapter this name is optional.
+        /// </summary>
         public string? name;
+        /// <summary>
         /// The path of the source to be shown in the UI.
+        /// <br/>
         /// It is only used to locate and load the content of the source if no `sourceReference` is specified (or its value is 0).
+        /// </summary>
         public string? path;
+        /// <summary>
         /// If the value > 0 the contents of the source must be retrieved through the `source` request (even if a path is specified).
+        /// <br/>
         /// Since a `sourceReference` is only valid for a session, it can not be used to persist a source.
+        /// <br/>
         /// The value should be less than or equal to 2147483647 (2^31-1).
+        /// </summary>
         public ulong? sourceReference;
+        /// <summary>
         /// A hint for how to present the source in the UI.
+        /// <br/>
         /// A value of `deemphasize` can be used to indicate that the source is not available or that it is skipped on stepping.
+        /// </summary>
         public SourcePresentationHint? presentationHint;
+        /// <summary>
         /// The origin of this source. For example, 'internal module', 'inlined content from source map', etc.
+        /// </summary>
         public string? origin;
+        /// <summary>
         /// A list of sources that are related to this source. These may be the source that generated this source.
+        /// </summary>
         public Source[]? sources;
+        /// <summary>
         /// Additional data that a debug adapter might want to loop through the client.
+        /// <br/>
         /// The client should leave the data intact and persist it across sessions. The client should not interpret the data.
+        /// </summary>
         public object? adapterData;
+        /// <summary>
         /// The checksums associated with this file.
+        /// </summary>
         public Checksum[]? checksums;
     }
 
+    /// <summary>
     /// A hint for how to present the source in the UI.
+    /// <br/>
     /// A value of `deemphasize` can be used to indicate that the source is not available or that it is skipped on stepping.
+    /// </summary>
     [JsonConverter(typeof(StringEnumConverter))]
     public enum SourcePresentationHint
     {
@@ -1429,38 +2405,67 @@ namespace Dap
         Deemphasize,
     }
 
+    /// <summary>
     /// A Stackframe contains the source location.
+    /// </summary>
     [JsonObject]
     public struct StackFrame
     {
+        /// <summary>
         /// An identifier for the stack frame. It must be unique across all threads.
+        /// <br/>
         /// This id can be used to retrieve the scopes of the frame with the `scopes` request or to restart the execution of a stack frame.
+        /// </summary>
         public ulong id;
+        /// <summary>
         /// The name of the stack frame, typically a method name.
+        /// </summary>
         public string name;
+        /// <summary>
         /// The source of the frame.
+        /// </summary>
         public Source? source;
+        /// <summary>
         /// The line within the source of the frame. If the source attribute is missing or doesn't exist, `line` is 0 and should be ignored by the client.
+        /// </summary>
         public ulong line;
+        /// <summary>
         /// Start position of the range covered by the stack frame. It is measured in UTF-16 code units and the client capability `columnsStartAt1` determines whether it is 0- or 1-based. If attribute `source` is missing or doesn't exist, `column` is 0 and should be ignored by the client.
+        /// </summary>
         public ulong column;
+        /// <summary>
         /// The end line of the range covered by the stack frame.
+        /// </summary>
         public ulong? endLine;
+        /// <summary>
         /// End position of the range covered by the stack frame. It is measured in UTF-16 code units and the client capability `columnsStartAt1` determines whether it is 0- or 1-based.
+        /// </summary>
         public ulong? endColumn;
+        /// <summary>
         /// Indicates whether this frame can be restarted with the `restartFrame` request. Clients should only use this if the debug adapter supports the `restart` request and the corresponding capability `supportsRestartFrame` is true. If a debug adapter has this capability, then `canRestart` defaults to `true` if the property is absent.
+        /// </summary>
         public bool? canRestart;
+        /// <summary>
         /// A memory reference for the current instruction pointer in this frame.
+        /// </summary>
         public string? instructionPointerReference;
+        /// <summary>
         /// The module associated with this frame, if any.
+        /// </summary>
         public string? moduleId;
+        /// <summary>
         /// A hint for how to present this frame in the UI.
+        /// <br/>
         /// A value of `label` can be used to indicate that the frame is an artificial frame that is used as a visual label or separator. A value of `subtle` can be used to change the appearance of a frame in a 'subtle' way.
+        /// </summary>
         public StackFramePresentationHint? presentationHint;
     }
 
+    /// <summary>
     /// A hint for how to present this frame in the UI.
+    /// <br/>
     /// A value of `label` can be used to indicate that the frame is an artificial frame that is used as a visual label or separator. A value of `subtle` can be used to change the appearance of a frame in a 'subtle' way.
+    /// </summary>
     [JsonConverter(typeof(StringEnumConverter))]
     public enum StackFramePresentationHint
     {
@@ -1472,153 +2477,277 @@ namespace Dap
         Subtle,
     }
 
+    /// <summary>
     /// A `Scope` is a named container for variables. Optionally a scope can map to a source or a range within a source.
+    /// </summary>
     [JsonObject]
     public struct Scope
     {
+        /// <summary>
         /// Name of the scope such as 'Arguments', 'Locals', or 'Registers'. This string is shown in the UI as is and can be translated.
+        /// </summary>
         public string name;
+        /// <summary>
         /// A hint for how to present this scope in the UI. If this attribute is missing, the scope is shown with a generic UI.
+        /// </summary>
         public string? presentationHint;
+        /// <summary>
         /// The variables of this scope can be retrieved by passing the value of `variablesReference` to the `variables` request as long as execution remains suspended. See 'Lifetime of Object References' in the Overview section for details.
+        /// </summary>
         public ulong variablesReference;
+        /// <summary>
         /// The number of named variables in this scope.
+        /// <br/>
         /// The client can use this information to present the variables in a paged UI and fetch them in chunks.
+        /// </summary>
         public ulong? namedVariables;
+        /// <summary>
         /// The number of indexed variables in this scope.
+        /// <br/>
         /// The client can use this information to present the variables in a paged UI and fetch them in chunks.
+        /// </summary>
         public ulong? indexedVariables;
+        /// <summary>
         /// If true, the number of variables in this scope is large or expensive to retrieve.
+        /// </summary>
         public bool expensive;
+        /// <summary>
         /// The source for this scope.
+        /// </summary>
         public Source? source;
+        /// <summary>
         /// The start line of the range covered by this scope.
+        /// </summary>
         public ulong? line;
+        /// <summary>
         /// Start position of the range covered by the scope. It is measured in UTF-16 code units and the client capability `columnsStartAt1` determines whether it is 0- or 1-based.
+        /// </summary>
         public ulong? column;
+        /// <summary>
         /// The end line of the range covered by this scope.
+        /// </summary>
         public ulong? endLine;
+        /// <summary>
         /// End position of the range covered by the scope. It is measured in UTF-16 code units and the client capability `columnsStartAt1` determines whether it is 0- or 1-based.
+        /// </summary>
         public ulong? endColumn;
     }
 
+    /// <summary>
     /// A Variable is a name/value pair.
+    /// <br/>
     /// The `type` attribute is shown if space permits or when hovering over the variable's name.
+    /// <br/>
     /// The `kind` attribute is used to render additional properties of the variable, e.g. different icons can be used to indicate that a variable is public or private.
+    /// <br/>
     /// If the value is structured (has children), a handle is provided to retrieve the children with the `variables` request.
+    /// <br/>
     /// If the number of named or indexed children is large, the numbers should be returned via the `namedVariables` and `indexedVariables` attributes.
+    /// <br/>
     /// The client can use this information to present the children in a paged UI and fetch them in chunks.
+    /// </summary>
     [JsonObject]
     public struct Variable
     {
+        /// <summary>
         /// The variable's name.
+        /// </summary>
         public string name;
+        /// <summary>
         /// The variable's value.
+        /// <br/>
         /// This can be a multi-line text, e.g. for a function the body of a function.
+        /// <br/>
         /// For structured variables (which do not have a simple value), it is recommended to provide a one-line representation of the structured object. This helps to identify the structured object in the collapsed state when its children are not yet visible.
+        /// <br/>
         /// An empty string can be used if no value should be shown in the UI.
+        /// </summary>
         public string value;
+        /// <summary>
         /// The type of the variable's value. Typically shown in the UI when hovering over the value.
+        /// <br/>
         /// This attribute should only be returned by a debug adapter if the corresponding capability `supportsVariableType` is true.
+        /// </summary>
         public string? type;
+        /// <summary>
         /// Properties of a variable that can be used to determine how to render the variable in the UI.
+        /// </summary>
         public VariablePresentationHint? presentationHint;
+        /// <summary>
         /// The evaluatable name of this variable which can be passed to the `evaluate` request to fetch the variable's value.
+        /// </summary>
         public string? evaluateName;
+        /// <summary>
         /// If `variablesReference` is > 0, the variable is structured and its children can be retrieved by passing `variablesReference` to the `variables` request as long as execution remains suspended. See 'Lifetime of Object References' in the Overview section for details.
+        /// </summary>
         public ulong variablesReference;
+        /// <summary>
         /// The number of named child variables.
+        /// <br/>
         /// The client can use this information to present the children in a paged UI and fetch them in chunks.
+        /// </summary>
         public ulong? namedVariables;
+        /// <summary>
         /// The number of indexed child variables.
+        /// <br/>
         /// The client can use this information to present the children in a paged UI and fetch them in chunks.
+        /// </summary>
         public ulong? indexedVariables;
+        /// <summary>
         /// A memory reference associated with this variable.
+        /// <br/>
         /// For pointer type variables, this is generally a reference to the memory address contained in the pointer.
+        /// <br/>
         /// For executable data, this reference may later be used in a `disassemble` request.
+        /// <br/>
         /// This attribute may be returned by a debug adapter if corresponding capability `supportsMemoryReferences` is true.
+        /// </summary>
         public string? memoryReference;
+        /// <summary>
         /// A reference that allows the client to request the location where the variable is declared. This should be present only if the adapter is likely to be able to resolve the location.
+        /// <br/>
         ///
+        /// <br/>
         /// This reference shares the same lifetime as the `variablesReference`. See 'Lifetime of Object References' in the Overview section for details.
+        /// </summary>
         public ulong? declarationLocationReference;
+        /// <summary>
         /// A reference that allows the client to request the location where the variable's value is declared. For example, if the variable contains a function pointer, the adapter may be able to look up the function's location. This should be present only if the adapter is likely to be able to resolve the location.
+        /// <br/>
         ///
+        /// <br/>
         /// This reference shares the same lifetime as the `variablesReference`. See 'Lifetime of Object References' in the Overview section for details.
+        /// </summary>
         public ulong? valueLocationReference;
     }
 
+    /// <summary>
     /// Properties of a variable that can be used to determine how to render the variable in the UI.
+    /// </summary>
     [JsonObject]
     public struct VariablePresentationHint
     {
+        /// <summary>
         /// The kind of variable. Before introducing additional values, try to use the listed values.
+        /// </summary>
         public string? kind;
+        /// <summary>
         /// Set of attributes represented as an array of strings. Before introducing additional values, try to use the listed values.
+        /// </summary>
         public string[]? attributes;
+        /// <summary>
         /// Visibility of variable. Before introducing additional values, try to use the listed values.
+        /// </summary>
         public string? visibility;
+        /// <summary>
         /// If true, clients can present the variable with a UI that supports a specific gesture to trigger its evaluation.
+        /// <br/>
         /// This mechanism can be used for properties that require executing code when retrieving their value and where the code execution can be expensive and/or produce side-effects. A typical example are properties based on a getter function.
+        /// <br/>
         /// Please note that in addition to the `lazy` flag, the variable's `variablesReference` is expected to refer to a variable that will provide the value through another `variable` request.
+        /// </summary>
         public bool? lazy;
     }
 
+    /// <summary>
     /// Properties of a breakpoint location returned from the `breakpointLocations` request.
+    /// </summary>
     [JsonObject]
     public struct BreakpointLocation
     {
+        /// <summary>
         /// Start line of breakpoint location.
+        /// </summary>
         public ulong line;
+        /// <summary>
         /// The start position of a breakpoint location. Position is measured in UTF-16 code units and the client capability `columnsStartAt1` determines whether it is 0- or 1-based.
+        /// </summary>
         public ulong? column;
+        /// <summary>
         /// The end line of breakpoint location if the location covers a range.
+        /// </summary>
         public ulong? endLine;
+        /// <summary>
         /// The end position of a breakpoint location (if the location covers a range). Position is measured in UTF-16 code units and the client capability `columnsStartAt1` determines whether it is 0- or 1-based.
+        /// </summary>
         public ulong? endColumn;
     }
 
+    /// <summary>
     /// Properties of a breakpoint or logpoint passed to the `setBreakpoints` request.
+    /// </summary>
     [JsonObject]
     public struct SourceBreakpoint
     {
+        /// <summary>
         /// The source line of the breakpoint or logpoint.
+        /// </summary>
         public ulong line;
+        /// <summary>
         /// Start position within source line of the breakpoint or logpoint. It is measured in UTF-16 code units and the client capability `columnsStartAt1` determines whether it is 0- or 1-based.
+        /// </summary>
         public ulong? column;
+        /// <summary>
         /// The expression for conditional breakpoints.
+        /// <br/>
         /// It is only honored by a debug adapter if the corresponding capability `supportsConditionalBreakpoints` is true.
+        /// </summary>
         public string? condition;
+        /// <summary>
         /// The expression that controls how many hits of the breakpoint are ignored.
+        /// <br/>
         /// The debug adapter is expected to interpret the expression as needed.
+        /// <br/>
         /// The attribute is only honored by a debug adapter if the corresponding capability `supportsHitConditionalBreakpoints` is true.
+        /// <br/>
         /// If both this property and `condition` are specified, `hitCondition` should be evaluated only if the `condition` is met, and the debug adapter should stop only if both conditions are met.
+        /// </summary>
         public string? hitCondition;
+        /// <summary>
         /// If this attribute exists and is non-empty, the debug adapter must not 'break' (stop)
+        /// <br/>
         /// but log the message instead. Expressions within `{}` are interpolated.
+        /// <br/>
         /// The attribute is only honored by a debug adapter if the corresponding capability `supportsLogPoints` is true.
+        /// <br/>
         /// If either `hitCondition` or `condition` is specified, then the message should only be logged if those conditions are met.
+        /// </summary>
         public string? logMessage;
+        /// <summary>
         /// The mode of this breakpoint. If defined, this must be one of the `breakpointModes` the debug adapter advertised in its `Capabilities`.
+        /// </summary>
         public string? mode;
     }
 
+    /// <summary>
     /// Properties of a breakpoint passed to the `setFunctionBreakpoints` request.
+    /// </summary>
     [JsonObject]
     public struct FunctionBreakpoint
     {
+        /// <summary>
         /// The name of the function.
+        /// </summary>
         public string name;
+        /// <summary>
         /// An expression for conditional breakpoints.
+        /// <br/>
         /// It is only honored by a debug adapter if the corresponding capability `supportsConditionalBreakpoints` is true.
+        /// </summary>
         public string? condition;
+        /// <summary>
         /// An expression that controls how many hits of the breakpoint are ignored.
+        /// <br/>
         /// The debug adapter is expected to interpret the expression as needed.
+        /// <br/>
         /// The attribute is only honored by a debug adapter if the corresponding capability `supportsHitConditionalBreakpoints` is true.
+        /// </summary>
         public string? hitCondition;
     }
 
+    /// <summary>
     /// This enumeration defines all possible access types for data breakpoints.
+    /// </summary>
     [JsonConverter(typeof(StringEnumConverter))]
     public enum DataBreakpointAccessType
     {
@@ -1630,80 +2759,143 @@ namespace Dap
         ReadWrite,
     }
 
+    /// <summary>
     /// Properties of a data breakpoint passed to the `setDataBreakpoints` request.
+    /// </summary>
     [JsonObject]
     public struct DataBreakpoint
     {
+        /// <summary>
         /// An id representing the data. This id is returned from the `dataBreakpointInfo` request.
+        /// </summary>
         public string dataId;
+        /// <summary>
         /// The access type of the data.
+        /// </summary>
         public DataBreakpointAccessType? accessType;
+        /// <summary>
         /// An expression for conditional breakpoints.
+        /// </summary>
         public string? condition;
+        /// <summary>
         /// An expression that controls how many hits of the breakpoint are ignored.
+        /// <br/>
         /// The debug adapter is expected to interpret the expression as needed.
+        /// </summary>
         public string? hitCondition;
     }
 
+    /// <summary>
     /// Properties of a breakpoint passed to the `setInstructionBreakpoints` request
+    /// </summary>
     [JsonObject]
     public struct InstructionBreakpoint
     {
+        /// <summary>
         /// The instruction reference of the breakpoint.
+        /// <br/>
         /// This should be a memory or instruction pointer reference from an `EvaluateResponse`, `Variable`, `StackFrame`, `GotoTarget`, or `Breakpoint`.
+        /// </summary>
         public string instructionReference;
+        /// <summary>
         /// The offset from the instruction reference in bytes.
+        /// <br/>
         /// This can be negative.
+        /// </summary>
         public ulong? offset;
+        /// <summary>
         /// An expression for conditional breakpoints.
+        /// <br/>
         /// It is only honored by a debug adapter if the corresponding capability `supportsConditionalBreakpoints` is true.
+        /// </summary>
         public string? condition;
+        /// <summary>
         /// An expression that controls how many hits of the breakpoint are ignored.
+        /// <br/>
         /// The debug adapter is expected to interpret the expression as needed.
+        /// <br/>
         /// The attribute is only honored by a debug adapter if the corresponding capability `supportsHitConditionalBreakpoints` is true.
+        /// </summary>
         public string? hitCondition;
+        /// <summary>
         /// The mode of this breakpoint. If defined, this must be one of the `breakpointModes` the debug adapter advertised in its `Capabilities`.
+        /// </summary>
         public string? mode;
     }
 
+    /// <summary>
     /// Information about a breakpoint created in `setBreakpoints`, `setFunctionBreakpoints`, `setInstructionBreakpoints`, or `setDataBreakpoints` requests.
+    /// </summary>
     [JsonObject]
     public struct Breakpoint
     {
+        /// <summary>
         /// The identifier for the breakpoint. It is needed if breakpoint events are used to update or remove breakpoints.
+        /// </summary>
         public ulong? id;
+        /// <summary>
         /// If true, the breakpoint could be set (but not necessarily at the desired location).
+        /// </summary>
         public bool verified;
+        /// <summary>
         /// A message about the state of the breakpoint.
+        /// <br/>
         /// This is shown to the user and can be used to explain why a breakpoint could not be verified.
+        /// </summary>
         public string? message;
+        /// <summary>
         /// The source where the breakpoint is located.
+        /// </summary>
         public Source? source;
+        /// <summary>
         /// The start line of the actual range covered by the breakpoint.
+        /// </summary>
         public ulong? line;
+        /// <summary>
         /// Start position of the source range covered by the breakpoint. It is measured in UTF-16 code units and the client capability `columnsStartAt1` determines whether it is 0- or 1-based.
+        /// </summary>
         public ulong? column;
+        /// <summary>
         /// The end line of the actual range covered by the breakpoint.
+        /// </summary>
         public ulong? endLine;
+        /// <summary>
         /// End position of the source range covered by the breakpoint. It is measured in UTF-16 code units and the client capability `columnsStartAt1` determines whether it is 0- or 1-based.
+        /// <br/>
         /// If no end line is given, then the end column is assumed to be in the start line.
+        /// </summary>
         public ulong? endColumn;
+        /// <summary>
         /// A memory reference to where the breakpoint is set.
+        /// </summary>
         public string? instructionReference;
+        /// <summary>
         /// The offset from the instruction reference.
+        /// <br/>
         /// This can be negative.
+        /// </summary>
         public ulong? offset;
+        /// <summary>
         /// A machine-readable explanation of why a breakpoint may not be verified. If a breakpoint is verified or a specific reason is not known, the adapter should omit this property. Possible values include:
+        /// <br/>
         ///
+        /// <br/>
         /// - `pending`: Indicates a breakpoint might be verified in the future, but the adapter cannot verify it in the current state.
+        /// <br/>
         ///  - `failed`: Indicates a breakpoint was not able to be verified, and the adapter does not believe it can be verified without intervention.
+        /// </summary>
         public BreakpointReason? reason;
     }
 
+    /// <summary>
     /// A machine-readable explanation of why a breakpoint may not be verified. If a breakpoint is verified or a specific reason is not known, the adapter should omit this property. Possible values include:
+    /// <br/>
     ///
+    /// <br/>
     /// - `pending`: Indicates a breakpoint might be verified in the future, but the adapter cannot verify it in the current state.
+    /// <br/>
     ///  - `failed`: Indicates a breakpoint was not able to be verified, and the adapter does not believe it can be verified without intervention.
+    /// </summary>
     [JsonConverter(typeof(StringEnumConverter))]
     public enum BreakpointReason
     {
@@ -1713,87 +2905,150 @@ namespace Dap
         Failed,
     }
 
+    /// <summary>
     /// The granularity of one 'step' in the stepping requests `next`, `stepIn`, `stepOut`, and `stepBack`.
+    /// </summary>
     [JsonConverter(typeof(StringEnumConverter))]
     public enum SteppingGranularity
     {
+        /// <summary>
         /// The step should allow the program to run until the current statement has finished executing.
+        /// <br/>
         /// The meaning of a statement is determined by the adapter and it may be considered equivalent to a line.
+        /// <br/>
         /// For example 'for(int i = 0; i < 10; i++)' could be considered to have 3 statements 'int i = 0', 'i < 10', and 'i++'.
+        /// </summary>
         [EnumMember(Value = "statement")]
         Statement,
+        /// <summary>
         /// The step should allow the program to run until the current source line has executed.
+        /// </summary>
         [EnumMember(Value = "line")]
         Line,
+        /// <summary>
         /// The step should allow one instruction to execute (e.g. one x86 instruction).
+        /// </summary>
         [EnumMember(Value = "instruction")]
         Instruction,
     }
 
+    /// <summary>
     /// A `StepInTarget` can be used in the `stepIn` request and determines into which single target the `stepIn` request should step.
+    /// </summary>
     [JsonObject]
     public struct StepInTarget
     {
+        /// <summary>
         /// Unique identifier for a step-in target.
+        /// </summary>
         public ulong id;
+        /// <summary>
         /// The name of the step-in target (shown in the UI).
+        /// </summary>
         public string label;
+        /// <summary>
         /// The line of the step-in target.
+        /// </summary>
         public ulong? line;
+        /// <summary>
         /// Start position of the range covered by the step in target. It is measured in UTF-16 code units and the client capability `columnsStartAt1` determines whether it is 0- or 1-based.
+        /// </summary>
         public ulong? column;
+        /// <summary>
         /// The end line of the range covered by the step-in target.
+        /// </summary>
         public ulong? endLine;
+        /// <summary>
         /// End position of the range covered by the step in target. It is measured in UTF-16 code units and the client capability `columnsStartAt1` determines whether it is 0- or 1-based.
+        /// </summary>
         public ulong? endColumn;
     }
 
+    /// <summary>
     /// A `GotoTarget` describes a code location that can be used as a target in the `goto` request.
+    /// <br/>
     /// The possible goto targets can be determined via the `gotoTargets` request.
+    /// </summary>
     [JsonObject]
     public struct GotoTarget
     {
+        /// <summary>
         /// Unique identifier for a goto target. This is used in the `goto` request.
+        /// </summary>
         public ulong id;
+        /// <summary>
         /// The name of the goto target (shown in the UI).
+        /// </summary>
         public string label;
+        /// <summary>
         /// The line of the goto target.
+        /// </summary>
         public ulong line;
+        /// <summary>
         /// The column of the goto target.
+        /// </summary>
         public ulong? column;
+        /// <summary>
         /// The end line of the range covered by the goto target.
+        /// </summary>
         public ulong? endLine;
+        /// <summary>
         /// The end column of the range covered by the goto target.
+        /// </summary>
         public ulong? endColumn;
+        /// <summary>
         /// A memory reference for the instruction pointer value represented by this target.
+        /// </summary>
         public string? instructionPointerReference;
     }
 
+    /// <summary>
     /// `CompletionItems` are the suggestions returned from the `completions` request.
+    /// </summary>
     [JsonObject]
     public struct CompletionItem
     {
+        /// <summary>
         /// The label of this completion item. By default this is also the text that is inserted when selecting this completion.
+        /// </summary>
         public string label;
+        /// <summary>
         /// If text is returned and not an empty string, then it is inserted instead of the label.
+        /// </summary>
         public string? text;
+        /// <summary>
         /// A string that should be used when comparing this item with other items. If not returned or an empty string, the `label` is used instead.
+        /// </summary>
         public string? sortText;
+        /// <summary>
         /// A human-readable string with additional information about this item, like type or symbol information.
+        /// </summary>
         public string? detail;
+        /// <summary>
         /// The item's type. Typically the client uses this information to render the item in the UI with an icon.
+        /// </summary>
         public CompletionItemType? type;
+        /// <summary>
         /// Start position (within the `text` attribute of the `completions` request) where the completion text is added. The position is measured in UTF-16 code units and the client capability `columnsStartAt1` determines whether it is 0- or 1-based. If the start position is omitted the text is added at the location specified by the `column` attribute of the `completions` request.
+        /// </summary>
         public ulong? start;
+        /// <summary>
         /// Length determines how many characters are overwritten by the completion text and it is measured in UTF-16 code units. If missing the value 0 is assumed which results in the completion text being inserted.
+        /// </summary>
         public ulong? length;
+        /// <summary>
         /// Determines the start of the new selection after the text has been inserted (or replaced). `selectionStart` is measured in UTF-16 code units and must be in the range 0 and length of the completion text. If omitted the selection starts at the end of the completion text.
+        /// </summary>
         public ulong? selectionStart;
+        /// <summary>
         /// Determines the length of the new selection after the text has been inserted (or replaced) and it is measured in UTF-16 code units. The selection can not extend beyond the bounds of the completion text. If omitted the length is assumed to be 0.
+        /// </summary>
         public ulong? selectionLength;
     }
 
+    /// <summary>
     /// Some predefined types for the CompletionItem. Please note that not all clients have specific icons for all of them.
+    /// </summary>
     [JsonConverter(typeof(StringEnumConverter))]
     public enum CompletionItemType
     {
@@ -1837,7 +3092,9 @@ namespace Dap
         Customcolor,
     }
 
+    /// <summary>
     /// Names of checksum algorithms that may be supported by a debug adapter.
+    /// </summary>
     [JsonConverter(typeof(StringEnumConverter))]
     public enum ChecksumAlgorithm
     {
@@ -1851,75 +3108,125 @@ namespace Dap
         Timestamp,
     }
 
+    /// <summary>
     /// The checksum of an item calculated by the specified algorithm.
+    /// </summary>
     [JsonObject]
     public struct Checksum
     {
+        /// <summary>
         /// The algorithm used to calculate this checksum.
+        /// </summary>
         public ChecksumAlgorithm algorithm;
+        /// <summary>
         /// Value of the checksum, encoded as a hexadecimal value.
+        /// </summary>
         public string checksum;
     }
 
+    /// <summary>
     /// Provides formatting information for a value.
+    /// </summary>
     [JsonObject]
     public struct ValueFormat
     {
+        /// <summary>
         /// Display the value in hex.
+        /// </summary>
         public bool? hex;
     }
 
+    /// <summary>
     /// Provides formatting information for a stack frame.
+    /// </summary>
     [JsonObject]
     public struct StackFrameFormat
     {
+        /// <summary>
         /// Display the value in hex.
+        /// </summary>
         public bool? hex;
+        /// <summary>
         /// Displays parameters for the stack frame.
+        /// </summary>
         public bool? parameters;
+        /// <summary>
         /// Displays the types of parameters for the stack frame.
+        /// </summary>
         public bool? parameterTypes;
+        /// <summary>
         /// Displays the names of parameters for the stack frame.
+        /// </summary>
         public bool? parameterNames;
+        /// <summary>
         /// Displays the values of parameters for the stack frame.
+        /// </summary>
         public bool? parameterValues;
+        /// <summary>
         /// Displays the line number of the stack frame.
+        /// </summary>
         public bool? line;
+        /// <summary>
         /// Displays the module of the stack frame.
+        /// </summary>
         public bool? module;
+        /// <summary>
         /// Includes all stack frames, including those the debug adapter might otherwise hide.
+        /// </summary>
         public bool? includeAll;
     }
 
+    /// <summary>
     /// An `ExceptionFilterOptions` is used to specify an exception filter together with a condition for the `setExceptionBreakpoints` request.
+    /// </summary>
     [JsonObject]
     public struct ExceptionFilterOptions
     {
+        /// <summary>
         /// ID of an exception filter returned by the `exceptionBreakpointFilters` capability.
+        /// </summary>
         public string filterId;
+        /// <summary>
         /// An expression for conditional exceptions.
+        /// <br/>
         /// The exception breaks into the debugger if the result of the condition is true.
+        /// </summary>
         public string? condition;
+        /// <summary>
         /// The mode of this exception breakpoint. If defined, this must be one of the `breakpointModes` the debug adapter advertised in its `Capabilities`.
+        /// </summary>
         public string? mode;
     }
 
+    /// <summary>
     /// An `ExceptionOptions` assigns configuration options to a set of exceptions.
+    /// </summary>
     [JsonObject]
     public struct ExceptionOptions
     {
+        /// <summary>
         /// A path that selects a single or multiple exceptions in a tree. If `path` is missing, the whole tree is selected.
+        /// <br/>
         /// By convention the first segment of the path is a category that is used to group exceptions in the UI.
+        /// </summary>
         public ExceptionPathSegment[]? path;
+        /// <summary>
         /// Condition when a thrown exception should result in a break.
+        /// </summary>
         public ExceptionBreakMode breakMode;
     }
 
+    /// <summary>
     /// This enumeration defines all possible conditions when a thrown exception should result in a break.
+    /// <br/>
     /// never: never breaks,
+    /// <br/>
     /// always: always breaks,
+    /// <br/>
     /// unhandled: breaks when exception unhandled,
+    /// <br/>
     /// userUnhandled: breaks if the exception is not handled by user code.
+    /// </summary>
     [JsonConverter(typeof(StringEnumConverter))]
     public enum ExceptionBreakMode
     {
@@ -1933,68 +3240,119 @@ namespace Dap
         UserUnhandled,
     }
 
+    /// <summary>
     /// An `ExceptionPathSegment` represents a segment in a path that is used to match leafs or nodes in a tree of exceptions.
+    /// <br/>
     /// If a segment consists of more than one name, it matches the names provided if `negate` is false or missing, or it matches anything except the names provided if `negate` is true.
+    /// </summary>
     [JsonObject]
     public struct ExceptionPathSegment
     {
+        /// <summary>
         /// If false or missing this segment matches the names provided, otherwise it matches anything except the names provided.
+        /// </summary>
         public bool? negate;
+        /// <summary>
         /// Depending on the value of `negate` the names that should match or not match.
+        /// </summary>
         public string[] names;
     }
 
+    /// <summary>
     /// Detailed information about an exception that has occurred.
+    /// </summary>
     [JsonObject]
     public struct ExceptionDetails
     {
+        /// <summary>
         /// Message contained in the exception.
+        /// </summary>
         public string? message;
+        /// <summary>
         /// Short type name of the exception object.
+        /// </summary>
         public string? typeName;
+        /// <summary>
         /// Fully-qualified type name of the exception object.
+        /// </summary>
         public string? fullTypeName;
+        /// <summary>
         /// An expression that can be evaluated in the current scope to obtain the exception object.
+        /// </summary>
         public string? evaluateName;
+        /// <summary>
         /// Stack trace at the time the exception was thrown.
+        /// </summary>
         public string? stackTrace;
+        /// <summary>
         /// Details of the exception contained by this exception, if any.
+        /// </summary>
         public ExceptionDetails[]? innerException;
     }
 
+    /// <summary>
     /// Represents a single disassembled instruction.
+    /// </summary>
     [JsonObject]
     public struct DisassembledInstruction
     {
+        /// <summary>
         /// The address of the instruction. Treated as a hex value if prefixed with `0x`, or as a decimal value otherwise.
+        /// </summary>
         public string address;
+        /// <summary>
         /// Raw bytes representing the instruction and its operands, in an implementation-defined format.
+        /// </summary>
         public string? instructionBytes;
+        /// <summary>
         /// Text representing the instruction and its operands, in an implementation-defined format.
+        /// </summary>
         public string instruction;
+        /// <summary>
         /// Name of the symbol that corresponds with the location of this instruction, if any.
+        /// </summary>
         public string? symbol;
+        /// <summary>
         /// Source location that corresponds to this instruction, if any.
+        /// <br/>
         /// Should always be set (if available) on the first instruction returned,
+        /// <br/>
         /// but can be omitted afterwards if this instruction maps to the same source file as the previous instruction.
+        /// </summary>
         public Source? location;
+        /// <summary>
         /// The line within the source location that corresponds to this instruction, if any.
+        /// </summary>
         public ulong? line;
+        /// <summary>
         /// The column within the line that corresponds to this instruction, if any.
+        /// </summary>
         public ulong? column;
+        /// <summary>
         /// The end line of the range that corresponds to this instruction, if any.
+        /// </summary>
         public ulong? endLine;
+        /// <summary>
         /// The end column of the range that corresponds to this instruction, if any.
+        /// </summary>
         public ulong? endColumn;
+        /// <summary>
         /// A hint for how to present the instruction in the UI.
+        /// <br/>
         ///
+        /// <br/>
         /// A value of `invalid` may be used to indicate this instruction is 'filler' and cannot be reached by the program. For example, unreadable memory addresses may be presented is 'invalid.'
+        /// </summary>
         public DisassembledInstructionPresentationHint? presentationHint;
     }
 
+    /// <summary>
     /// A hint for how to present the instruction in the UI.
+    /// <br/>
     ///
+    /// <br/>
     /// A value of `invalid` may be used to indicate this instruction is 'filler' and cannot be reached by the program. For example, unreadable memory addresses may be presented is 'invalid.'
+    /// </summary>
     [JsonConverter(typeof(StringEnumConverter))]
     public enum DisassembledInstructionPresentationHint
     {
@@ -2004,17 +3362,27 @@ namespace Dap
         Invalid,
     }
 
+    /// <summary>
     /// A `BreakpointMode` is provided as a option when setting breakpoints on sources or instructions.
+    /// </summary>
     [JsonObject]
     public struct BreakpointMode
     {
+        /// <summary>
         /// The internal ID of the mode. This value is passed to the `setBreakpoints` request.
+        /// </summary>
         public string mode;
+        /// <summary>
         /// The name of the breakpoint mode. This is shown in the UI.
+        /// </summary>
         public string label;
+        /// <summary>
         /// A help text providing additional information about the breakpoint mode. This string is typically shown as a hover and can be translated.
+        /// </summary>
         public string? description;
+        /// <summary>
         /// Describes one or more type of breakpoint this mode applies to.
+        /// </summary>
         public string[] appliesTo;
     }
 }

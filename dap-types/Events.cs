@@ -89,131 +89,188 @@ namespace Dap
                 case Dap.EventType.Memory:
                     return message.ToObject<MemoryEvent>();
                 default:
-                    throw new Exception($"unknown event type: {command}");
+                    throw new ArgumentException($"unknown event type: {command}");
             }
         }
     }
 
+    /// <summary>
     /// This event indicates that the debug adapter is ready to accept configuration requests (e.g. `setBreakpoints`, `setExceptionBreakpoints`).
+    /// <br/>
     /// A debug adapter is expected to send this event when it is ready to accept configuration requests (but not before the `initialize` request has finished).
+    /// <br/>
     /// The sequence of events/requests is as follows:
+    /// <br/>
     /// - adapters sends `initialized` event (after the `initialize` request has returned)
+    /// <br/>
     /// - client sends zero or more `setBreakpoints` requests
+    /// <br/>
     /// - client sends one `setFunctionBreakpoints` request (if corresponding capability `supportsFunctionBreakpoints` is true)
+    /// <br/>
     /// - client sends a `setExceptionBreakpoints` request if one or more `exceptionBreakpointFilters` have been defined (or if `supportsConfigurationDoneRequest` is not true)
+    /// <br/>
     /// - client sends other future configuration requests
+    /// <br/>
     /// - client sends one `configurationDone` request to indicate the end of the configuration.
+    /// </summary>
     public sealed class InitializedEvent : Event
     {
         public override Dap.EventType EventType => Dap.EventType.Initialized;
     }
 
+    /// <summary>
     /// The event indicates that the execution of the debuggee has stopped due to some condition.
+    /// <br/>
     /// This can be caused by a breakpoint previously set, a stepping request has completed, by executing a debugger statement etc.
+    /// </summary>
     public sealed class StoppedEvent : Event<StoppedEventBody>
     {
         public override Dap.EventType EventType => Dap.EventType.Stopped;
     }
 
+    /// <summary>
     /// The event indicates that the execution of the debuggee has continued.
+    /// <br/>
     /// Please note: a debug adapter is not expected to send this event in response to a request that implies that execution continues, e.g. `launch` or `continue`.
+    /// <br/>
     /// It is only necessary to send a `continued` event if there was no previous request that implied this.
+    /// </summary>
     public sealed class ContinuedEvent : Event<ContinuedEventBody>
     {
         public override Dap.EventType EventType => Dap.EventType.Continued;
     }
 
+    /// <summary>
     /// The event indicates that the debuggee has exited and returns its exit code.
+    /// </summary>
     public sealed class ExitedEvent : Event<ExitedEventBody>
     {
         public override Dap.EventType EventType => Dap.EventType.Exited;
     }
 
+    /// <summary>
     /// The event indicates that debugging of the debuggee has terminated. This does **not** mean that the debuggee itself has exited.
+    /// </summary>
     public sealed class TerminatedEvent : Event<TerminatedEventBody>
     {
         public override Dap.EventType EventType => Dap.EventType.Terminated;
     }
 
+    /// <summary>
     /// The event indicates that a thread has started or exited.
+    /// </summary>
     public sealed class ThreadEvent : Event<ThreadEventBody>
     {
         public override Dap.EventType EventType => Dap.EventType.Thread;
     }
 
+    /// <summary>
     /// The event indicates that the target has produced some output.
+    /// </summary>
     public sealed class OutputEvent : Event<OutputEventBody>
     {
         public override Dap.EventType EventType => Dap.EventType.Output;
     }
 
+    /// <summary>
     /// The event indicates that some information about a breakpoint has changed.
+    /// </summary>
     public sealed class BreakpointEvent : Event<BreakpointEventBody>
     {
         public override Dap.EventType EventType => Dap.EventType.Breakpoint;
     }
 
+    /// <summary>
     /// The event indicates that some information about a module has changed.
+    /// </summary>
     public sealed class ModuleEvent : Event<ModuleEventBody>
     {
         public override Dap.EventType EventType => Dap.EventType.Module;
     }
 
+    /// <summary>
     /// The event indicates that some source has been added, changed, or removed from the set of all loaded sources.
+    /// </summary>
     public sealed class LoadedSourceEvent : Event<LoadedSourceEventBody>
     {
         public override Dap.EventType EventType => Dap.EventType.LoadedSource;
     }
 
+    /// <summary>
     /// The event indicates that the debugger has begun debugging a new process. Either one that it has launched, or one that it has attached to.
+    /// </summary>
     public sealed class ProcessEvent : Event<ProcessEventBody>
     {
         public override Dap.EventType EventType => Dap.EventType.Process;
     }
 
+    /// <summary>
     /// The event indicates that one or more capabilities have changed.
+    /// <br/>
     /// Since the capabilities are dependent on the client and its UI, it might not be possible to change that at random times (or too late).
+    /// <br/>
     /// Consequently this event has a hint characteristic: a client can only be expected to make a 'best effort' in honoring individual capabilities but there are no guarantees.
+    /// <br/>
     /// Only changed capabilities need to be included, all other capabilities keep their values.
+    /// </summary>
     public sealed class CapabilitiesEvent : Event<CapabilitiesEventBody>
     {
         public override Dap.EventType EventType => Dap.EventType.Capabilities;
     }
 
+    /// <summary>
     /// The event signals that a long running operation is about to start and provides additional information for the client to set up a corresponding progress and cancellation UI.
+    /// <br/>
     /// The client is free to delay the showing of the UI in order to reduce flicker.
+    /// <br/>
     /// This event should only be sent if the corresponding capability `supportsProgressReporting` is true.
+    /// </summary>
     public sealed class ProgressStartEvent : Event<ProgressStartEventBody>
     {
         public override Dap.EventType EventType => Dap.EventType.ProgressStart;
     }
 
+    /// <summary>
     /// The event signals that the progress reporting needs to be updated with a new message and/or percentage.
+    /// <br/>
     /// The client does not have to update the UI immediately, but the clients needs to keep track of the message and/or percentage values.
+    /// <br/>
     /// This event should only be sent if the corresponding capability `supportsProgressReporting` is true.
+    /// </summary>
     public sealed class ProgressUpdateEvent : Event<ProgressUpdateEventBody>
     {
         public override Dap.EventType EventType => Dap.EventType.ProgressUpdate;
     }
 
+    /// <summary>
     /// The event signals the end of the progress reporting with a final message.
+    /// <br/>
     /// This event should only be sent if the corresponding capability `supportsProgressReporting` is true.
+    /// </summary>
     public sealed class ProgressEndEvent : Event<ProgressEndEventBody>
     {
         public override Dap.EventType EventType => Dap.EventType.ProgressEnd;
     }
 
+    /// <summary>
     /// This event signals that some state in the debug adapter has changed and requires that the client needs to re-render the data snapshot previously requested.
+    /// <br/>
     /// Debug adapters do not have to emit this event for runtime changes like stopped or thread events because in that case the client refetches the new state anyway. But the event can be used for example to refresh the UI after rendering formatting has changed in the debug adapter.
+    /// <br/>
     /// This event should only be sent if the corresponding capability `supportsInvalidatedEvent` is true.
+    /// </summary>
     public sealed class InvalidatedEvent : Event<InvalidatedEventBody>
     {
         public override Dap.EventType EventType => Dap.EventType.Invalidated;
     }
 
+    /// <summary>
     /// This event indicates that some memory range has been updated. It should only be sent if the corresponding capability `supportsMemoryEvent` is true.
+    /// <br/>
     /// Clients typically react to the event by re-issuing a `readMemory` request if they show the memory identified by the `memoryReference` and if the updated memory range overlaps the displayed range. Clients should not make assumptions how individual memory references relate to each other, so they should not assume that they are part of a single continuous address range and might overlap.
+    /// <br/>
     /// Debug adapters can use this event to indicate that the contents of a memory range has changed due to some other request like `setVariable` or `setExpression`. Debug adapters are not expected to emit this event for each and every memory change of a running program, because that information is typically not available from debuggers and it would flood clients with too many events.
+    /// </summary>
     public sealed class MemoryEvent : Event<MemoryEventBody>
     {
         public override Dap.EventType EventType => Dap.EventType.Memory;
