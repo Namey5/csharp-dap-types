@@ -6,6 +6,8 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Linq;
 
+#pragma warning disable CS8603 // Possible null reference return.
+
 namespace Dap
 {
     [JsonConverter(typeof(StringEnumConverter))]

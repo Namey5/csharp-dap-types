@@ -146,7 +146,7 @@ namespace Dap
         {
             if (!(message["success"]?.ToObject<bool>() ?? throw new MissingFieldException("success")))
             {
-                return message.ToObject<ErrorResponse>();
+                return message.ToObject<ErrorResponse>() ?? throw new NullReferenceException();
             }
             return ParseInternal(message);
         }

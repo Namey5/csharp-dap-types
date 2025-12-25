@@ -19,7 +19,9 @@ using System;
 using System.Runtime.Serialization;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-using Newtonsoft.Json.Linq;";
+using Newtonsoft.Json.Linq;
+
+#pragma warning disable CS8603 // Possible null reference return.";
 const NAMESPACE: &str = "Dap";
 
 fn main() {
