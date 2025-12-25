@@ -107,7 +107,8 @@ namespace Dap
     {
         private partial static Request ParseInternal(JObject message)
         {
-            switch (message.Value<Dap.Command>("command"))
+            Dap.Command command = message.Value<Dap.Command>("command");
+            switch (command)
             {
                 case Dap.Command.Cancel:
                     return message.ToObject<CancelRequest>();
@@ -733,7 +734,8 @@ namespace Dap
     {
         private partial static Response ParseInternal(JObject message)
         {
-            switch (message.Value<Dap.Command>("command"))
+            Dap.Command command = message.Value<Dap.Command>("command");
+            switch (command)
             {
                 case Dap.Command.Cancel:
                     return message.ToObject<CancelResponse>();

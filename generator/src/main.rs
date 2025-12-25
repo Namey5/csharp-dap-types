@@ -129,8 +129,9 @@ fn write_request_types(writer: &mut Writer, types: &[(String, &Object, String)])
         writer.line("private partial static Request ParseInternal(JObject message)");
         writer.scoped(|writer| {
             writer.line(format!(
-                "switch (message.Value<{NAMESPACE}.Command>(\"command\"))"
+                "{NAMESPACE}.Command command = message.Value<{NAMESPACE}.Command>(\"command\");"
             ));
+            writer.line("switch (command)");
             writer.scoped(|writer| {
                 for (name, _, command) in types {
                     writer.line(format!("case {NAMESPACE}.Command.{command}:",));
@@ -175,8 +176,9 @@ fn write_response_types(writer: &mut Writer, types: &[(String, &Object, String)]
         writer.line("private partial static Response ParseInternal(JObject message)");
         writer.scoped(|writer| {
             writer.line(format!(
-                "switch (message.Value<{NAMESPACE}.Command>(\"command\"))"
+                "{NAMESPACE}.Command command = message.Value<{NAMESPACE}.Command>(\"command\");"
             ));
+            writer.line("switch (command)");
             writer.scoped(|writer| {
                 for (name, _, command) in types {
                     writer.line(format!("case {NAMESPACE}.Command.{command}:"));
@@ -259,8 +261,9 @@ fn write_events(types: &[ProtocolType]) -> String {
             writer.line("private partial static Event ParseInternal(JObject message)");
             writer.scoped(|writer| {
                 writer.line(format!(
-                    "switch (message.Value<{NAMESPACE}.EventType>(\"event\"))"
+                    "{NAMESPACE}.EventType eventType = message.Value<{NAMESPACE}.EventType>(\"event\");"
                 ));
+                writer.line("switch (eventType)");
                 writer.scoped(|writer| {
                     for (ty, _, event) in &event_types {
                         writer.line(format!("case {NAMESPACE}.EventType.{event}:"));
@@ -270,7 +273,7 @@ fn write_events(types: &[ProtocolType]) -> String {
                     }
                     writer.line("default:");
                     writer.indented(|writer| {
-                        writer.line("throw new ArgumentException($\"unknown event type: {command}\");")
+                        writer.line("throw new ArgumentException($\"unknown event type: {eventType}\");")
                     });
                 });
             });

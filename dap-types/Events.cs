@@ -51,7 +51,8 @@ namespace Dap
     {
         private partial static Event ParseInternal(JObject message)
         {
-            switch (message.Value<Dap.EventType>("event"))
+            Dap.EventType eventType = message.Value<Dap.EventType>("event");
+            switch (eventType)
             {
                 case Dap.EventType.Initialized:
                     return message.ToObject<InitializedEvent>();
@@ -88,7 +89,7 @@ namespace Dap
                 case Dap.EventType.Memory:
                     return message.ToObject<MemoryEvent>();
                 default:
-                    throw new ArgumentException($"unknown event type: {command}");
+                    throw new ArgumentException($"unknown event type: {eventType}");
             }
         }
     }
