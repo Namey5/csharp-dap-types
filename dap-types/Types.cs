@@ -681,7 +681,7 @@ namespace Dap
     /// Arguments for `configurationDone` request.
     /// </summary>
     [JsonObject]
-    public struct ConfigurationDoneArguments {}
+    public struct ConfigurationDoneArguments { }
 
     /// <summary>
     /// Arguments for `disconnect` request.
@@ -1461,7 +1461,7 @@ namespace Dap
     /// Arguments for `loadedSources` request.
     /// </summary>
     [JsonObject]
-    public struct LoadedSourcesArguments {}
+    public struct LoadedSourcesArguments { }
 
     /// <summary>
     /// Response to `loadedSources` request.
@@ -2150,7 +2150,8 @@ namespace Dap
         /// <summary>
         /// Initial value of the filter option. If not specified a value false is assumed.
         /// </summary>
-        public bool? default;
+        [JsonProperty("default")]
+        public bool? @default;
         /// <summary>
         /// Controls whether a condition can be specified for this filter option. If false or missing, a condition can not be set.
         /// </summary>

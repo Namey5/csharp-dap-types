@@ -47,9 +47,9 @@ namespace Dap
         Memory,
     }
 
-    public partial abstract class Event
+    public abstract partial class Event
     {
-        private partial static Event ParseInternal(JObject message)
+        private static partial Event ParseInternal(JObject message)
         {
             Dap.EventType eventType = message.Value<Dap.EventType>("event");
             switch (eventType)

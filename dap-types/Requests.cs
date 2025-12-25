@@ -103,9 +103,9 @@ namespace Dap
         Locations,
     }
 
-    public partial abstract class Request
+    public abstract partial class Request
     {
-        private partial static Request ParseInternal(JObject message)
+        private static partial Request ParseInternal(JObject message)
         {
             Dap.Command command = message.Value<Dap.Command>("command");
             switch (command)
@@ -730,9 +730,9 @@ namespace Dap
         public override Dap.Command Command => Dap.Command.Locations;
     }
 
-    public partial abstract class Response
+    public abstract partial class Response
     {
-        private partial static Response ParseInternal(JObject message)
+        private static partial Response ParseInternal(JObject message)
         {
             Dap.Command command = message.Value<Dap.Command>("command");
             switch (command)

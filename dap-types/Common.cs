@@ -63,7 +63,7 @@ namespace Dap
     /// <summary>
     /// A client or debug adapter initiated request.
     /// </summary>
-    public partial abstract class Request : ProtocolMessage
+    public abstract partial class Request : ProtocolMessage
     {
         public override Dap.MessageType MessageType => MessageType.Request;
 
@@ -78,7 +78,7 @@ namespace Dap
             return ParseInternal(message);
         }
 
-        private partial static Request ParseInternal(JObject message);
+        private static partial Request ParseInternal(JObject message);
     }
 
     /// <summary>
@@ -101,13 +101,13 @@ namespace Dap
         /// <summary>
         /// Object containing arguments for the command.
         /// </summary>
-        public JObject arguments;
+        public JObject? arguments;
     }
 
     /// <summary>
     /// Response for a request.
     /// </summary>
-    public partial abstract class Response : ProtocolMessage
+    public abstract partial class Response : ProtocolMessage
     {
         public override Dap.MessageType MessageType => MessageType.Response;
 
@@ -149,7 +149,7 @@ namespace Dap
             return ParseInternal(message);
         }
 
-        private partial static Response ParseInternal(JObject message);
+        private static partial Response ParseInternal(JObject message);
     }
 
     /// <summary>
@@ -172,7 +172,7 @@ namespace Dap
         /// <summary>
         /// Contains request result if success is true and error details if success is false.
         /// </summary>
-        public JObject body;
+        public JObject? body;
     }
 
     /// <summary>
@@ -181,13 +181,13 @@ namespace Dap
     public sealed class ErrorResponse : Response<ErrorResponseBody>
     {
         public override bool Success => false;
-        public override Dap.Command Command { get; set; }
+        public override Dap.Command Command { get; }
 
         public ErrorResponse() { }
 
-        public ErrorResponse(Dap.Request request, Dap.Message message)
+        public ErrorResponse(Dap.Command command, Dap.Message message)
         {
-            Command = request.Command;
+            Command = command;
             body = new ErrorResponseBody { error = message };
         }
     }
@@ -195,7 +195,7 @@ namespace Dap
     /// <summary>
     /// A debug adapter initiated event.
     /// </summary>
-    public partial abstract class Event : ProtocolMessage
+    public abstract partial class Event : ProtocolMessage
     {
         public override Dap.MessageType MessageType => MessageType.Event;
 
@@ -210,7 +210,7 @@ namespace Dap
             return ParseInternal(message);
         }
 
-        private partial static Event ParseInternal(JObject message);
+        private static partial Event ParseInternal(JObject message);
     }
 
     /// <summary>
@@ -233,6 +233,6 @@ namespace Dap
         /// <summary>
         /// Event-specific information.
         /// </summary>
-        public JObject body;
+        public JObject? body;
     }
 }
