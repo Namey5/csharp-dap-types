@@ -165,11 +165,9 @@ namespace Dap
         /// <summary>
         /// The output to report.
         /// <br/>
-        ///
         /// <br/>
         /// ANSI escape sequences may be used to influence text color and styling if `supportsANSIStyling` is present in both the adapter's `Capabilities` and the client's `InitializeRequestArguments`. A client may strip any unrecognized ANSI sequences.
         /// <br/>
-        ///
         /// <br/>
         /// If the `supportsANSIStyling` capabilities are not both true, then the client should display the output literally.
         /// </summary>
@@ -201,7 +199,6 @@ namespace Dap
         /// <summary>
         /// A reference that allows the client to request the location where the new value is declared. For example, if the logged value is function pointer, the adapter may be able to look up the function's location. This should be present only if the adapter is likely to be able to resolve the location.
         /// <br/>
-        ///
         /// <br/>
         /// This reference shares the same lifetime as the `variablesReference`. See 'Lifetime of Object References' in the Overview section for details.
         /// </summary>
@@ -905,7 +902,6 @@ namespace Dap
         /// <summary>
         /// If specified, a debug adapter should return information for the range of memory extending `bytes` number of bytes from the address or variable specified by `name`. Breakpoints set using the resulting data ID should pause on data access anywhere within that range.
         /// <br/>
-        ///
         /// <br/>
         /// Clients may set this property only if the `supportsDataBreakpointBytes` capability is true.
         /// </summary>
@@ -913,7 +909,6 @@ namespace Dap
         /// <summary>
         /// If `true`, the `name` is a memory address and the debugger should interpret it as a decimal value, or hex value if it is prefixed with `0x`.
         /// <br/>
-        ///
         /// <br/>
         /// Clients may set this property only if the `supportsDataBreakpointBytes`
         /// <br/>
@@ -1335,7 +1330,6 @@ namespace Dap
         /// <summary>
         /// If `variablesReference` is > 0, the new value is structured and its children can be retrieved by passing `variablesReference` to the `variables` request as long as execution remains suspended. See 'Lifetime of Object References' in the Overview section for details.
         /// <br/>
-        ///
         /// <br/>
         /// If this property is included in the response, any `variablesReference` previously associated with the updated variable, and those of its children, are no longer valid.
         /// </summary>
@@ -1367,7 +1361,6 @@ namespace Dap
         /// <summary>
         /// A reference that allows the client to request the location where the new value is declared. For example, if the new value is function pointer, the adapter may be able to look up the function's location. This should be present only if the adapter is likely to be able to resolve the location.
         /// <br/>
-        ///
         /// <br/>
         /// This reference shares the same lifetime as the `variablesReference`. See 'Lifetime of Object References' in the Overview section for details.
         /// </summary>
@@ -1503,7 +1496,6 @@ namespace Dap
         /// <summary>
         /// The contextual column where the expression should be evaluated. This may be provided if `line` is also provided.
         /// <br/>
-        ///
         /// <br/>
         /// It is measured in UTF-16 code units and the client capability `columnsStartAt1` determines whether it is 0- or 1-based.
         /// </summary>
@@ -1575,7 +1567,6 @@ namespace Dap
         /// <summary>
         /// A reference that allows the client to request the location where the returned value is declared. For example, if a function pointer is returned, the adapter may be able to look up the function's location. This should be present only if the adapter is likely to be able to resolve the location.
         /// <br/>
-        ///
         /// <br/>
         /// This reference shares the same lifetime as the `variablesReference`. See 'Lifetime of Object References' in the Overview section for details.
         /// </summary>
@@ -1657,7 +1648,6 @@ namespace Dap
         /// <summary>
         /// A reference that allows the client to request the location where the new value is declared. For example, if the new value is function pointer, the adapter may be able to look up the function's location. This should be present only if the adapter is likely to be able to resolve the location.
         /// <br/>
-        ///
         /// <br/>
         /// This reference shares the same lifetime as the `variablesReference`. See 'Lifetime of Object References' in the Overview section for details.
         /// </summary>
@@ -2129,7 +2119,6 @@ namespace Dap
         /// <summary>
         /// Modes of breakpoints supported by the debug adapter, such as 'hardware' or 'software'. If present, the client may allow the user to select a mode and include it in its `setBreakpoints` request.
         /// <br/>
-        ///
         /// <br/>
         /// Clients may present the first applicable mode in this array as the 'default' mode in gestures that set breakpoints.
         /// </summary>
@@ -2217,11 +2206,9 @@ namespace Dap
     /// <br/>
     /// The `name` attribute is used to minimally render the module in the UI.
     /// <br/>
-    ///
     /// <br/>
     /// Additional attributes can be added to the module. They show up in the module view if they have a corresponding `ColumnDescriptor`.
     /// <br/>
-    ///
     /// <br/>
     /// To avoid an unnecessary proliferation of additional attributes with similar semantics but different names, we recommend to re-use attributes from the 'recommended' list below first, and only introduce new attributes if nothing appropriate could be found.
     /// </summary>
@@ -2605,7 +2592,6 @@ namespace Dap
         /// <summary>
         /// A reference that allows the client to request the location where the variable is declared. This should be present only if the adapter is likely to be able to resolve the location.
         /// <br/>
-        ///
         /// <br/>
         /// This reference shares the same lifetime as the `variablesReference`. See 'Lifetime of Object References' in the Overview section for details.
         /// </summary>
@@ -2613,7 +2599,6 @@ namespace Dap
         /// <summary>
         /// A reference that allows the client to request the location where the variable's value is declared. For example, if the variable contains a function pointer, the adapter may be able to look up the function's location. This should be present only if the adapter is likely to be able to resolve the location.
         /// <br/>
-        ///
         /// <br/>
         /// This reference shares the same lifetime as the `variablesReference`. See 'Lifetime of Object References' in the Overview section for details.
         /// </summary>
@@ -2877,7 +2862,6 @@ namespace Dap
         /// <summary>
         /// A machine-readable explanation of why a breakpoint may not be verified. If a breakpoint is verified or a specific reason is not known, the adapter should omit this property. Possible values include:
         /// <br/>
-        ///
         /// <br/>
         /// - `pending`: Indicates a breakpoint might be verified in the future, but the adapter cannot verify it in the current state.
         /// <br/>
@@ -2889,7 +2873,6 @@ namespace Dap
     /// <summary>
     /// A machine-readable explanation of why a breakpoint may not be verified. If a breakpoint is verified or a specific reason is not known, the adapter should omit this property. Possible values include:
     /// <br/>
-    ///
     /// <br/>
     /// - `pending`: Indicates a breakpoint might be verified in the future, but the adapter cannot verify it in the current state.
     /// <br/>
@@ -3338,7 +3321,6 @@ namespace Dap
         /// <summary>
         /// A hint for how to present the instruction in the UI.
         /// <br/>
-        ///
         /// <br/>
         /// A value of `invalid` may be used to indicate this instruction is 'filler' and cannot be reached by the program. For example, unreadable memory addresses may be presented is 'invalid.'
         /// </summary>
@@ -3348,7 +3330,6 @@ namespace Dap
     /// <summary>
     /// A hint for how to present the instruction in the UI.
     /// <br/>
-    ///
     /// <br/>
     /// A value of `invalid` may be used to indicate this instruction is 'filler' and cannot be reached by the program. For example, unreadable memory addresses may be presented is 'invalid.'
     /// </summary>

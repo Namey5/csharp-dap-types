@@ -605,7 +605,9 @@ impl Writer {
             if i > 0 {
                 self.line("/// <br/>")
             }
-            self.line(format!("/// {line}"));
+            if !line.is_empty() {
+                self.line(format!("/// {line}"));
+            }
         }
         self.line("/// </summary>");
     }
