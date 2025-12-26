@@ -87,14 +87,8 @@ namespace Dap
                         throw new ArgumentException($"unknown message type: {messageType}");
                 }
             }
-            catch (MissingFieldException)
-            {
-                throw;
-            }
-            catch (ArgumentException)
-            {
-                throw;
-            }
+            catch (MissingFieldException) { throw; }
+            catch (ArgumentException) { throw; }
             catch (Exception e)
             {
                 throw new InvalidCastException("could not parse a valid ProtocolMessage from json", e);
@@ -307,14 +301,8 @@ namespace Dap
                         [propertyName ?? throw new ArgumentNullException(nameof(propertyName))]?
                         .ToObject(typeof(T)) ?? throw new MissingFieldException(propertyName));
             }
-            catch (ArgumentNullException)
-            {
-                throw;
-            }
-            catch (MissingFieldException)
-            {
-                throw;
-            }
+            catch (ArgumentNullException) { throw; }
+            catch (MissingFieldException) { throw; }
             catch (Exception e)
             {
                 throw new InvalidCastException($"failed to cast property '{propertyName}' to type '{typeof(T)}'", e);
@@ -429,14 +417,8 @@ namespace Dap
                 }
                 return message.ToString();
             }
-            catch (MissingFieldException)
-            {
-                throw;
-            }
-            catch (FormatException)
-            {
-                throw;
-            }
+            catch (MissingFieldException) { throw; }
+            catch (FormatException) { throw; }
             catch (Exception e)
             {
                 throw new AggregateException(e);
