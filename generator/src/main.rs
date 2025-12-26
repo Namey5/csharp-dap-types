@@ -3,6 +3,9 @@ use std::{collections::HashSet, path::PathBuf};
 use indexmap::IndexMap;
 use serde_json::{Map, Value};
 
+const SCHEMA_PATH: &str = "schema.json";
+const OUTPUT_PATH: &str = "Dap";
+
 const BLACKLISTED_TYPES: &[&str] = &["ProtocolMessage", "Request", "Event", "Response"];
 const DYNAMIC_TYPES: &[&str] = &[
     "RestartArguments",
@@ -38,7 +41,7 @@ fn load_schema() -> Value {
         .parent()
         .unwrap();
     let mut schema_path = workspace_dir.to_owned();
-    schema_path.push("schema.json");
+    schema_path.push(SCHEMA_PATH);
     let contents = std::fs::read_to_string(&schema_path).unwrap();
     serde_json::from_str(&contents).unwrap()
 }
@@ -48,7 +51,7 @@ fn dst_path(file: &str) -> PathBuf {
         .parent()
         .unwrap();
     let mut path = workspace_dir.to_owned();
-    path.push("dap-types");
+    path.push(OUTPUT_PATH);
     std::fs::create_dir_all(&path).unwrap();
     path.push(file);
     path
