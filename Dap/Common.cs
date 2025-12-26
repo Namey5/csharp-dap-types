@@ -330,17 +330,18 @@ namespace Dap
                         switch (format[i])
                         {
                             case '{':
-                                throw new FormatException($"invalid '{{' inside format specifier at index {i}");
+                                throw new FormatException($"invalid '{{' inside format specifier at character {i}");
 
                             case '}':
                             {
-                                int specifierLength = i - specifierStart.Value - 1;
-                                if (specifierLength <= 0)
+                                int start = specifierStart.Value + 1;
+                                int length = i - start;
+                                if (length <= 0)
                                 {
-                                    throw new FormatException($"empty format specifier at index {specifierStart}");
+                                    throw new FormatException($"empty format specifier at character {specifierStart}");
                                 }
 
-                                string specifier = format.Substring(specifierStart.Value + 1, specifierLength);
+                                string specifier = format.Substring(start, length);
                                 message.Append(
                                     variables[specifier]?
                                         .ToString()
@@ -376,7 +377,7 @@ namespace Dap
                                     goto default;
                                 }
                             }
-                            throw new FormatException($"invalid '}}' outside format specifier at index {i}");
+                            throw new FormatException($"invalid '}}' outside format specifier at character {i}");
 
                             default:
                             {
@@ -388,7 +389,7 @@ namespace Dap
                 }
                 if (specifierStart.HasValue)
                 {
-                    throw new FormatException($"incomplete format specifier at index {specifierStart}");
+                    throw new FormatException($"incomplete format specifier at character {specifierStart}");
                 }
                 return message.ToString();
             }
