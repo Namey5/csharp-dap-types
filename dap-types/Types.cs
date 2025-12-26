@@ -6,8 +6,6 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Linq;
 
-#pragma warning disable CS8603 // Possible null reference return.
-
 namespace Dap
 {
     /// <summary>
@@ -39,7 +37,7 @@ namespace Dap
         /// <br/>
         /// Both a `requestId` and a `progressId` can be specified in one request.
         /// </summary>
-        public string? progressId;
+        public string progressId;
     }
 
     /// <summary>
@@ -59,7 +57,7 @@ namespace Dap
         /// <summary>
         /// The full reason for the event, e.g. 'Paused on exception'. This string is shown in the UI as is and can be translated.
         /// </summary>
-        public string? description;
+        public string description;
         /// <summary>
         /// The thread which was stopped.
         /// </summary>
@@ -71,7 +69,7 @@ namespace Dap
         /// <summary>
         /// Additional information. E.g. if reason is `exception`, text contains the exception name. This string is shown in the UI.
         /// </summary>
-        public string? text;
+        public string text;
         /// <summary>
         /// If `allThreadsStopped` is true, a debug adapter can announce that all threads have stopped.
         /// <br/>
@@ -89,7 +87,7 @@ namespace Dap
         /// <br/>
         /// - Multiple function breakpoints with different function names map to the same location.
         /// </summary>
-        public ulong[]? hitBreakpointIds;
+        public ulong[] hitBreakpointIds;
     }
 
     /// <summary>
@@ -135,7 +133,7 @@ namespace Dap
         /// <br/>
         /// The value is not interpreted by the client and passed unmodified as an attribute `__restart` to the `launch` and `attach` requests.
         /// </summary>
-        public object? restart;
+        public object restart;
     }
 
     /// <summary>
@@ -163,7 +161,7 @@ namespace Dap
         /// <summary>
         /// The output category. If not specified or if the category is not understood by the client, `console` is assumed.
         /// </summary>
-        public string? category;
+        public string category;
         /// <summary>
         /// The output to report.
         /// <br/>
@@ -197,7 +195,7 @@ namespace Dap
         /// <summary>
         /// Additional data to report. For the `telemetry` category the data is sent to telemetry, for the other categories the data is shown in JSON format.
         /// </summary>
-        public object? data;
+        public object data;
         /// <summary>
         /// A reference that allows the client to request the location where the new value is declared. For example, if the logged value is function pointer, the adapter may be able to look up the function's location. This should be present only if the adapter is likely to be able to resolve the location.
         /// <br/>
@@ -418,7 +416,7 @@ namespace Dap
         /// <summary>
         /// More detailed progress message.
         /// </summary>
-        public string? message;
+        public string message;
         /// <summary>
         /// Progress percentage to display (value range: 0 to 100). If omitted no percentage is shown.
         /// </summary>
@@ -442,7 +440,7 @@ namespace Dap
         /// <summary>
         /// More detailed progress message. If omitted, the previous message (if any) is used.
         /// </summary>
-        public string? message;
+        public string message;
         /// <summary>
         /// Progress percentage to display (value range: 0 to 100). If omitted no percentage is shown.
         /// </summary>
@@ -464,7 +462,7 @@ namespace Dap
         /// <summary>
         /// More detailed progress message. If omitted, the previous message (if any) is used.
         /// </summary>
-        public string? message;
+        public string message;
     }
 
     /// <summary>
@@ -480,7 +478,7 @@ namespace Dap
         /// <summary>
         /// Set of logical areas that got invalidated. This property has a hint characteristic: a client can only be expected to make a 'best effort' in honoring the areas but there are no guarantees. If this property is missing, empty, or if values are not understood, the client should assume a single value `all`.
         /// </summary>
-        public string[]? areas;
+        public string[] areas;
         /// <summary>
         /// If specified, the client only needs to refetch data related to this thread.
         /// </summary>
@@ -528,7 +526,7 @@ namespace Dap
         /// <summary>
         /// Title of the terminal.
         /// </summary>
-        public string? title;
+        public string title;
         /// <summary>
         /// Working directory for the command. For non-empty, valid paths this typically results in execution of a change directory command.
         /// </summary>
@@ -540,7 +538,7 @@ namespace Dap
         /// <summary>
         /// Environment key-value pairs that are added to or removed from the default environment.
         /// </summary>
-        public object? env;
+        public object env;
         /// <summary>
         /// This property should only be set if the corresponding capability `supportsArgsCanBeInterpretedByShell` is true. If the client uses an intermediary shell to launch the application, then the client must not attempt to escape characters with special meanings for the shell. The user is fully responsible for escaping as needed and that arguments using special characters may not be portable across shells.
         /// </summary>
@@ -612,11 +610,11 @@ namespace Dap
         /// <summary>
         /// The ID of the client using this adapter.
         /// </summary>
-        public string? clientID;
+        public string clientID;
         /// <summary>
         /// The human-readable name of the client using this adapter.
         /// </summary>
-        public string? clientName;
+        public string clientName;
         /// <summary>
         /// The ID of the debug adapter.
         /// </summary>
@@ -624,7 +622,7 @@ namespace Dap
         /// <summary>
         /// The ISO-639 locale of the client using this adapter, e.g. en-US or de-CH.
         /// </summary>
-        public string? locale;
+        public string locale;
         /// <summary>
         /// If true all line numbers are 1-based (default).
         /// </summary>
@@ -636,7 +634,7 @@ namespace Dap
         /// <summary>
         /// Determines in what format paths are specified. The default is `path`, which is the native format.
         /// </summary>
-        public string? pathFormat;
+        public string pathFormat;
         /// <summary>
         /// Client supports the `type` attribute for variables.
         /// </summary>
@@ -780,11 +778,11 @@ namespace Dap
         /// <summary>
         /// The code locations of the breakpoints.
         /// </summary>
-        public SourceBreakpoint[]? breakpoints;
+        public SourceBreakpoint[] breakpoints;
         /// <summary>
         /// Deprecated: The code locations of the breakpoints.
         /// </summary>
-        public ulong[]? lines;
+        public ulong[] lines;
         /// <summary>
         /// A value of true indicates that the underlying source has been modified which results in new breakpoint locations.
         /// </summary>
@@ -852,13 +850,13 @@ namespace Dap
         /// <summary>
         /// Set of exception filters and their options. The set of all possible exception filters is defined by the `exceptionBreakpointFilters` capability. This attribute is only honored by a debug adapter if the corresponding capability `supportsExceptionFilterOptions` is true. The `filter` and `filterOptions` sets are additive.
         /// </summary>
-        public ExceptionFilterOptions[]? filterOptions;
+        public ExceptionFilterOptions[] filterOptions;
         /// <summary>
         /// Configuration options for selected exceptions.
         /// <br/>
         /// The attribute is only honored by a debug adapter if the corresponding capability `supportsExceptionOptions` is true.
         /// </summary>
-        public ExceptionOptions[]? exceptionOptions;
+        public ExceptionOptions[] exceptionOptions;
     }
 
     /// <summary>
@@ -878,7 +876,7 @@ namespace Dap
         /// <br/>
         /// The breakpoints returned are in the same order as the elements of the `filters`, `filterOptions`, `exceptionOptions` arrays in the arguments. If both `filters` and `filterOptions` are given, the returned array must start with `filters` information first, followed by `filterOptions` information.
         /// </summary>
-        public Breakpoint[]? breakpoints;
+        public Breakpoint[] breakpoints;
     }
 
     /// <summary>
@@ -920,7 +918,7 @@ namespace Dap
         /// <summary>
         /// The mode of the desired breakpoint. If defined, this must be one of the `breakpointModes` the debug adapter advertised in its `Capabilities`.
         /// </summary>
-        public string? mode;
+        public string mode;
     }
 
     /// <summary>
@@ -940,7 +938,7 @@ namespace Dap
         /// <summary>
         /// Attribute lists the available access types for a potential data breakpoint. A UI client could surface this information.
         /// </summary>
-        public DataBreakpointAccessType[]? accessTypes;
+        public DataBreakpointAccessType[] accessTypes;
         /// <summary>
         /// Attribute indicates that a potential data breakpoint could be persisted across sessions.
         /// </summary>
@@ -1328,7 +1326,7 @@ namespace Dap
         /// <summary>
         /// The type of the new value. Typically shown in the UI when hovering over the value.
         /// </summary>
-        public string? type;
+        public string type;
         /// <summary>
         /// If `variablesReference` is > 0, the new value is structured and its children can be retrieved by passing `variablesReference` to the `variables` request as long as execution remains suspended. See 'Lifetime of Object References' in the Overview section for details.
         /// <br/>
@@ -1359,7 +1357,7 @@ namespace Dap
         /// <br/>
         /// This attribute may be returned by a debug adapter if corresponding capability `supportsMemoryReferences` is true.
         /// </summary>
-        public string? memoryReference;
+        public string memoryReference;
         /// <summary>
         /// A reference that allows the client to request the location where the new value is declared. For example, if the new value is function pointer, the adapter may be able to look up the function's location. This should be present only if the adapter is likely to be able to resolve the location.
         /// <br/>
@@ -1400,7 +1398,7 @@ namespace Dap
         /// <summary>
         /// Content type (MIME type) of the source.
         /// </summary>
-        public string? mimeType;
+        public string mimeType;
     }
 
     /// <summary>
@@ -1424,7 +1422,7 @@ namespace Dap
         /// <summary>
         /// Ids of threads to be terminated.
         /// </summary>
-        public ulong[]? threadIds;
+        public ulong[] threadIds;
     }
 
     /// <summary>
@@ -1509,7 +1507,7 @@ namespace Dap
         /// <summary>
         /// The context in which the evaluate request is used.
         /// </summary>
-        public string? context;
+        public string context;
         /// <summary>
         /// Specifies details on how to format the result.
         /// <br/>
@@ -1533,7 +1531,7 @@ namespace Dap
         /// <br/>
         /// This attribute should only be returned by a debug adapter if the corresponding capability `supportsVariableType` is true.
         /// </summary>
-        public string? type;
+        public string type;
         /// <summary>
         /// Properties of an evaluate result that can be used to determine how to render the result in the UI.
         /// </summary>
@@ -1565,7 +1563,7 @@ namespace Dap
         /// <br/>
         /// This attribute may be returned by a debug adapter if corresponding capability `supportsMemoryReferences` is true.
         /// </summary>
-        public string? memoryReference;
+        public string memoryReference;
         /// <summary>
         /// A reference that allows the client to request the location where the returned value is declared. For example, if a function pointer is returned, the adapter may be able to look up the function's location. This should be present only if the adapter is likely to be able to resolve the location.
         /// <br/>
@@ -1614,7 +1612,7 @@ namespace Dap
         /// <br/>
         /// This attribute should only be returned by a debug adapter if the corresponding capability `supportsVariableType` is true.
         /// </summary>
-        public string? type;
+        public string type;
         /// <summary>
         /// Properties of a value that can be used to determine how to render the result in the UI.
         /// </summary>
@@ -1646,7 +1644,7 @@ namespace Dap
         /// <br/>
         /// This attribute may be returned by a debug adapter if corresponding capability `supportsMemoryReferences` is true.
         /// </summary>
-        public string? memoryReference;
+        public string memoryReference;
         /// <summary>
         /// A reference that allows the client to request the location where the new value is declared. For example, if the new value is function pointer, the adapter may be able to look up the function's location. This should be present only if the adapter is likely to be able to resolve the location.
         /// <br/>
@@ -1773,7 +1771,7 @@ namespace Dap
         /// <summary>
         /// Descriptive text for the exception.
         /// </summary>
-        public string? description;
+        public string description;
         /// <summary>
         /// Mode that caused the exception notification to be raised.
         /// </summary>
@@ -1825,7 +1823,7 @@ namespace Dap
         /// <summary>
         /// The bytes read from memory, encoded using base64. If the decoded length of `data` is less than the requested `count` in the original `readMemory` request, and `unreadableBytes` is zero or omitted, then the client should assume it's reached the end of readable memory.
         /// </summary>
-        public string? data;
+        public string data;
     }
 
     /// <summary>
@@ -1981,7 +1979,7 @@ namespace Dap
         /// <summary>
         /// Available exception filter options for the `setExceptionBreakpoints` request.
         /// </summary>
-        public ExceptionBreakpointsFilter[]? exceptionBreakpointFilters;
+        public ExceptionBreakpointsFilter[] exceptionBreakpointFilters;
         /// <summary>
         /// The debug adapter supports stepping back via the `stepBack` and `reverseContinue` requests.
         /// </summary>
@@ -2009,7 +2007,7 @@ namespace Dap
         /// <summary>
         /// The set of characters that should trigger completion in a REPL. If not specified, the UI should assume the `.` character.
         /// </summary>
-        public string[]? completionTriggerCharacters;
+        public string[] completionTriggerCharacters;
         /// <summary>
         /// The debug adapter supports the `modules` request.
         /// </summary>
@@ -2017,11 +2015,11 @@ namespace Dap
         /// <summary>
         /// The set of additional module information exposed by the debug adapter.
         /// </summary>
-        public ColumnDescriptor[]? additionalModuleColumns;
+        public ColumnDescriptor[] additionalModuleColumns;
         /// <summary>
         /// Checksum algorithms supported by the debug adapter.
         /// </summary>
-        public ChecksumAlgorithm[]? supportedChecksumAlgorithms;
+        public ChecksumAlgorithm[] supportedChecksumAlgorithms;
         /// <summary>
         /// The debug adapter supports the `restart` request. In this case a client should not implement `restart` by terminating and relaunching the adapter but by calling the `restart` request.
         /// </summary>
@@ -2124,7 +2122,7 @@ namespace Dap
         /// <br/>
         /// Clients may present the first applicable mode in this array as the 'default' mode in gestures that set breakpoints.
         /// </summary>
-        public BreakpointMode[]? breakpointModes;
+        public BreakpointMode[] breakpointModes;
         /// <summary>
         /// The debug adapter supports ANSI escape sequences in styling of `OutputEvent.output` and `Variable.value` fields.
         /// </summary>
@@ -2148,7 +2146,7 @@ namespace Dap
         /// <summary>
         /// A help text providing additional information about the exception filter. This string is typically shown as a hover and can be translated.
         /// </summary>
-        public string? description;
+        public string description;
         /// <summary>
         /// Initial value of the filter option. If not specified a value false is assumed.
         /// </summary>
@@ -2161,7 +2159,7 @@ namespace Dap
         /// <summary>
         /// A help text providing information about the condition. This string is shown as the placeholder text for a text box and can be translated.
         /// </summary>
-        public string? conditionDescription;
+        public string conditionDescription;
     }
 
     /// <summary>
@@ -2183,7 +2181,7 @@ namespace Dap
         /// <summary>
         /// An object used as a dictionary for looking up the variables in the format string.
         /// </summary>
-        public object? variables;
+        public object variables;
         /// <summary>
         /// If true send to telemetry.
         /// </summary>
@@ -2195,11 +2193,11 @@ namespace Dap
         /// <summary>
         /// A url where additional information about this message can be found.
         /// </summary>
-        public string? url;
+        public string url;
         /// <summary>
         /// A label that is presented to the user as the UI for opening the url.
         /// </summary>
-        public string? urlLabel;
+        public string urlLabel;
     }
 
     /// <summary>
@@ -2229,7 +2227,7 @@ namespace Dap
         /// <summary>
         /// Logical full path to the module. The exact definition is implementation defined, but usually this would be a full path to the on-disk file for the module.
         /// </summary>
-        public string? path;
+        public string path;
         /// <summary>
         /// True if the module is optimized.
         /// </summary>
@@ -2241,23 +2239,23 @@ namespace Dap
         /// <summary>
         /// Version of Module.
         /// </summary>
-        public string? version;
+        public string version;
         /// <summary>
         /// User-understandable description of if symbols were found for the module (ex: 'Symbols Loaded', 'Symbols not found', etc.)
         /// </summary>
-        public string? symbolStatus;
+        public string symbolStatus;
         /// <summary>
         /// Logical full path to the symbol file. The exact definition is implementation defined.
         /// </summary>
-        public string? symbolFilePath;
+        public string symbolFilePath;
         /// <summary>
         /// Module created or modified, encoded as a RFC 3339 timestamp.
         /// </summary>
-        public string? dateTimeStamp;
+        public string dateTimeStamp;
         /// <summary>
         /// Address range covered by this module.
         /// </summary>
-        public string? addressRange;
+        public string addressRange;
     }
 
     /// <summary>
@@ -2281,7 +2279,7 @@ namespace Dap
         /// <summary>
         /// Format to use for the rendered values in this column. TBD how the format strings looks like.
         /// </summary>
-        public string? format;
+        public string format;
         /// <summary>
         /// Datatype of values in this column. Defaults to `string` if not specified.
         /// </summary>
@@ -2337,13 +2335,13 @@ namespace Dap
         /// <br/>
         /// When sending a source to the debug adapter this name is optional.
         /// </summary>
-        public string? name;
+        public string name;
         /// <summary>
         /// The path of the source to be shown in the UI.
         /// <br/>
         /// It is only used to locate and load the content of the source if no `sourceReference` is specified (or its value is 0).
         /// </summary>
-        public string? path;
+        public string path;
         /// <summary>
         /// If the value > 0 the contents of the source must be retrieved through the `source` request (even if a path is specified).
         /// <br/>
@@ -2361,21 +2359,21 @@ namespace Dap
         /// <summary>
         /// The origin of this source. For example, 'internal module', 'inlined content from source map', etc.
         /// </summary>
-        public string? origin;
+        public string origin;
         /// <summary>
         /// A list of sources that are related to this source. These may be the source that generated this source.
         /// </summary>
-        public Source[]? sources;
+        public Source[] sources;
         /// <summary>
         /// Additional data that a debug adapter might want to loop through the client.
         /// <br/>
         /// The client should leave the data intact and persist it across sessions. The client should not interpret the data.
         /// </summary>
-        public object? adapterData;
+        public object adapterData;
         /// <summary>
         /// The checksums associated with this file.
         /// </summary>
-        public Checksum[]? checksums;
+        public Checksum[] checksums;
     }
 
     /// <summary>
@@ -2437,11 +2435,11 @@ namespace Dap
         /// <summary>
         /// A memory reference for the current instruction pointer in this frame.
         /// </summary>
-        public string? instructionPointerReference;
+        public string instructionPointerReference;
         /// <summary>
         /// The module associated with this frame, if any.
         /// </summary>
-        public string? moduleId;
+        public string moduleId;
         /// <summary>
         /// A hint for how to present this frame in the UI.
         /// <br/>
@@ -2479,7 +2477,7 @@ namespace Dap
         /// <summary>
         /// A hint for how to present this scope in the UI. If this attribute is missing, the scope is shown with a generic UI.
         /// </summary>
-        public string? presentationHint;
+        public string presentationHint;
         /// <summary>
         /// The variables of this scope can be retrieved by passing the value of `variablesReference` to the `variables` request as long as execution remains suspended. See 'Lifetime of Object References' in the Overview section for details.
         /// </summary>
@@ -2557,7 +2555,7 @@ namespace Dap
         /// <br/>
         /// This attribute should only be returned by a debug adapter if the corresponding capability `supportsVariableType` is true.
         /// </summary>
-        public string? type;
+        public string type;
         /// <summary>
         /// Properties of a variable that can be used to determine how to render the variable in the UI.
         /// </summary>
@@ -2565,7 +2563,7 @@ namespace Dap
         /// <summary>
         /// The evaluatable name of this variable which can be passed to the `evaluate` request to fetch the variable's value.
         /// </summary>
-        public string? evaluateName;
+        public string evaluateName;
         /// <summary>
         /// If `variablesReference` is > 0, the variable is structured and its children can be retrieved by passing `variablesReference` to the `variables` request as long as execution remains suspended. See 'Lifetime of Object References' in the Overview section for details.
         /// </summary>
@@ -2591,7 +2589,7 @@ namespace Dap
         /// <br/>
         /// This attribute may be returned by a debug adapter if corresponding capability `supportsMemoryReferences` is true.
         /// </summary>
-        public string? memoryReference;
+        public string memoryReference;
         /// <summary>
         /// A reference that allows the client to request the location where the variable is declared. This should be present only if the adapter is likely to be able to resolve the location.
         /// <br/>
@@ -2617,15 +2615,15 @@ namespace Dap
         /// <summary>
         /// The kind of variable. Before introducing additional values, try to use the listed values.
         /// </summary>
-        public string? kind;
+        public string kind;
         /// <summary>
         /// Set of attributes represented as an array of strings. Before introducing additional values, try to use the listed values.
         /// </summary>
-        public string[]? attributes;
+        public string[] attributes;
         /// <summary>
         /// Visibility of variable. Before introducing additional values, try to use the listed values.
         /// </summary>
-        public string? visibility;
+        public string visibility;
         /// <summary>
         /// If true, clients can present the variable with a UI that supports a specific gesture to trigger its evaluation.
         /// <br/>
@@ -2679,7 +2677,7 @@ namespace Dap
         /// <br/>
         /// It is only honored by a debug adapter if the corresponding capability `supportsConditionalBreakpoints` is true.
         /// </summary>
-        public string? condition;
+        public string condition;
         /// <summary>
         /// The expression that controls how many hits of the breakpoint are ignored.
         /// <br/>
@@ -2689,7 +2687,7 @@ namespace Dap
         /// <br/>
         /// If both this property and `condition` are specified, `hitCondition` should be evaluated only if the `condition` is met, and the debug adapter should stop only if both conditions are met.
         /// </summary>
-        public string? hitCondition;
+        public string hitCondition;
         /// <summary>
         /// If this attribute exists and is non-empty, the debug adapter must not 'break' (stop)
         /// <br/>
@@ -2699,11 +2697,11 @@ namespace Dap
         /// <br/>
         /// If either `hitCondition` or `condition` is specified, then the message should only be logged if those conditions are met.
         /// </summary>
-        public string? logMessage;
+        public string logMessage;
         /// <summary>
         /// The mode of this breakpoint. If defined, this must be one of the `breakpointModes` the debug adapter advertised in its `Capabilities`.
         /// </summary>
-        public string? mode;
+        public string mode;
     }
 
     /// <summary>
@@ -2721,7 +2719,7 @@ namespace Dap
         /// <br/>
         /// It is only honored by a debug adapter if the corresponding capability `supportsConditionalBreakpoints` is true.
         /// </summary>
-        public string? condition;
+        public string condition;
         /// <summary>
         /// An expression that controls how many hits of the breakpoint are ignored.
         /// <br/>
@@ -2729,7 +2727,7 @@ namespace Dap
         /// <br/>
         /// The attribute is only honored by a debug adapter if the corresponding capability `supportsHitConditionalBreakpoints` is true.
         /// </summary>
-        public string? hitCondition;
+        public string hitCondition;
     }
 
     /// <summary>
@@ -2763,13 +2761,13 @@ namespace Dap
         /// <summary>
         /// An expression for conditional breakpoints.
         /// </summary>
-        public string? condition;
+        public string condition;
         /// <summary>
         /// An expression that controls how many hits of the breakpoint are ignored.
         /// <br/>
         /// The debug adapter is expected to interpret the expression as needed.
         /// </summary>
-        public string? hitCondition;
+        public string hitCondition;
     }
 
     /// <summary>
@@ -2795,7 +2793,7 @@ namespace Dap
         /// <br/>
         /// It is only honored by a debug adapter if the corresponding capability `supportsConditionalBreakpoints` is true.
         /// </summary>
-        public string? condition;
+        public string condition;
         /// <summary>
         /// An expression that controls how many hits of the breakpoint are ignored.
         /// <br/>
@@ -2803,11 +2801,11 @@ namespace Dap
         /// <br/>
         /// The attribute is only honored by a debug adapter if the corresponding capability `supportsHitConditionalBreakpoints` is true.
         /// </summary>
-        public string? hitCondition;
+        public string hitCondition;
         /// <summary>
         /// The mode of this breakpoint. If defined, this must be one of the `breakpointModes` the debug adapter advertised in its `Capabilities`.
         /// </summary>
-        public string? mode;
+        public string mode;
     }
 
     /// <summary>
@@ -2829,7 +2827,7 @@ namespace Dap
         /// <br/>
         /// This is shown to the user and can be used to explain why a breakpoint could not be verified.
         /// </summary>
-        public string? message;
+        public string message;
         /// <summary>
         /// The source where the breakpoint is located.
         /// </summary>
@@ -2855,7 +2853,7 @@ namespace Dap
         /// <summary>
         /// A memory reference to where the breakpoint is set.
         /// </summary>
-        public string? instructionReference;
+        public string instructionReference;
         /// <summary>
         /// The offset from the instruction reference.
         /// <br/>
@@ -2984,7 +2982,7 @@ namespace Dap
         /// <summary>
         /// A memory reference for the instruction pointer value represented by this target.
         /// </summary>
-        public string? instructionPointerReference;
+        public string instructionPointerReference;
     }
 
     /// <summary>
@@ -3000,15 +2998,15 @@ namespace Dap
         /// <summary>
         /// If text is returned and not an empty string, then it is inserted instead of the label.
         /// </summary>
-        public string? text;
+        public string text;
         /// <summary>
         /// A string that should be used when comparing this item with other items. If not returned or an empty string, the `label` is used instead.
         /// </summary>
-        public string? sortText;
+        public string sortText;
         /// <summary>
         /// A human-readable string with additional information about this item, like type or symbol information.
         /// </summary>
-        public string? detail;
+        public string detail;
         /// <summary>
         /// The item's type. Typically the client uses this information to render the item in the UI with an icon.
         /// </summary>
@@ -3176,11 +3174,11 @@ namespace Dap
         /// <br/>
         /// The exception breaks into the debugger if the result of the condition is true.
         /// </summary>
-        public string? condition;
+        public string condition;
         /// <summary>
         /// The mode of this exception breakpoint. If defined, this must be one of the `breakpointModes` the debug adapter advertised in its `Capabilities`.
         /// </summary>
-        public string? mode;
+        public string mode;
     }
 
     /// <summary>
@@ -3194,7 +3192,7 @@ namespace Dap
         /// <br/>
         /// By convention the first segment of the path is a category that is used to group exceptions in the UI.
         /// </summary>
-        public ExceptionPathSegment[]? path;
+        public ExceptionPathSegment[] path;
         /// <summary>
         /// Condition when a thrown exception should result in a break.
         /// </summary>
@@ -3252,27 +3250,27 @@ namespace Dap
         /// <summary>
         /// Message contained in the exception.
         /// </summary>
-        public string? message;
+        public string message;
         /// <summary>
         /// Short type name of the exception object.
         /// </summary>
-        public string? typeName;
+        public string typeName;
         /// <summary>
         /// Fully-qualified type name of the exception object.
         /// </summary>
-        public string? fullTypeName;
+        public string fullTypeName;
         /// <summary>
         /// An expression that can be evaluated in the current scope to obtain the exception object.
         /// </summary>
-        public string? evaluateName;
+        public string evaluateName;
         /// <summary>
         /// Stack trace at the time the exception was thrown.
         /// </summary>
-        public string? stackTrace;
+        public string stackTrace;
         /// <summary>
         /// Details of the exception contained by this exception, if any.
         /// </summary>
-        public ExceptionDetails[]? innerException;
+        public ExceptionDetails[] innerException;
     }
 
     /// <summary>
@@ -3288,7 +3286,7 @@ namespace Dap
         /// <summary>
         /// Raw bytes representing the instruction and its operands, in an implementation-defined format.
         /// </summary>
-        public string? instructionBytes;
+        public string instructionBytes;
         /// <summary>
         /// Text representing the instruction and its operands, in an implementation-defined format.
         /// </summary>
@@ -3296,7 +3294,7 @@ namespace Dap
         /// <summary>
         /// Name of the symbol that corresponds with the location of this instruction, if any.
         /// </summary>
-        public string? symbol;
+        public string symbol;
         /// <summary>
         /// Source location that corresponds to this instruction, if any.
         /// <br/>
@@ -3362,7 +3360,7 @@ namespace Dap
         /// <summary>
         /// A help text providing additional information about the breakpoint mode. This string is typically shown as a hover and can be translated.
         /// </summary>
-        public string? description;
+        public string description;
         /// <summary>
         /// Describes one or more type of breakpoint this mode applies to.
         /// </summary>

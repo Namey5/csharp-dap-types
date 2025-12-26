@@ -237,9 +237,9 @@ dotnet_naming_rule.parameters_should_be_camelcase.severity = suggestion
 dotnet_naming_rule.parameters_should_be_camelcase.symbols = parameters
 dotnet_naming_rule.parameters_should_be_camelcase.style = camelcase
 
-dotnet_naming_rule.public_fields_should_be_pascalcase.severity = suggestion
-dotnet_naming_rule.public_fields_should_be_pascalcase.symbols = public_fields
-dotnet_naming_rule.public_fields_should_be_pascalcase.style = pascalcase
+dotnet_naming_rule.public_fields_should_be_camelcase.severity = suggestion
+dotnet_naming_rule.public_fields_should_be_camelcase.symbols = public_fields
+dotnet_naming_rule.public_fields_should_be_camelcase.style = camelcase
 
 dotnet_naming_rule.private_fields_should_be__camelcase.severity = suggestion
 dotnet_naming_rule.private_fields_should_be__camelcase.symbols = private_fields

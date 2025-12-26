@@ -51,11 +51,11 @@ namespace Dap
             switch (messageType)
             {
                 case Dap.MessageType.Request:
-                    return Request.ParseMessage(message);
+                    return Request.Parse(message);
                 case Dap.MessageType.Response:
-                    return Response.ParseMessage(message);
+                    return Response.Parse(message);
                 case Dap.MessageType.Event:
-                    return Event.ParseMessage(message);
+                    return Event.Parse(message);
                 default:
                     throw new ArgumentException($"unknown message type: {messageType}");
             }
@@ -74,13 +74,6 @@ namespace Dap
         /// </summary>
         [JsonProperty("command")]
         public abstract Dap.Command Command { get; }
-
-        public static Request ParseMessage(JObject message)
-        {
-            return ParseInternal(message);
-        }
-
-        private static partial Request ParseInternal(JObject message);
     }
 
     /// <summary>
@@ -103,7 +96,7 @@ namespace Dap
         /// <summary>
         /// Object containing arguments for the command.
         /// </summary>
-        public JObject? arguments;
+        public JObject arguments;
     }
 
     /// <summary>
@@ -140,18 +133,7 @@ namespace Dap
         /// This raw error might be interpreted by the client and is not shown in the UI.
         /// Some predefined values exist.
         /// </summary>
-        public string? message;
-
-        public static Response ParseMessage(JObject message)
-        {
-            if (!(message["success"]?.ToObject<bool>() ?? throw new MissingFieldException("success")))
-            {
-                return message.ToObject<ErrorResponse>() ?? throw new NullReferenceException();
-            }
-            return ParseInternal(message);
-        }
-
-        private static partial Response ParseInternal(JObject message);
+        public string message = null;
     }
 
     /// <summary>
@@ -174,7 +156,7 @@ namespace Dap
         /// <summary>
         /// Contains request result if success is true and error details if success is false.
         /// </summary>
-        public JObject? body;
+        public JObject body;
     }
 
     /// <summary>
@@ -206,13 +188,6 @@ namespace Dap
         /// </summary>
         [JsonProperty("event")]
         public abstract Dap.EventType EventType { get; }
-
-        public static Event ParseMessage(JObject message)
-        {
-            return ParseInternal(message);
-        }
-
-        private static partial Event ParseInternal(JObject message);
     }
 
     /// <summary>
@@ -235,6 +210,6 @@ namespace Dap
         /// <summary>
         /// Event-specific information.
         /// </summary>
-        public JObject? body;
+        public JObject body;
     }
 }

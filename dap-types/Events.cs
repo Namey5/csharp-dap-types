@@ -6,8 +6,6 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Linq;
 
-#pragma warning disable CS8603 // Possible null reference return.
-
 namespace Dap
 {
     [JsonConverter(typeof(StringEnumConverter))]
@@ -51,7 +49,7 @@ namespace Dap
 
     public abstract partial class Event
     {
-        private static partial Event ParseInternal(JObject message)
+        public static Event Parse(JObject message)
         {
             Dap.EventType eventType = message["event"]?
                 .ToObject<Dap.EventType>()

@@ -19,9 +19,7 @@ using System;
 using System.Runtime.Serialization;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-using Newtonsoft.Json.Linq;
-
-#pragma warning disable CS8603 // Possible null reference return.";
+using Newtonsoft.Json.Linq;";
 const NAMESPACE: &str = "Dap";
 
 fn main() {
@@ -129,7 +127,7 @@ fn write_requests(types: &[ProtocolType]) -> String {
 fn write_request_types(writer: &mut Writer, types: &[(String, &Object, String)]) {
     writer.line("public abstract partial class Request");
     writer.scoped(|writer| {
-        writer.line("private static partial Request ParseInternal(JObject message)");
+        writer.line("public static Request Parse(JObject message)");
         writer.scoped(|writer| {
             writer.line(format!(
                 "{NAMESPACE}.Command command = message[\"command\"]?"
@@ -180,8 +178,19 @@ fn write_request_types(writer: &mut Writer, types: &[(String, &Object, String)])
 fn write_response_types(writer: &mut Writer, types: &[(String, &Object, String)]) {
     writer.line("public abstract partial class Response");
     writer.scoped(|writer| {
-        writer.line("private static partial Response ParseInternal(JObject message)");
+        writer.line("public static Response Parse(JObject message)");
         writer.scoped(|writer| {
+            writer.line("bool success = message[\"success\"]?");
+            writer.indented(|writer| {
+                writer.line(".ToObject<bool>()");
+                writer.line("?? throw new MissingFieldException(\"success\");");
+            });
+            writer.line("if (!success)");
+            writer.scoped(|writer| {
+                writer.line("return message.ToObject<ErrorResponse>();");
+            });
+            writer.finished_object();
+
             writer.line(format!(
                 "{NAMESPACE}.Command command = message[\"command\"]?"
             ));
@@ -269,7 +278,7 @@ fn write_events(types: &[ProtocolType]) -> String {
 
         writer.line("public abstract partial class Event");
         writer.scoped(|writer| {
-            writer.line("private static partial Event ParseInternal(JObject message)");
+            writer.line("public static Event Parse(JObject message)");
             writer.scoped(|writer| {
                 writer.line(format!(
                     "{NAMESPACE}.EventType eventType = message[\"event\"]?"
@@ -734,7 +743,7 @@ impl Object {
                     if let Some(doc) = &field.doc {
                         dst.doc(doc);
                     }
-                    if !field.required {
+                    if !field.type_info.is_reference_type() && !field.required {
                         ty.push('?');
                     }
                     if RESERVED_IDENTIFIERS.contains(&field.name.as_str()) {
@@ -798,6 +807,18 @@ impl Type {
                 inline_name
             }
             Type::Vec(x) => format!("{}[]", x.stringify(inline_name, pending)),
+        }
+    }
+
+    fn is_reference_type(&self) -> bool {
+        match self {
+            Type::Any | Type::Vec(_) => true,
+            Type::Object(obj) => obj.base.is_some(),
+            Type::Basic(name) => match name.as_str() {
+                "string" | "object" => true,
+                _ => false,
+            },
+            _ => false,
         }
     }
 }

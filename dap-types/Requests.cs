@@ -6,8 +6,6 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Linq;
 
-#pragma warning disable CS8603 // Possible null reference return.
-
 namespace Dap
 {
     [JsonConverter(typeof(StringEnumConverter))]
@@ -107,7 +105,7 @@ namespace Dap
 
     public abstract partial class Request
     {
-        private static partial Request ParseInternal(JObject message)
+        public static Request Parse(JObject message)
         {
             Dap.Command command = message["command"]?
                 .ToObject<Dap.Command>()
@@ -736,8 +734,16 @@ namespace Dap
 
     public abstract partial class Response
     {
-        private static partial Response ParseInternal(JObject message)
+        public static Response Parse(JObject message)
         {
+            bool success = message["success"]?
+                .ToObject<bool>()
+                ?? throw new MissingFieldException("success");
+            if (!success)
+            {
+                return message.ToObject<ErrorResponse>();
+            }
+
             Dap.Command command = message["command"]?
                 .ToObject<Dap.Command>()
                 ?? throw new MissingFieldException("command");
