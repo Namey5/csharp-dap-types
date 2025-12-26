@@ -8,10 +8,10 @@ See [Releases](https://github.com/Namey5/csharp-dap-types/releases) for the buil
 - `Dap-vX.X.X.zip` contains the generated source files + `.csproj`
 - `Dap-vX.X.X-NetStandard20.zip` contains the compiled `.NET Standard 2.0` library
 
-Alternatively, you can clone `csharp-dap-types` as a `git submodule` and reference the `.csproj` directly, i.e.
+Alternatively, you can clone `csharp-dap-types` as a [`git submodule`](https://git-scm.com/book/en/v2/Git-Tools-Submodules) and reference the `.csproj` directly, i.e.
 ```csproj
 <ItemGroup>
-  <ProjectReference Include="./csharp-dap-types/dap-types/Dap.csproj" />
+  <ProjectReference Include="./csharp-dap-types/Dap/Dap.csproj" />
 </ItemGroup>
 ```
 
