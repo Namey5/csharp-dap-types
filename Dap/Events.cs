@@ -51,9 +51,7 @@ namespace Dap
     {
         public static Event Parse(JObject message)
         {
-            Dap.EventType eventType = message["event"]?
-                .ToObject<Dap.EventType>()
-                ?? throw new MissingFieldException("event");
+            Dap.EventType eventType = message.Property<Dap.EventType>("event");
             switch (eventType)
             {
                 case Dap.EventType.Initialized:

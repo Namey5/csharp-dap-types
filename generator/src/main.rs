@@ -133,12 +133,8 @@ fn write_request_types(writer: &mut Writer, types: &[(String, &Object, String)])
         writer.line("public static Request Parse(JObject message)");
         writer.scoped(|writer| {
             writer.line(format!(
-                "{NAMESPACE}.Command command = message[\"command\"]?"
+                "{NAMESPACE}.Command command = message.Property<{NAMESPACE}.Command>(\"command\");"
             ));
-            writer.indented(|writer| {
-                writer.line(format!(".ToObject<{NAMESPACE}.Command>()"));
-                writer.line("?? throw new MissingFieldException(\"command\");");
-            });
             writer.line("switch (command)");
             writer.scoped(|writer| {
                 for (name, _, command) in types {
@@ -183,11 +179,7 @@ fn write_response_types(writer: &mut Writer, types: &[(String, &Object, String)]
     writer.scoped(|writer| {
         writer.line("public static Response Parse(JObject message)");
         writer.scoped(|writer| {
-            writer.line("bool success = message[\"success\"]?");
-            writer.indented(|writer| {
-                writer.line(".ToObject<bool>()");
-                writer.line("?? throw new MissingFieldException(\"success\");");
-            });
+            writer.line("bool success = message.Property<bool>(\"success\");");
             writer.line("if (!success)");
             writer.scoped(|writer| {
                 writer.line("return message.ToObject<ErrorResponse>();");
@@ -195,12 +187,8 @@ fn write_response_types(writer: &mut Writer, types: &[(String, &Object, String)]
             writer.finished_object();
 
             writer.line(format!(
-                "{NAMESPACE}.Command command = message[\"command\"]?"
+                "{NAMESPACE}.Command command = message.Property<{NAMESPACE}.Command>(\"command\");"
             ));
-            writer.indented(|writer| {
-                writer.line(format!(".ToObject<{NAMESPACE}.Command>()"));
-                writer.line("?? throw new MissingFieldException(\"command\");");
-            });
             writer.line("switch (command)");
             writer.scoped(|writer| {
                 for (name, _, command) in types {
@@ -284,12 +272,8 @@ fn write_events(types: &[ProtocolType]) -> String {
             writer.line("public static Event Parse(JObject message)");
             writer.scoped(|writer| {
                 writer.line(format!(
-                    "{NAMESPACE}.EventType eventType = message[\"event\"]?"
+                    "{NAMESPACE}.EventType eventType = message.Property<{NAMESPACE}.EventType>(\"event\");"
                 ));
-                writer.indented(|writer| {
-                    writer.line(format!(".ToObject<{NAMESPACE}.EventType>()"));
-                    writer.line("?? throw new MissingFieldException(\"event\");");
-                });
                 writer.line("switch (eventType)");
                 writer.scoped(|writer| {
                     for (ty, _, event) in &event_types {

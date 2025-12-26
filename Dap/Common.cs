@@ -74,9 +74,7 @@ namespace Dap
 
             try
             {
-                Dap.MessageType messageType = message["type"]?
-                    .ToObject<Dap.MessageType>()
-                    ?? throw new MissingFieldException("type");
+                Dap.MessageType messageType = message.Property<Dap.MessageType>("type");
                 switch (messageType)
                 {
                     case Dap.MessageType.Request:
@@ -286,6 +284,44 @@ namespace Dap
     public static class Extensions
     {
         /// <summary>
+        /// Retrieve the value of the json property named '<paramref name="propertyName"/>' converted to type <typeparamref name="T"/>.
+        /// <br/>
+        /// This is similar to <see cref="Newtonsoft.Json.Linq.JToken.Value{T}(object)"/> but will
+        /// fully deserialize using applicable converters instead of just trying a primitive cast.
+        /// </summary>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="self"/> or <paramref name="propertyName"/> is null.
+        /// </exception>
+        /// <exception cref="MissingFieldException">
+        /// <paramref name="self"/> did not contain a property named '<paramref name="propertyName"/>'.
+        /// </exception>
+        /// <exception cref="InvalidCastException">
+        /// Property could not be converted to type <typeparamref name="T"/>.
+        /// </exception>
+        public static T Property<T>(this JToken self, string propertyName)
+        {
+            try
+            {
+                return (T)(
+                    (self ?? throw new ArgumentNullException(nameof(self)))
+                        [propertyName ?? throw new ArgumentNullException(nameof(propertyName))]?
+                        .ToObject(typeof(T)) ?? throw new MissingFieldException(propertyName));
+            }
+            catch (ArgumentNullException)
+            {
+                throw;
+            }
+            catch (MissingFieldException)
+            {
+                throw;
+            }
+            catch (Exception e)
+            {
+                throw new InvalidCastException($"failed to cast property '{propertyName}' to type '{typeof(T)}'", e);
+            }
+        }
+
+        /// <summary>
         /// Resolve this <see cref="Message"/> using its <see cref="Message.format"/> and <see cref="Message.variables"/>.
         /// </summary>
         /// <exception cref="ArgumentNullException">
@@ -305,8 +341,8 @@ namespace Dap
         /// </exception>
         public static string FormatMessage(this in Message self)
         {
-            string format = self.format ?? throw new ArgumentNullException("format");
-            JObject variables = (self.variables ?? throw new ArgumentNullException("variables")) as JObject;
+            string format = self.format ?? throw new ArgumentNullException($"{nameof(self)}.{nameof(self.format)}");
+            JObject variables = (self.variables ?? throw new ArgumentNullException($"{nameof(self)}.{nameof(self.variables)}")) as JObject;
             if (variables == null)
             {
                 try

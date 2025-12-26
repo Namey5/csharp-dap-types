@@ -107,9 +107,7 @@ namespace Dap
     {
         public static Request Parse(JObject message)
         {
-            Dap.Command command = message["command"]?
-                .ToObject<Dap.Command>()
-                ?? throw new MissingFieldException("command");
+            Dap.Command command = message.Property<Dap.Command>("command");
             switch (command)
             {
                 case Dap.Command.Cancel:
@@ -736,17 +734,13 @@ namespace Dap
     {
         public static Response Parse(JObject message)
         {
-            bool success = message["success"]?
-                .ToObject<bool>()
-                ?? throw new MissingFieldException("success");
+            bool success = message.Property<bool>("success");
             if (!success)
             {
                 return message.ToObject<ErrorResponse>();
             }
 
-            Dap.Command command = message["command"]?
-                .ToObject<Dap.Command>()
-                ?? throw new MissingFieldException("command");
+            Dap.Command command = message.Property<Dap.Command>("command");
             switch (command)
             {
                 case Dap.Command.Cancel:
