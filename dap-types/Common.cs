@@ -42,22 +42,64 @@ namespace Dap
         /// </summary>
         public ulong seq;
 
+        /// <summary>
+        /// Parse a json object as a known DAP message.
+        /// </summary>
+        /// <returns>
+        /// A subtype of <see cref="Request"/>, <see cref="Response"/> or <see cref="Event"/> depending on <see cref="MessageType"/>.
+        /// </returns>
+        /// <exception cref="JsonException">
+        /// Failed to deserialize <paramref name="json"/>.
+        /// </exception>
+        /// <exception cref="MissingFieldException">
+        /// Message was missing a required field (eg. <see cref="MessageType"/>).
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// Required discriminant field (eg. <see cref="MessageType"/>) had an invalid value.
+        /// </exception>
+        /// <exception cref="InvalidCastException">
+        /// The message could not be parsed as its reported type.
+        /// </exception>
         public static ProtocolMessage Parse(string json)
         {
-            JObject message = JObject.Parse(json);
-            Dap.MessageType messageType = message["type"]?
-                .ToObject<Dap.MessageType>()
-                ?? throw new MissingFieldException("type");
-            switch (messageType)
+            JObject message;
+            try
             {
-                case Dap.MessageType.Request:
-                    return Request.Parse(message);
-                case Dap.MessageType.Response:
-                    return Response.Parse(message);
-                case Dap.MessageType.Event:
-                    return Event.Parse(message);
-                default:
-                    throw new ArgumentException($"unknown message type: {messageType}");
+                message = JObject.Parse(json);
+            }
+            catch (Exception e)
+            {
+                throw new JsonException("failed to parse json", e);
+            }
+
+            try
+            {
+                Dap.MessageType messageType = message["type"]?
+                    .ToObject<Dap.MessageType>()
+                    ?? throw new MissingFieldException("type");
+                switch (messageType)
+                {
+                    case Dap.MessageType.Request:
+                        return Request.Parse(message);
+                    case Dap.MessageType.Response:
+                        return Response.Parse(message);
+                    case Dap.MessageType.Event:
+                        return Event.Parse(message);
+                    default:
+                        throw new ArgumentException($"unknown message type: {messageType}");
+                }
+            }
+            catch (MissingFieldException)
+            {
+                throw;
+            }
+            catch (ArgumentException)
+            {
+                throw;
+            }
+            catch (Exception e)
+            {
+                throw new InvalidCastException("could not parse a valid ProtocolMessage from json", e);
             }
         }
     }
@@ -167,12 +209,40 @@ namespace Dap
         public override bool Success => false;
         public override Dap.Command Command { get; }
 
+        /// <summary>
+        /// Default constructor - should only be used when deserializing from json.
+        /// </summary>
         public ErrorResponse() { }
 
-        public ErrorResponse(Dap.Command command, Dap.Message message)
+        /// <summary>
+        /// Create a new error response with a specific message.
+        /// </summary>
+        public ErrorResponse(Dap.Command command, string message, in Dap.Message error)
         {
+            this.Command = command;
+            this.message = message;
+            this.body = new ErrorResponseBody { error = error };
+        }
+
+        /// <summary>
+        /// Create a new error response by resolving <see cref="Response.message"/> from
+        /// <paramref name="error"/> via <see cref="Extensions.FormatMessage(in Message)"/>.
+        /// </summary>
+        /// <exception cref="FormatException">
+        /// <paramref name="error"/> could not be resolved to a message.
+        /// </exception>
+        public ErrorResponse(Dap.Command command, in Dap.Message error)
+        {
+            try
+            {
+                message = error.FormatMessage();
+            }
+            catch (Exception e)
+            {
+                throw new FormatException("failed to format error", e);
+            }
             Command = command;
-            body = new ErrorResponseBody { error = message };
+            body = new ErrorResponseBody { error = error };
         }
     }
 
@@ -211,5 +281,129 @@ namespace Dap
         /// Event-specific information.
         /// </summary>
         public JObject body;
+    }
+
+    public static class Extensions
+    {
+        /// <summary>
+        /// Resolve this <see cref="Message"/> using its <see cref="Message.format"/> and <see cref="Message.variables"/>.
+        /// </summary>
+        /// <exception cref="ArgumentNullException">
+        /// <see cref="Message.format"/> or <see cref="Message.variables"/> was null.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// <see cref="Message.variables"/> was not convertible to <see cref="Newtonsoft.Json.Linq.JObject"/>.
+        /// </exception>
+        /// <exception cref="MissingFieldException">
+        /// <see cref="Message.format"/> contained a specifier not present in <see cref="Message.variables"/>.
+        /// </exception>
+        /// <exception cref="FormatException">
+        /// <see cref="Message.format"/> was not a valid format string.
+        /// </exception>
+        /// <exception cref="AggregateException">
+        /// An unhandled exception occurred during formatting.
+        /// </exception>
+        public static string FormatMessage(this in Message self)
+        {
+            string format = self.format ?? throw new ArgumentNullException("format");
+            JObject variables = (self.variables ?? throw new ArgumentNullException("variables")) as JObject;
+            if (variables == null)
+            {
+                try
+                {
+                    variables = JObject.FromObject(self.variables);
+                }
+                catch (Exception e)
+                {
+                    throw new ArgumentException("Message.variables must be an object", e);
+                }
+            }
+
+            try
+            {
+                System.Text.StringBuilder message = new System.Text.StringBuilder(format.Length);
+                int? specifierStart = null;
+                for (var i = 0; i < format.Length; i++)
+                {
+                    if (specifierStart.HasValue)
+                    {
+                        switch (format[i])
+                        {
+                            case '{':
+                                throw new FormatException($"invalid '{{' inside format specifier at index {i}");
+
+                            case '}':
+                            {
+                                int specifierLength = i - specifierStart.Value - 1;
+                                if (specifierLength <= 0)
+                                {
+                                    throw new FormatException($"empty format specifier at index {specifierStart}");
+                                }
+
+                                string specifier = format.Substring(specifierStart.Value + 1, specifierLength);
+                                message.Append(
+                                    variables[specifier]?
+                                        .ToString()
+                                        ?? throw new MissingFieldException(specifier));
+                                specifierStart = null;
+                            }
+                            break;
+
+                            default:
+                                break;
+                        }
+                    }
+                    else
+                    {
+                        switch (format[i])
+                        {
+                            case '{':
+                            {
+                                if ((i + 1) < format.Length && format[i + 1] == '{')
+                                {
+                                    i++;
+                                    goto default;
+                                }
+                                specifierStart = i;
+                            }
+                            break;
+
+                            case '}':
+                            {
+                                if ((i + 1) < format.Length && format[i + 1] == '}')
+                                {
+                                    i++;
+                                    goto default;
+                                }
+                            }
+                            throw new FormatException($"invalid '}}' outside format specifier at index {i}");
+
+                            default:
+                            {
+                                message.Append(format[i]);
+                            }
+                            break;
+                        }
+                    }
+                }
+                if (specifierStart.HasValue)
+                {
+                    throw new FormatException($"incomplete format specifier at index {specifierStart}");
+                }
+                return message.ToString();
+            }
+            catch (MissingFieldException)
+            {
+                throw;
+            }
+            catch (FormatException)
+            {
+                throw;
+            }
+            catch (Exception e)
+            {
+                throw new AggregateException(e);
+            }
+        }
     }
 }
