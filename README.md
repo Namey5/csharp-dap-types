@@ -1,5 +1,5 @@
 # Debug Adapter Protocol bindings for .NET
-C# bindings generator for the [Debug Adapter Protocol](https://microsoft.github.io/debug-adapter-protocol/) targeting `.NET Standard 2.0` for univarsal support.
+C# bindings generator for the [Debug Adapter Protocol](https://microsoft.github.io/debug-adapter-protocol/) targeting `.NET Standard 2.0` for universal support.
 
 Adapted from Zed's `rust` bindings.
 
