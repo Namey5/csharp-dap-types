@@ -1,6 +1,6 @@
-on: [push, pull_request]
-
 name: Tests
+
+on: [push, pull_request]
 
 jobs:
   test:
@@ -9,22 +9,20 @@ jobs:
     steps:
       - name: Checkout sources
         uses: actions/checkout@v2
-
       - name: Install stable toolchain
         uses: actions-rs/toolchain@v1
         with:
           profile: minimal
           toolchain: stable
           override: true
-
       - name: Cargo build
         uses: actions-rs/cargo@v1
         with:
           command: build
           args: --workspace
-
-      - name: Cargo test
+      - name: Cargo run
         uses: actions-rs/cargo@v1
         with:
-          command: test
-          args: --workspace
+          command: run
+      - name: Validate output
+        run: git diff --exit-code
