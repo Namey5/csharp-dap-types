@@ -31,9 +31,10 @@ ErrorResponse response = new ErrorResponse(
   new Message
   {
     id = 753.
-    format = "failed to resolve breakpoint at '{path}'",
+    format = "failed to resolve breakpoint '{_breakpointId}' at '{path}'",
     variables = new JObject(
-      new JProperty("path", path)),
+      new JProperty("path", path),
+      new JProperty("_breakpointId", 0)),
   });
 string json = JsonConvert.SerializeObject(response);
 ```
