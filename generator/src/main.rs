@@ -130,17 +130,14 @@ fn write_requests(types: &[ProtocolType]) -> String {
 fn write_request_types(writer: &mut Writer, types: &[(String, &Object, String)]) {
     writer.line("public abstract partial class Request");
     writer.scoped(|writer| {
-        writer.line("public static Request Parse(JObject message)");
+        writer.line(format!("private static Request Parse({NAMESPACE}.Command command, JObject message, JsonSerializer serializer)"));
         writer.scoped(|writer| {
-            writer.line(format!(
-                "{NAMESPACE}.Command command = message.Property<{NAMESPACE}.Command>(\"command\");"
-            ));
             writer.line("switch (command)");
             writer.scoped(|writer| {
                 for (name, _, command) in types {
                     writer.line(format!("case {NAMESPACE}.Command.{command}:",));
                     writer.indented(|writer| {
-                        writer.line(format!("return message.ToObject<{name}>();"))
+                        writer.line(format!("return message.ToObject<{name}>(serializer);"))
                     });
                 }
                 writer.line("default:");
@@ -177,24 +174,14 @@ fn write_request_types(writer: &mut Writer, types: &[(String, &Object, String)])
 fn write_response_types(writer: &mut Writer, types: &[(String, &Object, String)]) {
     writer.line("public abstract partial class Response");
     writer.scoped(|writer| {
-        writer.line("public static Response Parse(JObject message)");
+        writer.line(format!("private static Response Parse({NAMESPACE}.Command command, JObject message, JsonSerializer serializer)"));
         writer.scoped(|writer| {
-            writer.line("bool success = message.Property<bool>(\"success\");");
-            writer.line("if (!success)");
-            writer.scoped(|writer| {
-                writer.line("return message.ToObject<ErrorResponse>();");
-            });
-            writer.finished_object();
-
-            writer.line(format!(
-                "{NAMESPACE}.Command command = message.Property<{NAMESPACE}.Command>(\"command\");"
-            ));
             writer.line("switch (command)");
             writer.scoped(|writer| {
                 for (name, _, command) in types {
                     writer.line(format!("case {NAMESPACE}.Command.{command}:"));
                     writer.indented(|writer| {
-                        writer.line(format!("return message.ToObject<{name}>();"))
+                        writer.line(format!("return message.ToObject<{name}>(serializer);"))
                     });
                 }
                 writer.line("default:");
@@ -269,17 +256,14 @@ fn write_events(types: &[ProtocolType]) -> String {
 
         writer.line("public abstract partial class Event");
         writer.scoped(|writer| {
-            writer.line("public static Event Parse(JObject message)");
+            writer.line(format!("private static Event Parse({NAMESPACE}.EventType eventType, JObject message, JsonSerializer serializer)"));
             writer.scoped(|writer| {
-                writer.line(format!(
-                    "{NAMESPACE}.EventType eventType = message.Property<{NAMESPACE}.EventType>(\"event\");"
-                ));
                 writer.line("switch (eventType)");
                 writer.scoped(|writer| {
-                    for (ty, _, event) in &event_types {
+                    for (name, _, event) in &event_types {
                         writer.line(format!("case {NAMESPACE}.EventType.{event}:"));
                         writer.indented(|writer| {
-                            writer.line(format!("return message.ToObject<{ty}>();"))
+                            writer.line(format!("return message.ToObject<{name}>(serializer);"))
                         });
                     }
                     writer.line("default:");
