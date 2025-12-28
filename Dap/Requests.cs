@@ -105,101 +105,100 @@ namespace Dap
 
     public abstract partial class Request
     {
-        public static Request Parse(JObject message)
+        private static Request Parse(Dap.Command command, JObject message, JsonSerializer serializer)
         {
-            Dap.Command command = message.Property<Dap.Command>("command");
             switch (command)
             {
                 case Dap.Command.Cancel:
-                    return message.ToObject<CancelRequest>();
+                    return message.ToObject<CancelRequest>(serializer);
                 case Dap.Command.RunInTerminal:
-                    return message.ToObject<RunInTerminalRequest>();
+                    return message.ToObject<RunInTerminalRequest>(serializer);
                 case Dap.Command.StartDebugging:
-                    return message.ToObject<StartDebuggingRequest>();
+                    return message.ToObject<StartDebuggingRequest>(serializer);
                 case Dap.Command.Initialize:
-                    return message.ToObject<InitializeRequest>();
+                    return message.ToObject<InitializeRequest>(serializer);
                 case Dap.Command.ConfigurationDone:
-                    return message.ToObject<ConfigurationDoneRequest>();
+                    return message.ToObject<ConfigurationDoneRequest>(serializer);
                 case Dap.Command.Launch:
-                    return message.ToObject<LaunchRequest>();
+                    return message.ToObject<LaunchRequest>(serializer);
                 case Dap.Command.Attach:
-                    return message.ToObject<AttachRequest>();
+                    return message.ToObject<AttachRequest>(serializer);
                 case Dap.Command.Restart:
-                    return message.ToObject<RestartRequest>();
+                    return message.ToObject<RestartRequest>(serializer);
                 case Dap.Command.Disconnect:
-                    return message.ToObject<DisconnectRequest>();
+                    return message.ToObject<DisconnectRequest>(serializer);
                 case Dap.Command.Terminate:
-                    return message.ToObject<TerminateRequest>();
+                    return message.ToObject<TerminateRequest>(serializer);
                 case Dap.Command.BreakpointLocations:
-                    return message.ToObject<BreakpointLocationsRequest>();
+                    return message.ToObject<BreakpointLocationsRequest>(serializer);
                 case Dap.Command.SetBreakpoints:
-                    return message.ToObject<SetBreakpointsRequest>();
+                    return message.ToObject<SetBreakpointsRequest>(serializer);
                 case Dap.Command.SetFunctionBreakpoints:
-                    return message.ToObject<SetFunctionBreakpointsRequest>();
+                    return message.ToObject<SetFunctionBreakpointsRequest>(serializer);
                 case Dap.Command.SetExceptionBreakpoints:
-                    return message.ToObject<SetExceptionBreakpointsRequest>();
+                    return message.ToObject<SetExceptionBreakpointsRequest>(serializer);
                 case Dap.Command.DataBreakpointInfo:
-                    return message.ToObject<DataBreakpointInfoRequest>();
+                    return message.ToObject<DataBreakpointInfoRequest>(serializer);
                 case Dap.Command.SetDataBreakpoints:
-                    return message.ToObject<SetDataBreakpointsRequest>();
+                    return message.ToObject<SetDataBreakpointsRequest>(serializer);
                 case Dap.Command.SetInstructionBreakpoints:
-                    return message.ToObject<SetInstructionBreakpointsRequest>();
+                    return message.ToObject<SetInstructionBreakpointsRequest>(serializer);
                 case Dap.Command.Continue:
-                    return message.ToObject<ContinueRequest>();
+                    return message.ToObject<ContinueRequest>(serializer);
                 case Dap.Command.Next:
-                    return message.ToObject<NextRequest>();
+                    return message.ToObject<NextRequest>(serializer);
                 case Dap.Command.StepIn:
-                    return message.ToObject<StepInRequest>();
+                    return message.ToObject<StepInRequest>(serializer);
                 case Dap.Command.StepOut:
-                    return message.ToObject<StepOutRequest>();
+                    return message.ToObject<StepOutRequest>(serializer);
                 case Dap.Command.StepBack:
-                    return message.ToObject<StepBackRequest>();
+                    return message.ToObject<StepBackRequest>(serializer);
                 case Dap.Command.ReverseContinue:
-                    return message.ToObject<ReverseContinueRequest>();
+                    return message.ToObject<ReverseContinueRequest>(serializer);
                 case Dap.Command.RestartFrame:
-                    return message.ToObject<RestartFrameRequest>();
+                    return message.ToObject<RestartFrameRequest>(serializer);
                 case Dap.Command.Goto:
-                    return message.ToObject<GotoRequest>();
+                    return message.ToObject<GotoRequest>(serializer);
                 case Dap.Command.Pause:
-                    return message.ToObject<PauseRequest>();
+                    return message.ToObject<PauseRequest>(serializer);
                 case Dap.Command.StackTrace:
-                    return message.ToObject<StackTraceRequest>();
+                    return message.ToObject<StackTraceRequest>(serializer);
                 case Dap.Command.Scopes:
-                    return message.ToObject<ScopesRequest>();
+                    return message.ToObject<ScopesRequest>(serializer);
                 case Dap.Command.Variables:
-                    return message.ToObject<VariablesRequest>();
+                    return message.ToObject<VariablesRequest>(serializer);
                 case Dap.Command.SetVariable:
-                    return message.ToObject<SetVariableRequest>();
+                    return message.ToObject<SetVariableRequest>(serializer);
                 case Dap.Command.Source:
-                    return message.ToObject<SourceRequest>();
+                    return message.ToObject<SourceRequest>(serializer);
                 case Dap.Command.Threads:
-                    return message.ToObject<ThreadsRequest>();
+                    return message.ToObject<ThreadsRequest>(serializer);
                 case Dap.Command.TerminateThreads:
-                    return message.ToObject<TerminateThreadsRequest>();
+                    return message.ToObject<TerminateThreadsRequest>(serializer);
                 case Dap.Command.Modules:
-                    return message.ToObject<ModulesRequest>();
+                    return message.ToObject<ModulesRequest>(serializer);
                 case Dap.Command.LoadedSources:
-                    return message.ToObject<LoadedSourcesRequest>();
+                    return message.ToObject<LoadedSourcesRequest>(serializer);
                 case Dap.Command.Evaluate:
-                    return message.ToObject<EvaluateRequest>();
+                    return message.ToObject<EvaluateRequest>(serializer);
                 case Dap.Command.SetExpression:
-                    return message.ToObject<SetExpressionRequest>();
+                    return message.ToObject<SetExpressionRequest>(serializer);
                 case Dap.Command.StepInTargets:
-                    return message.ToObject<StepInTargetsRequest>();
+                    return message.ToObject<StepInTargetsRequest>(serializer);
                 case Dap.Command.GotoTargets:
-                    return message.ToObject<GotoTargetsRequest>();
+                    return message.ToObject<GotoTargetsRequest>(serializer);
                 case Dap.Command.Completions:
-                    return message.ToObject<CompletionsRequest>();
+                    return message.ToObject<CompletionsRequest>(serializer);
                 case Dap.Command.ExceptionInfo:
-                    return message.ToObject<ExceptionInfoRequest>();
+                    return message.ToObject<ExceptionInfoRequest>(serializer);
                 case Dap.Command.ReadMemory:
-                    return message.ToObject<ReadMemoryRequest>();
+                    return message.ToObject<ReadMemoryRequest>(serializer);
                 case Dap.Command.WriteMemory:
-                    return message.ToObject<WriteMemoryRequest>();
+                    return message.ToObject<WriteMemoryRequest>(serializer);
                 case Dap.Command.Disassemble:
-                    return message.ToObject<DisassembleRequest>();
+                    return message.ToObject<DisassembleRequest>(serializer);
                 case Dap.Command.Locations:
-                    return message.ToObject<LocationsRequest>();
+                    return message.ToObject<LocationsRequest>(serializer);
                 default:
                     throw new ArgumentException($"unknown request command: {command}");
             }
@@ -732,107 +731,100 @@ namespace Dap
 
     public abstract partial class Response
     {
-        public static Response Parse(JObject message)
+        private static Response Parse(Dap.Command command, JObject message, JsonSerializer serializer)
         {
-            bool success = message.Property<bool>("success");
-            if (!success)
-            {
-                return message.ToObject<ErrorResponse>();
-            }
-
-            Dap.Command command = message.Property<Dap.Command>("command");
             switch (command)
             {
                 case Dap.Command.Cancel:
-                    return message.ToObject<CancelResponse>();
+                    return message.ToObject<CancelResponse>(serializer);
                 case Dap.Command.RunInTerminal:
-                    return message.ToObject<RunInTerminalResponse>();
+                    return message.ToObject<RunInTerminalResponse>(serializer);
                 case Dap.Command.StartDebugging:
-                    return message.ToObject<StartDebuggingResponse>();
+                    return message.ToObject<StartDebuggingResponse>(serializer);
                 case Dap.Command.Initialize:
-                    return message.ToObject<InitializeResponse>();
+                    return message.ToObject<InitializeResponse>(serializer);
                 case Dap.Command.ConfigurationDone:
-                    return message.ToObject<ConfigurationDoneResponse>();
+                    return message.ToObject<ConfigurationDoneResponse>(serializer);
                 case Dap.Command.Launch:
-                    return message.ToObject<LaunchResponse>();
+                    return message.ToObject<LaunchResponse>(serializer);
                 case Dap.Command.Attach:
-                    return message.ToObject<AttachResponse>();
+                    return message.ToObject<AttachResponse>(serializer);
                 case Dap.Command.Restart:
-                    return message.ToObject<RestartResponse>();
+                    return message.ToObject<RestartResponse>(serializer);
                 case Dap.Command.Disconnect:
-                    return message.ToObject<DisconnectResponse>();
+                    return message.ToObject<DisconnectResponse>(serializer);
                 case Dap.Command.Terminate:
-                    return message.ToObject<TerminateResponse>();
+                    return message.ToObject<TerminateResponse>(serializer);
                 case Dap.Command.BreakpointLocations:
-                    return message.ToObject<BreakpointLocationsResponse>();
+                    return message.ToObject<BreakpointLocationsResponse>(serializer);
                 case Dap.Command.SetBreakpoints:
-                    return message.ToObject<SetBreakpointsResponse>();
+                    return message.ToObject<SetBreakpointsResponse>(serializer);
                 case Dap.Command.SetFunctionBreakpoints:
-                    return message.ToObject<SetFunctionBreakpointsResponse>();
+                    return message.ToObject<SetFunctionBreakpointsResponse>(serializer);
                 case Dap.Command.SetExceptionBreakpoints:
-                    return message.ToObject<SetExceptionBreakpointsResponse>();
+                    return message.ToObject<SetExceptionBreakpointsResponse>(serializer);
                 case Dap.Command.DataBreakpointInfo:
-                    return message.ToObject<DataBreakpointInfoResponse>();
+                    return message.ToObject<DataBreakpointInfoResponse>(serializer);
                 case Dap.Command.SetDataBreakpoints:
-                    return message.ToObject<SetDataBreakpointsResponse>();
+                    return message.ToObject<SetDataBreakpointsResponse>(serializer);
                 case Dap.Command.SetInstructionBreakpoints:
-                    return message.ToObject<SetInstructionBreakpointsResponse>();
+                    return message.ToObject<SetInstructionBreakpointsResponse>(serializer);
                 case Dap.Command.Continue:
-                    return message.ToObject<ContinueResponse>();
+                    return message.ToObject<ContinueResponse>(serializer);
                 case Dap.Command.Next:
-                    return message.ToObject<NextResponse>();
+                    return message.ToObject<NextResponse>(serializer);
                 case Dap.Command.StepIn:
-                    return message.ToObject<StepInResponse>();
+                    return message.ToObject<StepInResponse>(serializer);
                 case Dap.Command.StepOut:
-                    return message.ToObject<StepOutResponse>();
+                    return message.ToObject<StepOutResponse>(serializer);
                 case Dap.Command.StepBack:
-                    return message.ToObject<StepBackResponse>();
+                    return message.ToObject<StepBackResponse>(serializer);
                 case Dap.Command.ReverseContinue:
-                    return message.ToObject<ReverseContinueResponse>();
+                    return message.ToObject<ReverseContinueResponse>(serializer);
                 case Dap.Command.RestartFrame:
-                    return message.ToObject<RestartFrameResponse>();
+                    return message.ToObject<RestartFrameResponse>(serializer);
                 case Dap.Command.Goto:
-                    return message.ToObject<GotoResponse>();
+                    return message.ToObject<GotoResponse>(serializer);
                 case Dap.Command.Pause:
-                    return message.ToObject<PauseResponse>();
+                    return message.ToObject<PauseResponse>(serializer);
                 case Dap.Command.StackTrace:
-                    return message.ToObject<StackTraceResponse>();
+                    return message.ToObject<StackTraceResponse>(serializer);
                 case Dap.Command.Scopes:
-                    return message.ToObject<ScopesResponse>();
+                    return message.ToObject<ScopesResponse>(serializer);
                 case Dap.Command.Variables:
-                    return message.ToObject<VariablesResponse>();
+                    return message.ToObject<VariablesResponse>(serializer);
                 case Dap.Command.SetVariable:
-                    return message.ToObject<SetVariableResponse>();
+                    return message.ToObject<SetVariableResponse>(serializer);
                 case Dap.Command.Source:
-                    return message.ToObject<SourceResponse>();
+                    return message.ToObject<SourceResponse>(serializer);
                 case Dap.Command.Threads:
-                    return message.ToObject<ThreadsResponse>();
+                    return message.ToObject<ThreadsResponse>(serializer);
                 case Dap.Command.TerminateThreads:
-                    return message.ToObject<TerminateThreadsResponse>();
+                    return message.ToObject<TerminateThreadsResponse>(serializer);
                 case Dap.Command.Modules:
-                    return message.ToObject<ModulesResponse>();
+                    return message.ToObject<ModulesResponse>(serializer);
                 case Dap.Command.LoadedSources:
-                    return message.ToObject<LoadedSourcesResponse>();
+                    return message.ToObject<LoadedSourcesResponse>(serializer);
                 case Dap.Command.Evaluate:
-                    return message.ToObject<EvaluateResponse>();
+                    return message.ToObject<EvaluateResponse>(serializer);
                 case Dap.Command.SetExpression:
-                    return message.ToObject<SetExpressionResponse>();
+                    return message.ToObject<SetExpressionResponse>(serializer);
                 case Dap.Command.StepInTargets:
-                    return message.ToObject<StepInTargetsResponse>();
+                    return message.ToObject<StepInTargetsResponse>(serializer);
                 case Dap.Command.GotoTargets:
-                    return message.ToObject<GotoTargetsResponse>();
+                    return message.ToObject<GotoTargetsResponse>(serializer);
                 case Dap.Command.Completions:
-                    return message.ToObject<CompletionsResponse>();
+                    return message.ToObject<CompletionsResponse>(serializer);
                 case Dap.Command.ExceptionInfo:
-                    return message.ToObject<ExceptionInfoResponse>();
+                    return message.ToObject<ExceptionInfoResponse>(serializer);
                 case Dap.Command.ReadMemory:
-                    return message.ToObject<ReadMemoryResponse>();
+                    return message.ToObject<ReadMemoryResponse>(serializer);
                 case Dap.Command.WriteMemory:
-                    return message.ToObject<WriteMemoryResponse>();
+                    return message.ToObject<WriteMemoryResponse>(serializer);
                 case Dap.Command.Disassemble:
-                    return message.ToObject<DisassembleResponse>();
+                    return message.ToObject<DisassembleResponse>(serializer);
                 case Dap.Command.Locations:
-                    return message.ToObject<LocationsResponse>();
+                    return message.ToObject<LocationsResponse>(serializer);
                 default:
                     throw new ArgumentException($"unknown response command: {command}");
             }

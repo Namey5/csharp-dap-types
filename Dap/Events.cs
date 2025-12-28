@@ -49,45 +49,44 @@ namespace Dap
 
     public abstract partial class Event
     {
-        public static Event Parse(JObject message)
+        private static Event Parse(Dap.EventType eventType, JObject message, JsonSerializer serializer)
         {
-            Dap.EventType eventType = message.Property<Dap.EventType>("event");
             switch (eventType)
             {
                 case Dap.EventType.Initialized:
-                    return message.ToObject<InitializedEvent>();
+                    return message.ToObject<InitializedEvent>(serializer);
                 case Dap.EventType.Stopped:
-                    return message.ToObject<StoppedEvent>();
+                    return message.ToObject<StoppedEvent>(serializer);
                 case Dap.EventType.Continued:
-                    return message.ToObject<ContinuedEvent>();
+                    return message.ToObject<ContinuedEvent>(serializer);
                 case Dap.EventType.Exited:
-                    return message.ToObject<ExitedEvent>();
+                    return message.ToObject<ExitedEvent>(serializer);
                 case Dap.EventType.Terminated:
-                    return message.ToObject<TerminatedEvent>();
+                    return message.ToObject<TerminatedEvent>(serializer);
                 case Dap.EventType.Thread:
-                    return message.ToObject<ThreadEvent>();
+                    return message.ToObject<ThreadEvent>(serializer);
                 case Dap.EventType.Output:
-                    return message.ToObject<OutputEvent>();
+                    return message.ToObject<OutputEvent>(serializer);
                 case Dap.EventType.Breakpoint:
-                    return message.ToObject<BreakpointEvent>();
+                    return message.ToObject<BreakpointEvent>(serializer);
                 case Dap.EventType.Module:
-                    return message.ToObject<ModuleEvent>();
+                    return message.ToObject<ModuleEvent>(serializer);
                 case Dap.EventType.LoadedSource:
-                    return message.ToObject<LoadedSourceEvent>();
+                    return message.ToObject<LoadedSourceEvent>(serializer);
                 case Dap.EventType.Process:
-                    return message.ToObject<ProcessEvent>();
+                    return message.ToObject<ProcessEvent>(serializer);
                 case Dap.EventType.Capabilities:
-                    return message.ToObject<CapabilitiesEvent>();
+                    return message.ToObject<CapabilitiesEvent>(serializer);
                 case Dap.EventType.ProgressStart:
-                    return message.ToObject<ProgressStartEvent>();
+                    return message.ToObject<ProgressStartEvent>(serializer);
                 case Dap.EventType.ProgressUpdate:
-                    return message.ToObject<ProgressUpdateEvent>();
+                    return message.ToObject<ProgressUpdateEvent>(serializer);
                 case Dap.EventType.ProgressEnd:
-                    return message.ToObject<ProgressEndEvent>();
+                    return message.ToObject<ProgressEndEvent>(serializer);
                 case Dap.EventType.Invalidated:
-                    return message.ToObject<InvalidatedEvent>();
+                    return message.ToObject<InvalidatedEvent>(serializer);
                 case Dap.EventType.Memory:
-                    return message.ToObject<MemoryEvent>();
+                    return message.ToObject<MemoryEvent>(serializer);
                 default:
                     throw new ArgumentException($"unknown event type: {eventType}");
             }

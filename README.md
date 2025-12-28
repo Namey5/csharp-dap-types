@@ -15,8 +15,47 @@ Alternatively, you can clone `csharp-dap-types` as a [`git submodule`](https://g
 </ItemGroup>
 ```
 
-To parse a received `JSON-RPC` message from the DAP you can call `Dap.ProtocolMessage.Parse(string json)` - this will automatically deserialize into the appropriate type
-(a subclass of `Dap.Request`, `Dap.Response` or `Dap.Event`, depending on the message's `type`).
+To parse a received `JSON-RPC` message from the DAP you can call `Newtonsoft.Json.JsonConvert.DeserializeObject<Dap.ProtocolMessage>(string json)` -
+this will automatically deserialize into the appropriate type (a subclass of `Dap.Request`, `Dap.Response` or `Dap.Event`, depending on the message's `type`):
+```csharp
+using Newtonsoft.Json;
+using Dap;
+
+// ...
+
+string json = """{
+  "type": "response",
+  "seq": 32,
+  "success": false,
+  "request_seq": 78,
+  "command": "attach",
+  "message": "failed to attach to debugger 'test'",
+  "body": {
+    "error": {
+      "id": 715,
+      "format": "failed to attach to debugger '{_name}'",
+      "variables": {
+        "_name": "test"
+      }
+    }
+  }
+}""";
+
+ProtocolMessage message = JsonConvert.DeserializeObject<ProtocolMessage>(json);
+switch (message.MessageType)
+{
+    case MessageType.Response:
+    {
+        Response response = (Response)message;
+        if (!response.Success)
+        // if (response is ErrorResponse error)
+        {
+            ErrorResponse error = (ErrorResponse)response;
+            throw new System.Exception($"response #{error.seq} had error: {error.message}");
+        }
+
+// ...
+```
 
 To send a new message, you can simply serialize the type to json:
 ```csharp
