@@ -305,6 +305,15 @@ namespace Dap
         internal ErrorResponse() { }
 
         /// <summary>
+        /// Default constructor with read-only fields
+        /// (you probably want to use one of the other overloads).
+        /// </summary>
+        public ErrorResponse(Dap.Command command)
+        {
+            Command = command;
+        }
+
+        /// <summary>
         /// Create a new error response with a specific message.
         /// </summary>
         public ErrorResponse(Request request, string message, in Dap.Message error)
