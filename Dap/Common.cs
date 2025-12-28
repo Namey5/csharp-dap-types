@@ -42,6 +42,22 @@ namespace Dap
         /// </summary>
         public ulong seq;
 
+        /// <summary>
+        /// Parse a json object as a known DAP message.
+        /// <br/>
+        /// Equivalent to calling <see cref="JsonConvert.DeserializeObject{T}(string)"/> specialized to <see cref="ProtocolMessage"/>.
+        /// </summary>
+        /// <returns>
+        /// A subtype of <see cref="Request"/>, <see cref="Response"/> or <see cref="Event"/> depending on <see cref="MessageType"/>.
+        /// </returns>
+        /// <exception cref="Exception">
+        /// Throws miscellaneous exception types if <paramref name="json"/> could not be parsed as a valid <see cref="ProtocolMessage"/>.
+        /// </exception>
+        public static ProtocolMessage Parse(string json)
+        {
+            return JsonConvert.DeserializeObject<ProtocolMessage>(json);
+        }
+
         private sealed class Converter : JsonConverter<ProtocolMessage>
         {
             public override bool CanWrite => false;
@@ -404,7 +420,7 @@ namespace Dap
         /// <summary>
         /// Retrieve the value of the json property named '<paramref name="propertyName"/>' converted to type <typeparamref name="T"/>.
         /// <br/>
-        /// This is similar to <see cref="Newtonsoft.Json.Linq.JToken.Value{T}(object)"/> but will
+        /// This is similar to <see cref="JToken.Value{T}(object)"/> but will
         /// fully deserialize using applicable converters instead of just trying a primitive cast.
         /// </summary>
         /// <exception cref="ArgumentNullException">
@@ -441,7 +457,7 @@ namespace Dap
         /// <see cref="Message.format"/> or <see cref="Message.variables"/> was null.
         /// </exception>
         /// <exception cref="ArgumentException">
-        /// <see cref="Message.variables"/> was not convertible to <see cref="Newtonsoft.Json.Linq.JObject"/>.
+        /// <see cref="Message.variables"/> was not convertible to <see cref="JObject"/>.
         /// </exception>
         /// <exception cref="MissingFieldException">
         /// <see cref="Message.format"/> contained a specifier not present in <see cref="Message.variables"/>.
