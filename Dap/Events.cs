@@ -88,7 +88,7 @@ namespace Dap
                 case Dap.EventType.Memory:
                     return message.ToObject<MemoryEvent>(serializer);
                 default:
-                    throw new ArgumentException($"unknown event type: {eventType}");
+                    throw new InvalidOperationException($"unknown event type: {eventType}");
             }
         }
     }

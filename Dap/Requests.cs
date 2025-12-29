@@ -200,7 +200,7 @@ namespace Dap
                 case Dap.Command.Locations:
                     return message.ToObject<LocationsRequest>(serializer);
                 default:
-                    throw new ArgumentException($"unknown request command: {command}");
+                    throw new InvalidOperationException($"unknown request command: {command}");
             }
         }
     }
@@ -826,7 +826,7 @@ namespace Dap
                 case Dap.Command.Locations:
                     return message.ToObject<LocationsResponse>(serializer);
                 default:
-                    throw new ArgumentException($"unknown response command: {command}");
+                    throw new InvalidOperationException($"unknown response command: {command}");
             }
         }
     }

@@ -85,7 +85,7 @@ namespace Dap
                     existingValue = (ProtocolMessage)Activator.CreateInstance(objectType);
                     if (existingValue.MessageType != messageType)
                     {
-                        throw new ArgumentException($"invalid message type (expected: '{existingValue.MessageType}', was: '{messageType}')");
+                        throw new InvalidOperationException($"invalid message type (expected: '{existingValue.MessageType}', was: '{messageType}')");
                     }
                     serializer.Populate(message.CreateReader(), existingValue);
                     return existingValue;
@@ -100,7 +100,7 @@ namespace Dap
                     case Dap.MessageType.Event:
                         return message.ToObject<Event>(serializer);
                     default:
-                        throw new ArgumentException($"unknown message type: {messageType}");
+                        throw new InvalidOperationException($"unknown message type: {messageType}");
                 }
             }
         }
@@ -140,7 +140,7 @@ namespace Dap
                 Dap.MessageType messageType = message.Property<Dap.MessageType>("type", serializer);
                 if (messageType != Dap.MessageType.Request)
                 {
-                    throw new ArgumentException($"invalid message type (expected: '{Dap.MessageType.Request}', was: '{messageType}')");
+                    throw new InvalidOperationException($"invalid message type (expected: '{Dap.MessageType.Request}', was: '{messageType}')");
                 }
 
                 Dap.Command command = message.Property<Dap.Command>("command", serializer);
@@ -149,7 +149,7 @@ namespace Dap
                     existingValue = (Request)Activator.CreateInstance(objectType);
                     if (existingValue.Command != command)
                     {
-                        throw new ArgumentException($"invalid request command (expected: '{existingValue.Command}', was: '{command}')");
+                        throw new InvalidOperationException($"invalid request command (expected: '{existingValue.Command}', was: '{command}')");
                     }
                     serializer.Populate(message.CreateReader(), existingValue);
                     return existingValue;
@@ -240,7 +240,7 @@ namespace Dap
                 Dap.MessageType messageType = message.Property<Dap.MessageType>("type", serializer);
                 if (messageType != Dap.MessageType.Response)
                 {
-                    throw new ArgumentException($"invalid message type (expected: '{Dap.MessageType.Response}', was: '{messageType}')");
+                    throw new InvalidOperationException($"invalid message type (expected: '{Dap.MessageType.Response}', was: '{messageType}')");
                 }
 
                 bool success = message.Property<bool>("success", serializer);
@@ -257,7 +257,7 @@ namespace Dap
                     existingValue = (Response)Activator.CreateInstance(objectType);
                     if (existingValue.Command != command)
                     {
-                        throw new ArgumentException($"invalid response command (expected: '{existingValue.Command}', was: '{command}')");
+                        throw new InvalidOperationException($"invalid response command (expected: '{existingValue.Command}', was: '{command}')");
                     }
                     serializer.Populate(message.CreateReader(), existingValue);
                     return existingValue;
@@ -381,7 +381,7 @@ namespace Dap
                 Dap.MessageType messageType = message.Property<Dap.MessageType>("type", serializer);
                 if (messageType != Dap.MessageType.Event)
                 {
-                    throw new ArgumentException($"invalid message type (expected: '{Dap.MessageType.Event}', was: '{messageType}')");
+                    throw new InvalidOperationException($"invalid message type (expected: '{Dap.MessageType.Event}', was: '{messageType}')");
                 }
 
                 Dap.EventType eventType = message.Property<Dap.EventType>("event", serializer);
@@ -390,7 +390,7 @@ namespace Dap
                     existingValue = (Event)Activator.CreateInstance(objectType);
                     if (existingValue.EventType != eventType)
                     {
-                        throw new ArgumentException($"invalid event type (expected: '{existingValue.EventType}', was: '{eventType}')");
+                        throw new InvalidOperationException($"invalid event type (expected: '{existingValue.EventType}', was: '{eventType}')");
                     }
                     serializer.Populate(message.CreateReader(), existingValue);
                     return existingValue;
@@ -441,13 +441,13 @@ namespace Dap
         /// <exception cref="InvalidCastException">
         /// Property could not be converted to type <typeparamref name="T"/>.
         /// </exception>
-        public static T Property<T>(this JToken self, string propertyName, JsonSerializer serializer = null)
+        public static T Property<T>(this JObject self, string propertyName, JsonSerializer serializer = null)
         {
             try
             {
                 return (T)(
                     (self ?? throw new ArgumentNullException(nameof(self)))
-                        [propertyName ?? throw new ArgumentNullException(nameof(propertyName))]?
+                        [propertyName]?
                         .ToObject(typeof(T), serializer ?? JsonSerializer.CreateDefault())
                         ?? throw new MissingFieldException(propertyName));
             }
@@ -489,7 +489,10 @@ namespace Dap
                 }
                 catch (Exception e)
                 {
-                    throw new ArgumentException("Message.variables must be an object", e);
+                    throw new ArgumentException(
+                        $"{self.variables.GetType()} is not convertable to Newtonsoft.Json.JObject",
+                        $"{nameof(self)}.{nameof(self.variables)}",
+                        e);
                 }
             }
 
@@ -534,24 +537,22 @@ namespace Dap
                         {
                             case '{':
                             {
-                                if ((i + 1) < format.Length && format[i + 1] == '{')
+                                if (++i < format.Length && format[i] == '{')
                                 {
-                                    i++;
                                     goto default;
                                 }
-                                specifierStart = i;
+                                specifierStart = --i;
                             }
                             break;
 
                             case '}':
                             {
-                                if ((i + 1) < format.Length && format[i + 1] == '}')
+                                if (++i < format.Length && format[i] == '}')
                                 {
-                                    i++;
                                     goto default;
                                 }
                             }
-                            throw new FormatException($"invalid '}}' outside format specifier at character {i}");
+                            throw new FormatException($"invalid '}}' outside format specifier at character {--i}");
 
                             default:
                             {

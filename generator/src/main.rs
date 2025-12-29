@@ -143,7 +143,7 @@ fn write_request_types(writer: &mut Writer, types: &[(String, &Object, String)])
                 writer.line("default:");
                 writer.indented(|writer| {
                     writer.line(
-                        "throw new ArgumentException($\"unknown request command: {command}\");",
+                        "throw new InvalidOperationException($\"unknown request command: {command}\");",
                     )
                 });
             });
@@ -187,7 +187,7 @@ fn write_response_types(writer: &mut Writer, types: &[(String, &Object, String)]
                 writer.line("default:");
                 writer.indented(|writer| {
                     writer.line(
-                        "throw new ArgumentException($\"unknown response command: {command}\");",
+                        "throw new InvalidOperationException($\"unknown response command: {command}\");",
                     )
                 });
             });
@@ -268,7 +268,7 @@ fn write_events(types: &[ProtocolType]) -> String {
                     }
                     writer.line("default:");
                     writer.indented(|writer| {
-                        writer.line("throw new ArgumentException($\"unknown event type: {eventType}\");")
+                        writer.line("throw new InvalidOperationException($\"unknown event type: {eventType}\");")
                     });
                 });
             });
