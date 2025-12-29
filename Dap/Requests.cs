@@ -228,7 +228,7 @@ namespace Dap
     /// </summary>
     public sealed class CancelRequest : Request<CancelArguments>
     {
-        public override Dap.Command Command => Dap.Command.Cancel;
+        public sealed override Dap.Command Command => Dap.Command.Cancel;
     }
 
     /// <summary>
@@ -244,7 +244,7 @@ namespace Dap
     /// </summary>
     public sealed class RunInTerminalRequest : Request<RunInTerminalRequestArguments>
     {
-        public override Dap.Command Command => Dap.Command.RunInTerminal;
+        public sealed override Dap.Command Command => Dap.Command.RunInTerminal;
     }
 
     /// <summary>
@@ -256,7 +256,7 @@ namespace Dap
     /// </summary>
     public sealed class StartDebuggingRequest : Request<StartDebuggingRequestArguments>
     {
-        public override Dap.Command Command => Dap.Command.StartDebugging;
+        public sealed override Dap.Command Command => Dap.Command.StartDebugging;
     }
 
     /// <summary>
@@ -270,7 +270,7 @@ namespace Dap
     /// </summary>
     public sealed class InitializeRequest : Request<InitializeRequestArguments>
     {
-        public override Dap.Command Command => Dap.Command.Initialize;
+        public sealed override Dap.Command Command => Dap.Command.Initialize;
     }
 
     /// <summary>
@@ -282,7 +282,7 @@ namespace Dap
     /// </summary>
     public sealed class ConfigurationDoneRequest : Request<ConfigurationDoneArguments>
     {
-        public override Dap.Command Command => Dap.Command.ConfigurationDone;
+        public sealed override Dap.Command Command => Dap.Command.ConfigurationDone;
     }
 
     /// <summary>
@@ -292,7 +292,7 @@ namespace Dap
     /// </summary>
     public sealed class LaunchRequest : GenericRequest
     {
-        public override Dap.Command Command => Dap.Command.Launch;
+        public sealed override Dap.Command Command => Dap.Command.Launch;
     }
 
     /// <summary>
@@ -302,7 +302,7 @@ namespace Dap
     /// </summary>
     public sealed class AttachRequest : GenericRequest
     {
-        public override Dap.Command Command => Dap.Command.Attach;
+        public sealed override Dap.Command Command => Dap.Command.Attach;
     }
 
     /// <summary>
@@ -312,7 +312,7 @@ namespace Dap
     /// </summary>
     public sealed class RestartRequest : GenericRequest
     {
-        public override Dap.Command Command => Dap.Command.Restart;
+        public sealed override Dap.Command Command => Dap.Command.Restart;
     }
 
     /// <summary>
@@ -324,7 +324,7 @@ namespace Dap
     /// </summary>
     public sealed class DisconnectRequest : Request<DisconnectArguments>
     {
-        public override Dap.Command Command => Dap.Command.Disconnect;
+        public sealed override Dap.Command Command => Dap.Command.Disconnect;
     }
 
     /// <summary>
@@ -338,7 +338,7 @@ namespace Dap
     /// </summary>
     public sealed class TerminateRequest : Request<TerminateArguments>
     {
-        public override Dap.Command Command => Dap.Command.Terminate;
+        public sealed override Dap.Command Command => Dap.Command.Terminate;
     }
 
     /// <summary>
@@ -348,7 +348,7 @@ namespace Dap
     /// </summary>
     public sealed class BreakpointLocationsRequest : Request<BreakpointLocationsArguments>
     {
-        public override Dap.Command Command => Dap.Command.BreakpointLocations;
+        public sealed override Dap.Command Command => Dap.Command.BreakpointLocations;
     }
 
     /// <summary>
@@ -360,7 +360,7 @@ namespace Dap
     /// </summary>
     public sealed class SetBreakpointsRequest : Request<SetBreakpointsArguments>
     {
-        public override Dap.Command Command => Dap.Command.SetBreakpoints;
+        public sealed override Dap.Command Command => Dap.Command.SetBreakpoints;
     }
 
     /// <summary>
@@ -374,7 +374,7 @@ namespace Dap
     /// </summary>
     public sealed class SetFunctionBreakpointsRequest : Request<SetFunctionBreakpointsArguments>
     {
-        public override Dap.Command Command => Dap.Command.SetFunctionBreakpoints;
+        public sealed override Dap.Command Command => Dap.Command.SetFunctionBreakpoints;
     }
 
     /// <summary>
@@ -384,7 +384,7 @@ namespace Dap
     /// </summary>
     public sealed class SetExceptionBreakpointsRequest : Request<SetExceptionBreakpointsArguments>
     {
-        public override Dap.Command Command => Dap.Command.SetExceptionBreakpoints;
+        public sealed override Dap.Command Command => Dap.Command.SetExceptionBreakpoints;
     }
 
     /// <summary>
@@ -394,7 +394,7 @@ namespace Dap
     /// </summary>
     public sealed class DataBreakpointInfoRequest : Request<DataBreakpointInfoArguments>
     {
-        public override Dap.Command Command => Dap.Command.DataBreakpointInfo;
+        public sealed override Dap.Command Command => Dap.Command.DataBreakpointInfo;
     }
 
     /// <summary>
@@ -408,7 +408,7 @@ namespace Dap
     /// </summary>
     public sealed class SetDataBreakpointsRequest : Request<SetDataBreakpointsArguments>
     {
-        public override Dap.Command Command => Dap.Command.SetDataBreakpoints;
+        public sealed override Dap.Command Command => Dap.Command.SetDataBreakpoints;
     }
 
     /// <summary>
@@ -422,7 +422,7 @@ namespace Dap
     /// </summary>
     public sealed class SetInstructionBreakpointsRequest : Request<SetInstructionBreakpointsArguments>
     {
-        public override Dap.Command Command => Dap.Command.SetInstructionBreakpoints;
+        public sealed override Dap.Command Command => Dap.Command.SetInstructionBreakpoints;
     }
 
     /// <summary>
@@ -430,7 +430,7 @@ namespace Dap
     /// </summary>
     public sealed class ContinueRequest : Request<ContinueArguments>
     {
-        public override Dap.Command Command => Dap.Command.Continue;
+        public sealed override Dap.Command Command => Dap.Command.Continue;
     }
 
     /// <summary>
@@ -442,7 +442,7 @@ namespace Dap
     /// </summary>
     public sealed class NextRequest : Request<NextArguments>
     {
-        public override Dap.Command Command => Dap.Command.Next;
+        public sealed override Dap.Command Command => Dap.Command.Next;
     }
 
     /// <summary>
@@ -462,7 +462,7 @@ namespace Dap
     /// </summary>
     public sealed class StepInRequest : Request<StepInArguments>
     {
-        public override Dap.Command Command => Dap.Command.StepIn;
+        public sealed override Dap.Command Command => Dap.Command.StepIn;
     }
 
     /// <summary>
@@ -474,7 +474,7 @@ namespace Dap
     /// </summary>
     public sealed class StepOutRequest : Request<StepOutArguments>
     {
-        public override Dap.Command Command => Dap.Command.StepOut;
+        public sealed override Dap.Command Command => Dap.Command.StepOut;
     }
 
     /// <summary>
@@ -488,7 +488,7 @@ namespace Dap
     /// </summary>
     public sealed class StepBackRequest : Request<StepBackArguments>
     {
-        public override Dap.Command Command => Dap.Command.StepBack;
+        public sealed override Dap.Command Command => Dap.Command.StepBack;
     }
 
     /// <summary>
@@ -498,7 +498,7 @@ namespace Dap
     /// </summary>
     public sealed class ReverseContinueRequest : Request<ReverseContinueArguments>
     {
-        public override Dap.Command Command => Dap.Command.ReverseContinue;
+        public sealed override Dap.Command Command => Dap.Command.ReverseContinue;
     }
 
     /// <summary>
@@ -510,7 +510,7 @@ namespace Dap
     /// </summary>
     public sealed class RestartFrameRequest : Request<RestartFrameArguments>
     {
-        public override Dap.Command Command => Dap.Command.RestartFrame;
+        public sealed override Dap.Command Command => Dap.Command.RestartFrame;
     }
 
     /// <summary>
@@ -526,7 +526,7 @@ namespace Dap
     /// </summary>
     public sealed class GotoRequest : Request<GotoArguments>
     {
-        public override Dap.Command Command => Dap.Command.Goto;
+        public sealed override Dap.Command Command => Dap.Command.Goto;
     }
 
     /// <summary>
@@ -536,7 +536,7 @@ namespace Dap
     /// </summary>
     public sealed class PauseRequest : Request<PauseArguments>
     {
-        public override Dap.Command Command => Dap.Command.Pause;
+        public sealed override Dap.Command Command => Dap.Command.Pause;
     }
 
     /// <summary>
@@ -546,7 +546,7 @@ namespace Dap
     /// </summary>
     public sealed class StackTraceRequest : Request<StackTraceArguments>
     {
-        public override Dap.Command Command => Dap.Command.StackTrace;
+        public sealed override Dap.Command Command => Dap.Command.StackTrace;
     }
 
     /// <summary>
@@ -554,7 +554,7 @@ namespace Dap
     /// </summary>
     public sealed class ScopesRequest : Request<ScopesArguments>
     {
-        public override Dap.Command Command => Dap.Command.Scopes;
+        public sealed override Dap.Command Command => Dap.Command.Scopes;
     }
 
     /// <summary>
@@ -564,7 +564,7 @@ namespace Dap
     /// </summary>
     public sealed class VariablesRequest : Request<VariablesArguments>
     {
-        public override Dap.Command Command => Dap.Command.Variables;
+        public sealed override Dap.Command Command => Dap.Command.Variables;
     }
 
     /// <summary>
@@ -574,7 +574,7 @@ namespace Dap
     /// </summary>
     public sealed class SetVariableRequest : Request<SetVariableArguments>
     {
-        public override Dap.Command Command => Dap.Command.SetVariable;
+        public sealed override Dap.Command Command => Dap.Command.SetVariable;
     }
 
     /// <summary>
@@ -582,7 +582,7 @@ namespace Dap
     /// </summary>
     public sealed class SourceRequest : Request<SourceArguments>
     {
-        public override Dap.Command Command => Dap.Command.Source;
+        public sealed override Dap.Command Command => Dap.Command.Source;
     }
 
     /// <summary>
@@ -590,7 +590,7 @@ namespace Dap
     /// </summary>
     public sealed class ThreadsRequest : Request
     {
-        public override Dap.Command Command => Dap.Command.Threads;
+        public sealed override Dap.Command Command => Dap.Command.Threads;
     }
 
     /// <summary>
@@ -600,7 +600,7 @@ namespace Dap
     /// </summary>
     public sealed class TerminateThreadsRequest : Request<TerminateThreadsArguments>
     {
-        public override Dap.Command Command => Dap.Command.TerminateThreads;
+        public sealed override Dap.Command Command => Dap.Command.TerminateThreads;
     }
 
     /// <summary>
@@ -610,7 +610,7 @@ namespace Dap
     /// </summary>
     public sealed class ModulesRequest : Request<ModulesArguments>
     {
-        public override Dap.Command Command => Dap.Command.Modules;
+        public sealed override Dap.Command Command => Dap.Command.Modules;
     }
 
     /// <summary>
@@ -620,7 +620,7 @@ namespace Dap
     /// </summary>
     public sealed class LoadedSourcesRequest : Request<LoadedSourcesArguments>
     {
-        public override Dap.Command Command => Dap.Command.LoadedSources;
+        public sealed override Dap.Command Command => Dap.Command.LoadedSources;
     }
 
     /// <summary>
@@ -630,7 +630,7 @@ namespace Dap
     /// </summary>
     public sealed class EvaluateRequest : Request<EvaluateArguments>
     {
-        public override Dap.Command Command => Dap.Command.Evaluate;
+        public sealed override Dap.Command Command => Dap.Command.Evaluate;
     }
 
     /// <summary>
@@ -644,7 +644,7 @@ namespace Dap
     /// </summary>
     public sealed class SetExpressionRequest : Request<SetExpressionArguments>
     {
-        public override Dap.Command Command => Dap.Command.SetExpression;
+        public sealed override Dap.Command Command => Dap.Command.SetExpression;
     }
 
     /// <summary>
@@ -656,7 +656,7 @@ namespace Dap
     /// </summary>
     public sealed class StepInTargetsRequest : Request<StepInTargetsArguments>
     {
-        public override Dap.Command Command => Dap.Command.StepInTargets;
+        public sealed override Dap.Command Command => Dap.Command.StepInTargets;
     }
 
     /// <summary>
@@ -668,7 +668,7 @@ namespace Dap
     /// </summary>
     public sealed class GotoTargetsRequest : Request<GotoTargetsArguments>
     {
-        public override Dap.Command Command => Dap.Command.GotoTargets;
+        public sealed override Dap.Command Command => Dap.Command.GotoTargets;
     }
 
     /// <summary>
@@ -678,7 +678,7 @@ namespace Dap
     /// </summary>
     public sealed class CompletionsRequest : Request<CompletionsArguments>
     {
-        public override Dap.Command Command => Dap.Command.Completions;
+        public sealed override Dap.Command Command => Dap.Command.Completions;
     }
 
     /// <summary>
@@ -688,7 +688,7 @@ namespace Dap
     /// </summary>
     public sealed class ExceptionInfoRequest : Request<ExceptionInfoArguments>
     {
-        public override Dap.Command Command => Dap.Command.ExceptionInfo;
+        public sealed override Dap.Command Command => Dap.Command.ExceptionInfo;
     }
 
     /// <summary>
@@ -698,7 +698,7 @@ namespace Dap
     /// </summary>
     public sealed class ReadMemoryRequest : Request<ReadMemoryArguments>
     {
-        public override Dap.Command Command => Dap.Command.ReadMemory;
+        public sealed override Dap.Command Command => Dap.Command.ReadMemory;
     }
 
     /// <summary>
@@ -708,7 +708,7 @@ namespace Dap
     /// </summary>
     public sealed class WriteMemoryRequest : Request<WriteMemoryArguments>
     {
-        public override Dap.Command Command => Dap.Command.WriteMemory;
+        public sealed override Dap.Command Command => Dap.Command.WriteMemory;
     }
 
     /// <summary>
@@ -718,7 +718,7 @@ namespace Dap
     /// </summary>
     public sealed class DisassembleRequest : Request<DisassembleArguments>
     {
-        public override Dap.Command Command => Dap.Command.Disassemble;
+        public sealed override Dap.Command Command => Dap.Command.Disassemble;
     }
 
     /// <summary>
@@ -726,7 +726,7 @@ namespace Dap
     /// </summary>
     public sealed class LocationsRequest : Request<LocationsArguments>
     {
-        public override Dap.Command Command => Dap.Command.Locations;
+        public sealed override Dap.Command Command => Dap.Command.Locations;
     }
 
     public abstract partial class Response
@@ -854,7 +854,7 @@ namespace Dap
     /// </summary>
     public sealed class CancelResponse : Response
     {
-        public override Dap.Command Command => Dap.Command.Cancel;
+        public sealed override Dap.Command Command => Dap.Command.Cancel;
     }
 
     /// <summary>
@@ -870,7 +870,7 @@ namespace Dap
     /// </summary>
     public sealed class RunInTerminalResponse : Response
     {
-        public override Dap.Command Command => Dap.Command.RunInTerminal;
+        public sealed override Dap.Command Command => Dap.Command.RunInTerminal;
     }
 
     /// <summary>
@@ -882,7 +882,7 @@ namespace Dap
     /// </summary>
     public sealed class StartDebuggingResponse : Response
     {
-        public override Dap.Command Command => Dap.Command.StartDebugging;
+        public sealed override Dap.Command Command => Dap.Command.StartDebugging;
     }
 
     /// <summary>
@@ -896,7 +896,7 @@ namespace Dap
     /// </summary>
     public sealed class InitializeResponse : Response
     {
-        public override Dap.Command Command => Dap.Command.Initialize;
+        public sealed override Dap.Command Command => Dap.Command.Initialize;
     }
 
     /// <summary>
@@ -908,7 +908,7 @@ namespace Dap
     /// </summary>
     public sealed class ConfigurationDoneResponse : Response
     {
-        public override Dap.Command Command => Dap.Command.ConfigurationDone;
+        public sealed override Dap.Command Command => Dap.Command.ConfigurationDone;
     }
 
     /// <summary>
@@ -918,7 +918,7 @@ namespace Dap
     /// </summary>
     public sealed class LaunchResponse : Response
     {
-        public override Dap.Command Command => Dap.Command.Launch;
+        public sealed override Dap.Command Command => Dap.Command.Launch;
     }
 
     /// <summary>
@@ -928,7 +928,7 @@ namespace Dap
     /// </summary>
     public sealed class AttachResponse : Response
     {
-        public override Dap.Command Command => Dap.Command.Attach;
+        public sealed override Dap.Command Command => Dap.Command.Attach;
     }
 
     /// <summary>
@@ -938,7 +938,7 @@ namespace Dap
     /// </summary>
     public sealed class RestartResponse : Response
     {
-        public override Dap.Command Command => Dap.Command.Restart;
+        public sealed override Dap.Command Command => Dap.Command.Restart;
     }
 
     /// <summary>
@@ -950,7 +950,7 @@ namespace Dap
     /// </summary>
     public sealed class DisconnectResponse : Response
     {
-        public override Dap.Command Command => Dap.Command.Disconnect;
+        public sealed override Dap.Command Command => Dap.Command.Disconnect;
     }
 
     /// <summary>
@@ -964,7 +964,7 @@ namespace Dap
     /// </summary>
     public sealed class TerminateResponse : Response
     {
-        public override Dap.Command Command => Dap.Command.Terminate;
+        public sealed override Dap.Command Command => Dap.Command.Terminate;
     }
 
     /// <summary>
@@ -974,7 +974,7 @@ namespace Dap
     /// </summary>
     public sealed class BreakpointLocationsResponse : Response
     {
-        public override Dap.Command Command => Dap.Command.BreakpointLocations;
+        public sealed override Dap.Command Command => Dap.Command.BreakpointLocations;
     }
 
     /// <summary>
@@ -986,7 +986,7 @@ namespace Dap
     /// </summary>
     public sealed class SetBreakpointsResponse : Response
     {
-        public override Dap.Command Command => Dap.Command.SetBreakpoints;
+        public sealed override Dap.Command Command => Dap.Command.SetBreakpoints;
     }
 
     /// <summary>
@@ -1000,7 +1000,7 @@ namespace Dap
     /// </summary>
     public sealed class SetFunctionBreakpointsResponse : Response
     {
-        public override Dap.Command Command => Dap.Command.SetFunctionBreakpoints;
+        public sealed override Dap.Command Command => Dap.Command.SetFunctionBreakpoints;
     }
 
     /// <summary>
@@ -1010,7 +1010,7 @@ namespace Dap
     /// </summary>
     public sealed class SetExceptionBreakpointsResponse : Response
     {
-        public override Dap.Command Command => Dap.Command.SetExceptionBreakpoints;
+        public sealed override Dap.Command Command => Dap.Command.SetExceptionBreakpoints;
     }
 
     /// <summary>
@@ -1020,7 +1020,7 @@ namespace Dap
     /// </summary>
     public sealed class DataBreakpointInfoResponse : Response
     {
-        public override Dap.Command Command => Dap.Command.DataBreakpointInfo;
+        public sealed override Dap.Command Command => Dap.Command.DataBreakpointInfo;
     }
 
     /// <summary>
@@ -1034,7 +1034,7 @@ namespace Dap
     /// </summary>
     public sealed class SetDataBreakpointsResponse : Response
     {
-        public override Dap.Command Command => Dap.Command.SetDataBreakpoints;
+        public sealed override Dap.Command Command => Dap.Command.SetDataBreakpoints;
     }
 
     /// <summary>
@@ -1048,7 +1048,7 @@ namespace Dap
     /// </summary>
     public sealed class SetInstructionBreakpointsResponse : Response
     {
-        public override Dap.Command Command => Dap.Command.SetInstructionBreakpoints;
+        public sealed override Dap.Command Command => Dap.Command.SetInstructionBreakpoints;
     }
 
     /// <summary>
@@ -1056,7 +1056,7 @@ namespace Dap
     /// </summary>
     public sealed class ContinueResponse : Response
     {
-        public override Dap.Command Command => Dap.Command.Continue;
+        public sealed override Dap.Command Command => Dap.Command.Continue;
     }
 
     /// <summary>
@@ -1068,7 +1068,7 @@ namespace Dap
     /// </summary>
     public sealed class NextResponse : Response
     {
-        public override Dap.Command Command => Dap.Command.Next;
+        public sealed override Dap.Command Command => Dap.Command.Next;
     }
 
     /// <summary>
@@ -1088,7 +1088,7 @@ namespace Dap
     /// </summary>
     public sealed class StepInResponse : Response
     {
-        public override Dap.Command Command => Dap.Command.StepIn;
+        public sealed override Dap.Command Command => Dap.Command.StepIn;
     }
 
     /// <summary>
@@ -1100,7 +1100,7 @@ namespace Dap
     /// </summary>
     public sealed class StepOutResponse : Response
     {
-        public override Dap.Command Command => Dap.Command.StepOut;
+        public sealed override Dap.Command Command => Dap.Command.StepOut;
     }
 
     /// <summary>
@@ -1114,7 +1114,7 @@ namespace Dap
     /// </summary>
     public sealed class StepBackResponse : Response
     {
-        public override Dap.Command Command => Dap.Command.StepBack;
+        public sealed override Dap.Command Command => Dap.Command.StepBack;
     }
 
     /// <summary>
@@ -1124,7 +1124,7 @@ namespace Dap
     /// </summary>
     public sealed class ReverseContinueResponse : Response
     {
-        public override Dap.Command Command => Dap.Command.ReverseContinue;
+        public sealed override Dap.Command Command => Dap.Command.ReverseContinue;
     }
 
     /// <summary>
@@ -1136,7 +1136,7 @@ namespace Dap
     /// </summary>
     public sealed class RestartFrameResponse : Response
     {
-        public override Dap.Command Command => Dap.Command.RestartFrame;
+        public sealed override Dap.Command Command => Dap.Command.RestartFrame;
     }
 
     /// <summary>
@@ -1152,7 +1152,7 @@ namespace Dap
     /// </summary>
     public sealed class GotoResponse : Response
     {
-        public override Dap.Command Command => Dap.Command.Goto;
+        public sealed override Dap.Command Command => Dap.Command.Goto;
     }
 
     /// <summary>
@@ -1162,7 +1162,7 @@ namespace Dap
     /// </summary>
     public sealed class PauseResponse : Response
     {
-        public override Dap.Command Command => Dap.Command.Pause;
+        public sealed override Dap.Command Command => Dap.Command.Pause;
     }
 
     /// <summary>
@@ -1172,7 +1172,7 @@ namespace Dap
     /// </summary>
     public sealed class StackTraceResponse : Response
     {
-        public override Dap.Command Command => Dap.Command.StackTrace;
+        public sealed override Dap.Command Command => Dap.Command.StackTrace;
     }
 
     /// <summary>
@@ -1180,7 +1180,7 @@ namespace Dap
     /// </summary>
     public sealed class ScopesResponse : Response
     {
-        public override Dap.Command Command => Dap.Command.Scopes;
+        public sealed override Dap.Command Command => Dap.Command.Scopes;
     }
 
     /// <summary>
@@ -1190,7 +1190,7 @@ namespace Dap
     /// </summary>
     public sealed class VariablesResponse : Response
     {
-        public override Dap.Command Command => Dap.Command.Variables;
+        public sealed override Dap.Command Command => Dap.Command.Variables;
     }
 
     /// <summary>
@@ -1200,7 +1200,7 @@ namespace Dap
     /// </summary>
     public sealed class SetVariableResponse : Response
     {
-        public override Dap.Command Command => Dap.Command.SetVariable;
+        public sealed override Dap.Command Command => Dap.Command.SetVariable;
     }
 
     /// <summary>
@@ -1208,7 +1208,7 @@ namespace Dap
     /// </summary>
     public sealed class SourceResponse : Response
     {
-        public override Dap.Command Command => Dap.Command.Source;
+        public sealed override Dap.Command Command => Dap.Command.Source;
     }
 
     /// <summary>
@@ -1216,7 +1216,7 @@ namespace Dap
     /// </summary>
     public sealed class ThreadsResponse : Response
     {
-        public override Dap.Command Command => Dap.Command.Threads;
+        public sealed override Dap.Command Command => Dap.Command.Threads;
     }
 
     /// <summary>
@@ -1226,7 +1226,7 @@ namespace Dap
     /// </summary>
     public sealed class TerminateThreadsResponse : Response
     {
-        public override Dap.Command Command => Dap.Command.TerminateThreads;
+        public sealed override Dap.Command Command => Dap.Command.TerminateThreads;
     }
 
     /// <summary>
@@ -1236,7 +1236,7 @@ namespace Dap
     /// </summary>
     public sealed class ModulesResponse : Response
     {
-        public override Dap.Command Command => Dap.Command.Modules;
+        public sealed override Dap.Command Command => Dap.Command.Modules;
     }
 
     /// <summary>
@@ -1246,7 +1246,7 @@ namespace Dap
     /// </summary>
     public sealed class LoadedSourcesResponse : Response
     {
-        public override Dap.Command Command => Dap.Command.LoadedSources;
+        public sealed override Dap.Command Command => Dap.Command.LoadedSources;
     }
 
     /// <summary>
@@ -1256,7 +1256,7 @@ namespace Dap
     /// </summary>
     public sealed class EvaluateResponse : Response
     {
-        public override Dap.Command Command => Dap.Command.Evaluate;
+        public sealed override Dap.Command Command => Dap.Command.Evaluate;
     }
 
     /// <summary>
@@ -1270,7 +1270,7 @@ namespace Dap
     /// </summary>
     public sealed class SetExpressionResponse : Response
     {
-        public override Dap.Command Command => Dap.Command.SetExpression;
+        public sealed override Dap.Command Command => Dap.Command.SetExpression;
     }
 
     /// <summary>
@@ -1282,7 +1282,7 @@ namespace Dap
     /// </summary>
     public sealed class StepInTargetsResponse : Response
     {
-        public override Dap.Command Command => Dap.Command.StepInTargets;
+        public sealed override Dap.Command Command => Dap.Command.StepInTargets;
     }
 
     /// <summary>
@@ -1294,7 +1294,7 @@ namespace Dap
     /// </summary>
     public sealed class GotoTargetsResponse : Response
     {
-        public override Dap.Command Command => Dap.Command.GotoTargets;
+        public sealed override Dap.Command Command => Dap.Command.GotoTargets;
     }
 
     /// <summary>
@@ -1304,7 +1304,7 @@ namespace Dap
     /// </summary>
     public sealed class CompletionsResponse : Response
     {
-        public override Dap.Command Command => Dap.Command.Completions;
+        public sealed override Dap.Command Command => Dap.Command.Completions;
     }
 
     /// <summary>
@@ -1314,7 +1314,7 @@ namespace Dap
     /// </summary>
     public sealed class ExceptionInfoResponse : Response
     {
-        public override Dap.Command Command => Dap.Command.ExceptionInfo;
+        public sealed override Dap.Command Command => Dap.Command.ExceptionInfo;
     }
 
     /// <summary>
@@ -1324,7 +1324,7 @@ namespace Dap
     /// </summary>
     public sealed class ReadMemoryResponse : Response
     {
-        public override Dap.Command Command => Dap.Command.ReadMemory;
+        public sealed override Dap.Command Command => Dap.Command.ReadMemory;
     }
 
     /// <summary>
@@ -1334,7 +1334,7 @@ namespace Dap
     /// </summary>
     public sealed class WriteMemoryResponse : Response
     {
-        public override Dap.Command Command => Dap.Command.WriteMemory;
+        public sealed override Dap.Command Command => Dap.Command.WriteMemory;
     }
 
     /// <summary>
@@ -1344,7 +1344,7 @@ namespace Dap
     /// </summary>
     public sealed class DisassembleResponse : Response
     {
-        public override Dap.Command Command => Dap.Command.Disassemble;
+        public sealed override Dap.Command Command => Dap.Command.Disassemble;
     }
 
     /// <summary>
@@ -1352,6 +1352,6 @@ namespace Dap
     /// </summary>
     public sealed class LocationsResponse : Response
     {
-        public override Dap.Command Command => Dap.Command.Locations;
+        public sealed override Dap.Command Command => Dap.Command.Locations;
     }
 }

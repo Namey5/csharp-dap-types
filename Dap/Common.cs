@@ -112,7 +112,7 @@ namespace Dap
     [JsonObject, JsonConverter(typeof(Request.Converter))]
     public abstract partial class Request : ProtocolMessage
     {
-        public override Dap.MessageType MessageType => MessageType.Request;
+        public sealed override Dap.MessageType MessageType => MessageType.Request;
 
         /// <summary>
         /// The command to execute.
@@ -189,7 +189,7 @@ namespace Dap
     [JsonObject, JsonConverter(typeof(Response.Converter))]
     public abstract partial class Response : ProtocolMessage
     {
-        public override Dap.MessageType MessageType => MessageType.Response;
+        public sealed override Dap.MessageType MessageType => MessageType.Response;
 
         /// <summary>
         /// The command requested.
@@ -296,8 +296,8 @@ namespace Dap
     /// </summary>
     public sealed class ErrorResponse : Response<ErrorResponseBody>
     {
-        public override bool Success => false;
-        public override Dap.Command Command { get; }
+        public sealed override bool Success => false;
+        public sealed override Dap.Command Command { get; }
 
         /// <summary>
         /// Default constructor - should only be used when deserializing from json.
@@ -353,7 +353,7 @@ namespace Dap
     [JsonObject, JsonConverter(typeof(Event.Converter))]
     public abstract partial class Event : ProtocolMessage
     {
-        public override Dap.MessageType MessageType => MessageType.Event;
+        public sealed override Dap.MessageType MessageType => MessageType.Event;
 
         /// <summary>
         /// Type of event.

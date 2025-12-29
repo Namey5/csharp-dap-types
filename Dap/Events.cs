@@ -114,7 +114,7 @@ namespace Dap
     /// </summary>
     public sealed class InitializedEvent : Event
     {
-        public override Dap.EventType EventType => Dap.EventType.Initialized;
+        public sealed override Dap.EventType EventType => Dap.EventType.Initialized;
     }
 
     /// <summary>
@@ -124,7 +124,7 @@ namespace Dap
     /// </summary>
     public sealed class StoppedEvent : Event<StoppedEventBody>
     {
-        public override Dap.EventType EventType => Dap.EventType.Stopped;
+        public sealed override Dap.EventType EventType => Dap.EventType.Stopped;
     }
 
     /// <summary>
@@ -136,7 +136,7 @@ namespace Dap
     /// </summary>
     public sealed class ContinuedEvent : Event<ContinuedEventBody>
     {
-        public override Dap.EventType EventType => Dap.EventType.Continued;
+        public sealed override Dap.EventType EventType => Dap.EventType.Continued;
     }
 
     /// <summary>
@@ -144,7 +144,7 @@ namespace Dap
     /// </summary>
     public sealed class ExitedEvent : Event<ExitedEventBody>
     {
-        public override Dap.EventType EventType => Dap.EventType.Exited;
+        public sealed override Dap.EventType EventType => Dap.EventType.Exited;
     }
 
     /// <summary>
@@ -152,7 +152,7 @@ namespace Dap
     /// </summary>
     public sealed class TerminatedEvent : Event<TerminatedEventBody>
     {
-        public override Dap.EventType EventType => Dap.EventType.Terminated;
+        public sealed override Dap.EventType EventType => Dap.EventType.Terminated;
     }
 
     /// <summary>
@@ -160,7 +160,7 @@ namespace Dap
     /// </summary>
     public sealed class ThreadEvent : Event<ThreadEventBody>
     {
-        public override Dap.EventType EventType => Dap.EventType.Thread;
+        public sealed override Dap.EventType EventType => Dap.EventType.Thread;
     }
 
     /// <summary>
@@ -168,7 +168,7 @@ namespace Dap
     /// </summary>
     public sealed class OutputEvent : Event<OutputEventBody>
     {
-        public override Dap.EventType EventType => Dap.EventType.Output;
+        public sealed override Dap.EventType EventType => Dap.EventType.Output;
     }
 
     /// <summary>
@@ -176,7 +176,7 @@ namespace Dap
     /// </summary>
     public sealed class BreakpointEvent : Event<BreakpointEventBody>
     {
-        public override Dap.EventType EventType => Dap.EventType.Breakpoint;
+        public sealed override Dap.EventType EventType => Dap.EventType.Breakpoint;
     }
 
     /// <summary>
@@ -184,7 +184,7 @@ namespace Dap
     /// </summary>
     public sealed class ModuleEvent : Event<ModuleEventBody>
     {
-        public override Dap.EventType EventType => Dap.EventType.Module;
+        public sealed override Dap.EventType EventType => Dap.EventType.Module;
     }
 
     /// <summary>
@@ -192,7 +192,7 @@ namespace Dap
     /// </summary>
     public sealed class LoadedSourceEvent : Event<LoadedSourceEventBody>
     {
-        public override Dap.EventType EventType => Dap.EventType.LoadedSource;
+        public sealed override Dap.EventType EventType => Dap.EventType.LoadedSource;
     }
 
     /// <summary>
@@ -200,7 +200,7 @@ namespace Dap
     /// </summary>
     public sealed class ProcessEvent : Event<ProcessEventBody>
     {
-        public override Dap.EventType EventType => Dap.EventType.Process;
+        public sealed override Dap.EventType EventType => Dap.EventType.Process;
     }
 
     /// <summary>
@@ -214,7 +214,7 @@ namespace Dap
     /// </summary>
     public sealed class CapabilitiesEvent : Event<CapabilitiesEventBody>
     {
-        public override Dap.EventType EventType => Dap.EventType.Capabilities;
+        public sealed override Dap.EventType EventType => Dap.EventType.Capabilities;
     }
 
     /// <summary>
@@ -226,7 +226,7 @@ namespace Dap
     /// </summary>
     public sealed class ProgressStartEvent : Event<ProgressStartEventBody>
     {
-        public override Dap.EventType EventType => Dap.EventType.ProgressStart;
+        public sealed override Dap.EventType EventType => Dap.EventType.ProgressStart;
     }
 
     /// <summary>
@@ -238,7 +238,7 @@ namespace Dap
     /// </summary>
     public sealed class ProgressUpdateEvent : Event<ProgressUpdateEventBody>
     {
-        public override Dap.EventType EventType => Dap.EventType.ProgressUpdate;
+        public sealed override Dap.EventType EventType => Dap.EventType.ProgressUpdate;
     }
 
     /// <summary>
@@ -248,7 +248,7 @@ namespace Dap
     /// </summary>
     public sealed class ProgressEndEvent : Event<ProgressEndEventBody>
     {
-        public override Dap.EventType EventType => Dap.EventType.ProgressEnd;
+        public sealed override Dap.EventType EventType => Dap.EventType.ProgressEnd;
     }
 
     /// <summary>
@@ -260,7 +260,7 @@ namespace Dap
     /// </summary>
     public sealed class InvalidatedEvent : Event<InvalidatedEventBody>
     {
-        public override Dap.EventType EventType => Dap.EventType.Invalidated;
+        public sealed override Dap.EventType EventType => Dap.EventType.Invalidated;
     }
 
     /// <summary>
@@ -272,6 +272,6 @@ namespace Dap
     /// </summary>
     public sealed class MemoryEvent : Event<MemoryEventBody>
     {
-        public override Dap.EventType EventType => Dap.EventType.Memory;
+        public sealed override Dap.EventType EventType => Dap.EventType.Memory;
     }
 }

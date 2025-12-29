@@ -165,7 +165,7 @@ fn write_request_types(writer: &mut Writer, types: &[(String, &Object, String)])
         writer.line(format!("public sealed class {name} : {base}"));
         writer.scoped(|writer| {
             writer.line(format!(
-                "public override {NAMESPACE}.Command Command => {NAMESPACE}.Command.{command};"
+                "public sealed override {NAMESPACE}.Command Command => {NAMESPACE}.Command.{command};"
             ))
         });
     }
@@ -210,7 +210,7 @@ fn write_response_types(writer: &mut Writer, types: &[(String, &Object, String)]
         writer.line(format!("public sealed class {name} : {base}"));
         writer.scoped(|writer| {
             writer.line(format!(
-                "public override {NAMESPACE}.Command Command => {NAMESPACE}.Command.{command};"
+                "public sealed override {NAMESPACE}.Command Command => {NAMESPACE}.Command.{command};"
             ))
         });
     }
@@ -290,7 +290,7 @@ fn write_events(types: &[ProtocolType]) -> String {
             writer.line(format!("public sealed class {name} : {event_base}"));
             writer.scoped(|writer| {
                 writer.line(format!(
-                    "public override {NAMESPACE}.EventType EventType => {NAMESPACE}.EventType.{event};"
+                    "public sealed override {NAMESPACE}.EventType EventType => {NAMESPACE}.EventType.{event};"
                 ))
             });
         }
